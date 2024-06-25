@@ -708,6 +708,7 @@ def interfaceUserGroup():
             print("- interfaceUsersGroup - readPermission : " + str(read_permission), flush=True)
             print("- interfaceUsersGroup - group : " + str(group), flush=True)
             print("- interfaceUsersGroup - user : " + str(user), flush=True)
+            print("--")
 
             return redirect(url_for('interfaceUserGroup'))
 
