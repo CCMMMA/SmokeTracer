@@ -11,7 +11,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/css/Login-Form-Basic-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/VentasPro-Login.css') }}">
-    <link rel="stylesheet" href="http://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+    <link rel="stylesheet" href="http://unpkg.com/leaflet@1.4.0/dist/leaflet.css">
 
     <style>
         .evidenziato {
@@ -230,9 +232,11 @@
         <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/KML.js') }}"></script>
+        <!--
         <script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/source/TileWMS.js"></script>
         <script src="http://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+        -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> <!-- utile per la gestione della data per i file kml -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.6.0/tinycolor.min.js"></script> <!-- libreria utile per la generazione di un colore randomico in esadecimale -->
     
@@ -250,17 +254,33 @@
             var map = new ol.Map({
                 target: 'map',
                 layers: [
+
                     new ol.layer.Tile({
                         source: new ol.source.XYZ({
-                            url: 'https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key=yNolbzVOYm8BH5d911a9' 
+                            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                            //url: 'https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}.png'
+                            //url: 'https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key=yNolbzVOYm8BH5d911a9' 
                         }),
                     }),
+
+                    new ol.layer.Vector({
+                        source: new ol.source.Vector({
+                        url: '/static/limits_comuni/limits_IT_municipalities.geojson',
+                        format: new ol.format.GeoJSON()
+                        })
+                    })
                 ],
                 view: new ol.View({
                     center: [0, 0],
                     zoom: 0,
                 })
             });
+
+            const fullScreenControl = new ol.control.FullScreen();
+            map.addControl(fullScreenControl);
+
+            const rotateMap = new ol.interaction.DragRotateAndZoom();
+            map.addInteraction(rotateMap);
 
             output.innerHTML = slider.value;
             slider.oninput = function() {
