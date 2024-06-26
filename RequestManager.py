@@ -19,12 +19,16 @@ import requests
 import random
 import time
 import json
+import psycopg2
 # Custom Import
+from pymongo import MongoClient
+from psycopg2 import sql
 from DBManager import DBProxy, DBManager
 from SbatchManager import SbatchManager
 from NcDumper import NCODump
 from ParserManager import Parser
 from DagonOnServiceManager import DagonOnServiceManager
+from SpatialQueryManager import SpatialQueryManager
 
 ##############
 ##  INIT   ##
@@ -59,6 +63,53 @@ mail = Mail(app)
 ##############
 ## HELPERS ##
 #############
+
+def inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql):
+    # create a table with 2 fields : long_name (text) - box (geometry-polygon - projection 4326)
+    cur = client_postgresql.cursor()
+
+    create_table_query = sql.SQL("""
+    CREATE TABLE IF NOT EXISTS comune (
+        id INT PRIMARY KEY,
+        nome_comune TEXT,
+        box GEOMETRY(Polygon, 4326)
+    )
+    """)
+
+    cur.execute(create_table_query)
+    cur.close()
+    client_postgresql.commit()
+
+    # extracting collection places from MONGODB
+    db = client_mongodb['test-db']
+    collection = db['places']
+    places = collection.find()
+
+    id_test = 0
+
+    for place in places:
+
+        # step 1 : extracting name and bounding box form 'places' collection from mongodb
+        long_name = place['long_name']['it']
+        bounding_box = place['bbox']
+
+        # step 2
+        # create a new tupla with long_name and bounding_box extracted
+        # insert the new tupla into the table in postgresql
+        polygon_wkt = f"POLYGON(({', '.join([f'{x} {y}' for x, y in bounding_box['coordinates']])}))"
+        cur = client_postgresql.cursor()
+        query = sql.SQL("INSERT INTO comune (id, nome_comune, box) VALUES (%s, %s, ST_GeomFromText(%s))")
+        # if long_name == "Comune di Valverde" or long_name == "Comune di Calliano":
+        #    pass
+        # else:
+        cur.execute(query, [id_test, long_name, polygon_wkt])
+        id_test+=1
+        print("[*] Insert : " + long_name + " -- box : " + str(bounding_box['coordinates']), flush=True)
+        cur.close()
+        client_postgresql.commit()
+
+    print("[*] Municipalities table created and populated", flush=True)
+
 
 # Simple function used to redirect an user to the correct page
 def redirect_to_dashboard(user):
@@ -1403,6 +1454,21 @@ if __name__ == "__main__":
     # Secret app key for session cookies (each time we restart the server, a new key is created:
     # doing so, all the cookies will be deleted and the user will need to sign in and create them again)
     app.secret_key = secrets.token_hex()
+
+    conn_params = {
+            "host": "db",
+            "database": "citizix_db",
+            "user": "citizix_user",
+            "password": "S3cret",
+            'port': '5432'
+        }
+
+    client_postgresql = psycopg2.connect(**conn_params)
+
+    client_mongodb = MongoClient("mongodb://db_mongo:27017/")
+
+    inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql)
+    
 
     # Running app at the specified port
     #app.run(debug=True, port=port)

@@ -13,90 +13,7 @@ conn_params = {
 
 client_postgresql = psycopg2.connect(**conn_params)
 
-client_mongodb = MongoClient("mongodb://localhost:27017/")
-
-
-def inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql):
-
-    # create a table with 2 fields : long_name (text) - box (geometry-polygon - projection 4326)
-    cur = client_postgresql.cursor()
-
-    create_table_query = sql.SQL("""
-    CREATE TABLE IF NOT EXISTS comune (
-        id INT PRIMARY KEY,
-        nome_comune TEXT,
-        box GEOMETRY(Polygon, 4326)
-    )
-    """)
-
-    cur.execute(create_table_query)
-    cur.close()
-    client_postgresql.commit()
-
-    # extracting collection places from MONGODB
-    db = client_mongodb['test-db']
-    collection = db['places']
-    places = collection.find()
-
-    id_test = 0
-
-    for place in places:
-
-        # step 1 : extracting name and bounding box form 'places' collection from mongodb
-        long_name = place['long_name']['it']
-        bounding_box = place['bbox']
-
-        # step 2
-        # create a new tupla with long_name and bounding_box extracted
-        # insert the new tupla into the table in postgresql
-        polygon_wkt = f"POLYGON(({', '.join([f'{x} {y}' for x, y in bounding_box['coordinates']])}))"
-        cur = client_postgresql.cursor()
-        query = sql.SQL("INSERT INTO comune (id, nome_comune, box) VALUES (%s, %s, ST_GeomFromText(%s))")
-        # if long_name == "Comune di Valverde" or long_name == "Comune di Calliano":
-        #    pass
-        # else:
-        cur.execute(query, [id_test, long_name, polygon_wkt])
-        id_test+=1
-        print("[*] Insert : " + long_name + " -- box : " + str(bounding_box['coordinates']))
-        cur.close()
-        client_postgresql.commit()
-
-    print("[*] Municipalities table created and populated")
-
-
-'''
-def read_polygon_from_kml(name_file):
-
-    namespace = {"ns": nsmap[None]}
-    coordinates_list_out = []
-    coordinates_list_out2 = []
-
-    with open(name_file) as f:
-        root = parser.parse(f).getroot()
-        pms = root.xpath(".//ns:Placemark[.//ns:LineString]",   namespaces=namespace)
-
-        for pm in pms:
-
-            string_coordinates = pm.LineString.coordinates
-
-            
-            print("[*] LineString ------------------------- ")
-            print(string_coordinates)
-            print("[*] LineString ------------------------- ")
-            
-
-            coordinates_list = str(string_coordinates).split()
-            # Itera attraverso le coppie di coordinate e aggiungi all'array
-            for coordinate_pair in coordinates_list:
-                lon, lat = coordinate_pair.split(',')
-                coordinates_list_out.append([float(lon), float(lat)])
-
-            coordinates_list_out2.append(coordinates_list_out)
-            # print("Array di coordinate:")
-            # print(coordinates_array)
-    return coordinates_list_out2
-
-
+client_mongodb = MongoClient("mongodb://container_mongodb_FUMI2:27017/")
 
 class HandlerSpatialQuery:
 
@@ -104,6 +21,81 @@ class HandlerSpatialQuery:
 
     def __init__(self, client_postgresql) -> None:
         self.client_postgresql = client_postgresql
+
+    def read_polygon_from_kml(name_file):
+        namespace = {"ns": nsmap[None]}
+        coordinates_list_out = []
+        coordinates_list_out2 = []
+
+        with open(name_file) as f:
+            root = parser.parse(f).getroot()
+            pms = root.xpath(".//ns:Placemark[.//ns:LineString]",   namespaces=namespace)
+
+            for pm in pms:
+
+                string_coordinates = pm.LineString.coordinates
+                
+                print("[*] LineString ------------------------- ")
+                print(string_coordinates)
+                print("[*] LineString ------------------------- ")
+                
+                coordinates_list = str(string_coordinates).split()
+                # Itera attraverso le coppie di coordinate e aggiungi all'array
+                for coordinate_pair in coordinates_list:
+                    lon, lat = coordinate_pair.split(',')
+                    coordinates_list_out.append([float(lon), float(lat)])
+
+                coordinates_list_out2.append(coordinates_list_out)
+                # print("Array di coordinate:")
+                # print(coordinates_array)
+        return coordinates_list_out2
+
+    
+    def inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql):
+        # create a table with 2 fields : long_name (text) - box (geometry-polygon - projection 4326)
+        cur = client_postgresql.cursor()
+
+        create_table_query = sql.SQL("""
+        CREATE TABLE IF NOT EXISTS comune (
+            id INT PRIMARY KEY,
+            nome_comune TEXT,
+            box GEOMETRY(Polygon, 4326)
+        )
+        """)
+
+        cur.execute(create_table_query)
+        cur.close()
+        client_postgresql.commit()
+
+        # extracting collection places from MONGODB
+        db = client_mongodb['test-db']
+        collection = db['places']
+        places = collection.find()
+
+        id_test = 0
+
+        for place in places:
+
+            # step 1 : extracting name and bounding box form 'places' collection from mongodb
+            long_name = place['long_name']['it']
+            bounding_box = place['bbox']
+
+            # step 2
+            # create a new tupla with long_name and bounding_box extracted
+            # insert the new tupla into the table in postgresql
+            polygon_wkt = f"POLYGON(({', '.join([f'{x} {y}' for x, y in bounding_box['coordinates']])}))"
+            cur = client_postgresql.cursor()
+            query = sql.SQL("INSERT INTO comune (id, nome_comune, box) VALUES (%s, %s, ST_GeomFromText(%s))")
+            # if long_name == "Comune di Valverde" or long_name == "Comune di Calliano":
+            #    pass
+            # else:
+            cur.execute(query, [id_test, long_name, polygon_wkt])
+            id_test+=1
+            print("[*] Insert : " + long_name + " -- box : " + str(bounding_box['coordinates']))
+            cur.close()
+            client_postgresql.commit()
+
+        print("[*] Municipalities table created and populated")
 
     def spatial_query_point(self, lon, lat):
         cur = self.client_postgresql.cursor()
@@ -137,23 +129,21 @@ class HandlerSpatialQuery:
                 result_filtrated.append(place)
 
         return result_filtrated
+
+
+
 '''
-
-
 if __name__ == '__main__':
 
     inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql)
-
     
     # postgresql_query_handler = HandlerSpatialQuery(client_postgresql)
 
-    '''
     result_query_point = postgresql_query_handler.spatial_query_point(14.2681, 40.8518)
 
     print("[*] point spatial query : ")
     for i in result_query_point:
         print("Common : " + str(i))
-
 
     port_of_naples_bbox = [
         [14.235, 40.8245],
@@ -183,13 +173,13 @@ if __name__ == '__main__':
     print("[*] box spatial query - campania :")
     for i in result_query_box2:
         print("Common : " + str(i[1]))
-    '''
+    
 
     # result_linestring = read_polygon_from_kml('/mydata.kml')
     # print(result_linestring)
     # print(str(type(result_linestring)))
 
-    '''
+    
     query_result = postgresql_query_handler.spazial_query_box(result_linestring[-1])
 
     for i in query_result:

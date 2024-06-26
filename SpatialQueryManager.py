@@ -1,9 +1,12 @@
+
+
 class SpatialQueryManager:
 
     client_postgresql = None
 
     def __init__(self, client_postgresql) -> None:
         self.client_postgresql = client_postgresql
+    
 
     def spatial_query_point(self, lon, lat):
         cur = self.client_postgresql.cursor()

@@ -89,11 +89,11 @@ class DBManager():
     def connect(self, dbpath):
         
         db_params = {
-            'host': 'db',  # Il nome del container PostgreSQL nella stessa rete
+            'host': 'db',  
             'database': 'citizix_db',
             'user': 'citizix_user',
             'password': 'S3cret',
-            'port': '5432',  # Assicurati che la porta corrisponda alla configurazione del tuo container PostgreSQL
+            'port': '5432',
         }
 
         try:
