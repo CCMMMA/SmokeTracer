@@ -93,7 +93,7 @@ class DBManager():
             'database': 'citizix_db',
             'user': 'citizix_user',
             'password': 'S3cret',
-            'port': '5432',
+            'port': '5433',
         }
 
         try:

@@ -1,5 +1,4 @@
 
-
 class SpatialQueryManager:
 
     client_postgresql = None
