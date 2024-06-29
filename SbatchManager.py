@@ -3,6 +3,7 @@ import time
 import subprocess
 import threading
 import re
+import geopandas as gpd
 
 from werkzeug.security import safe_join
 from shutil import copyfile, copytree, rmtree
@@ -12,6 +13,7 @@ from datetime import date
 from ParserManager import Parser, JOBINFO
 from datetime import datetime
 from SpatialQueryManager import SpatialQueryManager
+
 
 
 class SbatchManager():
@@ -46,8 +48,22 @@ class SbatchManager():
         subprocess.run(['mkdir', '{}/tmp_script_lunch'.format(script_path)])
         subprocess.run(['cp', '{}/lunch_remote_job.sh'.format(script_path), '{}/tmp_script_lunch/lunch_remote_job_{}.sh'.format(script_path, millis)])
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "USER", user)
-        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "DATE", formatted_date_for_user_dir)
-        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "ID", millis)
+        # self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "DATE", formatted_date_for_user_dir)
+
+
+        gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
+        comune_name = params[5]
+        print("-sbatch manager - comune_name : " + comune_name, flush=True)
+
+        cod_com = gdf.loc[gdf['COMUNE'] == comune_name, 'COD_COM'].values
+        if cod_com.size > 0:
+            print(f"Il codice COD_COM per il comune {comune_name} è {cod_com[0]}", flush=True)
+        else:
+            print(f"Comune {comune_name} non trovato nel file.", flush=True)
+
+        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "CODICECOMUNE", cod_com[0])
+
+        # self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "ID", millis)
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "LON", params[6])
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "LAT", params[7])
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "TEMPERATURE", params[8])
@@ -80,6 +96,9 @@ class SbatchManager():
                 print(f'[*] ID estratto: {id_value}', flush=True)
                 
                 subprocess.run(['rm', 'tmp/{}/out_from_job_{}_runcmd_{}.txt'.format(user, user, var_millis)])
+                path_old = 'static/smoketracer/' + user + '/' + user + '-' + cod_com[0] + '/out' 
+                path_new = 'static/smoketracer/' + user + '/' + user + '-' + cod_com[0] + '/' + id_value
+                subprocess.run(['mv', path_old, path_new])
                 return id_value
         else:
             print('[*] ID non trovato nel file.', flush=True)
@@ -136,6 +155,8 @@ class SbatchManager():
         subprocess.run(['cp', '{}/lunch_remote_job.sh'.format(script_path), '{}/lunch_remote_job_var.sh'.format(script_path)])
         self.substitute("{}/lunch_remote_job.sh".format(script_path), "USER", user)
         self.substitute("{}/lunch_remote_job.sh".format(script_path), "DATE", formatted_date_for_user_dir)
+
+
         self.substitute("{}/lunch_remote_job.sh".format(script_path), "ID", millis)
         
         self.substitute("{}/lunch_remote_job.sh".format(script_path), "LON", params[5])

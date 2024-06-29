@@ -14,7 +14,7 @@
     <style>
         .evidenziato {
            background-color: yellow !important;
-       }
+        }
    </style>
 </head>
 
@@ -182,13 +182,15 @@
     <script src="{{ url_for('static', filename='js/adminutils.js') }}"></script>
     <script>
         function evidenziaRiga(riga) {
+
+            // evidenzia la riga 
             var righe = document.querySelectorAll('tr');
             righe.forEach(function(row) {
                 row.classList.remove('evidenziato');
             });
             riga.classList.add('evidenziato');
 
-
+            // effettua altre operazioni 
             console.log("riga : ", riga);
             let name_group = riga.cells[0].textContent;
             console.log("name_group : ", name_group);

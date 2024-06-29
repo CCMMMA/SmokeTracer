@@ -54,14 +54,13 @@ app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-#app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
+#app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True) da decommentare quando si usa https 
 mail = Mail(app)
 
 ##############
 ## HELPERS ##
 #############
 
-# Simple function used to redirect an user to the correct page
 def redirect_to_dashboard(user):
 
     # Istanciate a db object to perform queries
@@ -75,7 +74,6 @@ def redirect_to_dashboard(user):
     else: 
         return redirect(url_for('dashboard'))
 
-# Simple function that validates an user string containing a regular expression
 def validate_string(string, pattern="[a-zA-Z0-9._]"):
     """
     This function takes a string and uses a regular expression pattern to validate its format.
@@ -100,8 +98,6 @@ def validate_password(string, pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A
     else: 
         return False
 
-# Simple function that will generate an unique link for the registration/password form 
-# given an username 
 def generate_unique_link(username, route):
 
     # We first generate an unique link and an encoded user
@@ -581,6 +577,7 @@ def storico():
         permissions = db.get_permission_of_group(user, group[0])
         if permission[0] == True:
             jobs_of_user_group = db.fetch_user_group(user, group[0])
+            print("- storico - jobs return to db query : " + str(jobs_of_user_group),  flush=True)
             for jobs_var in jobs_of_user_group:
                 jobs.append(jobs_var)
         '''
@@ -640,7 +637,6 @@ def getPermissionsUser():
     print("- getPermissionsUser - user : " + str(session['user']), flush=True)
     print("- getPermissionsUser - group : " + str(group), flush=True)
     return jsonify(db.get_permission_of_group(user, group))
-
 
 @app.route('/interfaceUserGroup', methods=['POST', 'GET'])
 def interfaceUserGroup():
@@ -1136,7 +1132,7 @@ def registration(unique_id):
                 return redirect(url_for('login'))
 
     # render the registation form
-    return render_template('registrationform.html')
+    return render_template('registrationform.html', user=session['user'])
 
 @app.route('/ripristino/<unique_id>', methods=['GET', 'POST'])
 def restoration(unique_id):
@@ -1405,8 +1401,5 @@ if __name__ == "__main__":
     # doing so, all the cookies will be deleted and the user will need to sign in and create them again)
     app.secret_key = secrets.token_hex()
 
-    # Running app at the specified port
-    #app.run(debug=True, port=port)
-    # app.run(debug=True, port=port, host='0.0.0.0')
     print("PORT : " + str(port), flush=True) 
     app.run(debug=True, host='0.0.0.0', port=port)

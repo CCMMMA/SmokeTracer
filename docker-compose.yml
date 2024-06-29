@@ -10,10 +10,9 @@ services:
     volumes:
       - /storage/ccmmma/prometeo/data/opendap/pippo/smoketracer:/home/fumi2/FUMI2/static/smoketracer
     # -  /home/d.caramiello/FUMI2/src/root:/home/fumi2/FUMI2/dati_prova
-    restart: always
     depends_on:
       - db
-      - db_mongo
+    #  - db_mongo
     networks:
       - net_FUMI2
   
@@ -25,31 +24,25 @@ services:
       - POSTGRES_PASSWORD=S3cret
       - POSTGRES_USER=citizix_user
       - POSTGRES_DB=citizix_db
-    volumes:
-      - /home/d.caramiello/SmokeTracer/FUMI2.sql:/docker-entrypoint-initdb.d/FUMI2.sql
-    # restart: always
-    networks:
-      - net_FUMI2
-    
-  db_mongo:
-    container_name: container_mongodb_FUMI2
-    build:
-      dockerfile: Dockerfile-mongodb
+    #volumes:
+    #  - /home/d.caramiello/SmokeTracer/FUMI2.sql:/docker-entrypoint-initdb.d/FUMI2.sql
     restart: always
     networks:
       - net_FUMI2
-
-  #sqlite3:
-  #  container_name: container_SQLite3_FUMI2
-  #  image: nouchka/sqlite3:latest
-  #  stdin_open: true
-  #  tty: true
-  #  volumes:
-  #    - /home/d.caramiello/FUMI2/src/gdal/sqlite-autoconf-3400100/fumi2new.db:/root/db/fumi2new.db
-  #    - /home/d.caramiello/FUMI2/src/gdal/sqlite-autoconf-3400100/FUMI2.sql:/root/db/FUMI2.sql
-  #  command: [".open /root/db/fumi2new.db"]
+  
+  # obbiettivo usare mongo db per fare resotre dei places e utilizzare quei dati per creare una collezione places per postgresql 
+  # l'idea è che all'avvio del container , manualmente :
+  # 1) entrare nel container di fumi2 e lanciare lo script python 'inizialize_spatial_queries_dbs.py'
+  # 2) uscire dal container e killare il container di mongo db 
+  
+  #db_mongo:
+  #  container_name: container_mongodb_FUMI2
+  #  build:
+  #    dockerfile: Dockerfile-mongodb
+  #  restart: always
   #  networks:
   #    - net_FUMI2
+  
 
 networks:
   net_FUMI2:

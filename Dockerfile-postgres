@@ -12,6 +12,6 @@ RUN apt-get install -y postgresql-14-postgis-3
 
 # RUN chmod +x /FUMI2/backup_db_postgres/backup_script.sh && echo "0 20 * * * /FUMI2/backup_db_postgres/backup_script.sh" | crontab -
 
-COPY postgresql.conf /postgresql.conf
+COPY FUMI2.sql /docker-entrypoint-initdb.d/FUMI2.sql
  
 CMD ["/usr/local/bin/docker-entrypoint.sh","postgres"]

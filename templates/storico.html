@@ -88,7 +88,7 @@
                     <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><small class="form-text fs-4 fw-semibold" style="width: 2348.234px;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
                         <ul class="navbar-nav flex-nowrap ms-auto">
                             <div class="d-none d-sm-block topbar-divider"></div>
-                        </ul><small class="form-text" style="margin-left: 0px;width: 450.1641px; font-weight:bold"><h4><b>{{ user }}</b></h4></small><a href="{{ url_for('logout') }}" class="btn btn-primary" style="white-space: nowrap; text-align: center;">Log Out</a>
+                        </ul><small class="form-text" style="margin-left: 0px;width: 450.1641px; font-weight:bold"><h4><b id="name_user_label">{{ user }}</b></h4></small><a href="{{ url_for('logout') }}" class="btn btn-primary" style="white-space: nowrap; text-align: center;">Log Out</a>
                     </div>
                 </nav>
                 <div class="container-fluid">
@@ -133,7 +133,7 @@
                                         </thead>
                                         <tbody>
                                             {% for job in jobs %}
-                                            <tr>
+                                            <tr onclick="evidenziaRiga(this)">
                                                 <td>{{ job[0] }}</td>
                                                 <td>{{ job[1] }}</td>
                                                 <td>{{ job[2] }}</td>
@@ -144,7 +144,7 @@
                                                 <td>{{ job[7] }}</td>
                                                 <td>{{ job[8] }}</td>
                                                 <td>{{ job[9] }}</td>
-                                                <td>{{ job[10] }}</td>
+                                                <td>{{ job[11] }}</td>
                                                 
                                                 <!-- <form action="{{ url_for('download') }}" method="post"> -->
                                                 <td>
@@ -164,7 +164,7 @@
                                                         <button class="btn btn-danger" type="submit" name="hdeletebutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Elimina&nbsp;<i class="fas fa-eraser"></i>&nbsp;</button>
                                                     </form>
                                                 </td>
-                                                <td style="display: none;">{{job[11]}}</td>
+                                                <td style="display: none;">{{job[12]}}</td>
 
                                                 
                                             </tr>
@@ -522,7 +522,18 @@
                         });
 
                     map.addLayer(vectorLayer);
-                    console.log("flag_buffer section completed")
+                    
+                    /*
+                    // aggiunge i confini dei comuni sulla mappa
+                    let borders = new ol.layer.Vector({
+                        source: new ol.source.Vector({
+                        url: '/static/limits_comuni/limits_IT_municipalities.geojson',
+                        format: new ol.format.GeoJSON()
+                        })
+                    })
+                    map.addLayer(borders);
+                    */
+                    
                 }
                 
                 // Controllo del buffer da 3km
@@ -692,10 +703,10 @@
                     console.log("BUFFER [3km] : Added to map")
                 }
 
-map.addLayer(targetVectorLayer);  
-document.getElementById("data_ora").innerText = i.toString();
-console.log("Ora successiva - load kml path : ", '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + i ).toString().padStart(2, '0') + ".kml");
-}
+                map.addLayer(targetVectorLayer);  
+                document.getElementById("data_ora").innerText = i.toString();
+                console.log("Ora successiva - load kml path : ", '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + i ).toString().padStart(2, '0') + ".kml");
+            }
 
             function previousKML(){
 
@@ -842,6 +853,29 @@ console.log("Ora successiva - load kml path : ", '/static/KML/' + "{{session['us
                 }
             }
             
+            function evidenziaRiga(riga) {
+                var righe = document.querySelectorAll('tr');
+                righe.forEach(function(row) {
+                    row.classList.remove('evidenziato');
+                });
+                riga.classList.add('evidenziato');
+                let name_user = document.getElementById('name_user_label').textContent
+
+                path_storage_user = '/static/smoketracer/' + name_user + '/' + name_user + '-' + riga.cells[1].value 
+                console.log("path_storage_user ", path_storage_user);
+
+                /*
+                var targetVectorLayer = new ol.layer.Vector({
+                    source: new ol.source.Vector({
+                        // url: '/static/KML/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}")).toString().padStart(2, '0') + ".kml",
+                        url: '/static/KML/out_job/' + data + "Z" + (parseInt(oraInizio)).toString().padStart(2, '0') + ".kml",
+                        // url: '/static/KML/' + "{{session['path_show_kml']}}" + '-out/out_job/' + data + 'Z' + (parseInt("{{ session['ora_inizio'] }}")).toString().padStart(2, '0') + '.kml',
+                        format: new ol.format.KML()
+                    })
+                });
+                */
+
+            }
         </script>
 </body>
 </html>

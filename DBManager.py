@@ -92,8 +92,7 @@ class DBManager():
             'host': 'db',  
             'database': 'citizix_db',
             'user': 'citizix_user',
-            'password': 'S3cret',
-            'port': '5433',
+            'password': 'S3cret'
         }
 
         try:
@@ -363,15 +362,25 @@ class DBProxy():
         return self.__db.execute(query)
     
     def fetch_user_group(self, user, group):
-        query = '''SELECT NAME_SIM,\"DATE\",\"TIME\",DURATION,COMMON,LONG,LAT,TEMPERATURE,CODICE_GISA,JOBINFO.JOBID,SIMULATION_GROUP.NAME_GROUP,JOBINFO.SEARCH_FIELD
-                    FROM JOBINFO 
-                    JOIN JOBS ON JOBINFO.JOBID=JOBS.JOBID 
-                    JOIN \"USER\" ON JOBS.USERNAME=\"USER\".USERNAME 
-                    JOIN SIMULATION_GROUP ON JOBINFO.JOBID = SIMULATION_GROUP.JOBID
-                    JOIN GROUPS ON SIMULATION_GROUP.NAME_GROUP = GROUPS.NAME_GROUP
-                    WHERE \"USER\".USERNAME=\'{}\' AND GROUPS.NAME_GROUP=\'{}\' ;
-                '''.format(user, group)        
-        # returns values
+        
+        #query = '''SELECT NAME_SIM,\"DATE\",\"TIME\",DURATION,COMMON,LONG,LAT,TEMPERATURE,CODICE_GISA,JOBINFO.JOBID,SIMULATION_GROUP.NAME_GROUP,JOBINFO.SEARCH_FIELD
+        #            FROM JOBINFO 
+        #            JOIN JOBS ON JOBINFO.JOBID=JOBS.JOBID 
+        #            JOIN \"USER\" ON JOBS.USERNAME=\"USER\".USERNAME 
+        #            JOIN SIMULATION_GROUP ON JOBINFO.JOBID = SIMULATION_GROUP.JOBID
+        #            JOIN GROUPS ON SIMULATION_GROUP.NAME_GROUP = GROUPS.NAME_GROUP
+        #            WHERE \"USER\".USERNAME=\'{}\' AND GROUPS.NAME_GROUP=\'{}\' ;
+        #        '''.format(user, group) 
+
+        query = '''
+        SELECT JI.NAME_SIM, JI."DATE", JI."TIME", JI.DURATION, JI.COMMON, JI.LONG, JI.LAT, JI.TEMPERATURE, JI.CODICE_GISA, J.JOBID, JI.SEARCH_FIELD, (SELECT STRING_AGG(SG.NAME_GROUP, ', ')
+                                                                                                                                                      FROM SIMULATION_GROUP SG
+                                                                                                                                                      WHERE SG.JOBID = J.JOBID) AS GROUPS
+        FROM 
+            "USER" U JOIN JOBS J ON U.USERNAME = J.USERNAME JOIN JOBINFO JI ON J.JOBID = JI.JOBID
+        WHERE 
+            U.USERNAME = \'{}\';'''.format(user)
+ 
         return self.__db.execute(query)
         
     # Simple function that given a jobid, will return the output path associated 
