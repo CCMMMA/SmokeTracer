@@ -373,14 +373,15 @@ class DBProxy():
         #        '''.format(user, group) 
 
         query = '''
-        SELECT JI.NAME_SIM, JI."DATE", JI."TIME", JI.DURATION, JI.COMMON, JI.LONG, JI.LAT, JI.TEMPERATURE, JI.CODICE_GISA, J.JOBID, JI.SEARCH_FIELD, (SELECT STRING_AGG(SG.NAME_GROUP, ', ')
-                                                                                                                                                      FROM SIMULATION_GROUP SG
-                                                                                                                                                      WHERE SG.JOBID = J.JOBID) AS GROUPS
+        SELECT DISTINCT JI.NAME_SIM, JI."DATE", JI."TIME", JI.DURATION, JI.COMMON, JI.LONG, JI.LAT, JI.TEMPERATURE, JI.CODICE_GISA, J.JOBID, JI.SEARCH_FIELD, (SELECT DISTINCT STRING_AGG(SG.NAME_GROUP, ', ')
+                                                                                                                                                               FROM SIMULATION_GROUP SG
+                                                                                                                                                               WHERE SG.JOBID = J.JOBID) AS GROUPS
         FROM 
             "USER" U JOIN JOBS J ON U.USERNAME = J.USERNAME JOIN JOBINFO JI ON J.JOBID = JI.JOBID
         WHERE 
             U.USERNAME = \'{}\';'''.format(user)
- 
+
+        
         return self.__db.execute(query)
         
     # Simple function that given a jobid, will return the output path associated 

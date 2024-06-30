@@ -573,13 +573,17 @@ def storico():
     jobs = []
     string_search = ""
 
+    
     for group in user_groups:
-        permissions = db.get_permission_of_group(user, group[0])
-        if permission[0] == True:
-            jobs_of_user_group = db.fetch_user_group(user, group[0])
-            print("- storico - jobs return to db query : " + str(jobs_of_user_group),  flush=True)
-            for jobs_var in jobs_of_user_group:
-                jobs.append(jobs_var)
+        # print("- requestmanager - group : " + str(group), flush=True)
+        if str(group[0]) != str(user):
+            print("- requestmanager - group : " + str(group[0]) + " - user : " + str(user), flush=True)
+            permissions = db.get_permission_of_group(user, group[0])
+            if permission[0] == True:
+                jobs_of_user_group = db.fetch_user_group(user, group[0])
+                # print("- storico - jobs return to db query : " + str(jobs_of_user_group),  flush=True)
+                for jobs_var in jobs_of_user_group:
+                    jobs.append(jobs_var)
         '''
         for permission in permissions:
             if permission[0] == True:
@@ -587,7 +591,7 @@ def storico():
                 for jobs_var in jobs_of_user_group:
                     jobs.append(jobs_var)
         '''
-   
+    
     if request.method=="POST":  
         if "hsearchbutton" in request.form:
             print("[*] Search Button - coda", flush=True)
