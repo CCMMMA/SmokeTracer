@@ -403,7 +403,6 @@
                     /*
                     document.getElementById('options_simulation').style.visibility = 'visible';
                     document.getElementById('options_map').style.visibility = 'visible';
-                    
                     document.getElementById('div_slider').style.visibility = 'visible';
                     document.getElementById('bottoneSovrapposizione').style.visibility = 'visible';
                     document.getElementById('buffer3km').style.visibility = 'visible';
@@ -521,18 +520,7 @@
                         source: vectorSource
                         });
 
-                    map.addLayer(vectorLayer);
-                    
-                    /*
-                    // aggiunge i confini dei comuni sulla mappa
-                    let borders = new ol.layer.Vector({
-                        source: new ol.source.Vector({
-                        url: '/static/limits_comuni/limits_IT_municipalities.geojson',
-                        format: new ol.format.GeoJSON()
-                        })
-                    })
-                    map.addLayer(borders);
-                    */
+                    map.addLayer(vectorLayer);                
                     
                 }
                 
@@ -568,6 +556,15 @@
                     console.log("BUFFER [3km] : Added to map")
                 }
                 map.addLayer(targetVectorLayer); 
+
+                // aggiunge i confini dei comuni sulla mappa
+                let borders = new ol.layer.Vector({
+                    source: new ol.source.Vector({
+                    url: '/static/limits_comuni/limits_IT_municipalities.geojson',
+                    format: new ol.format.GeoJSON()
+                    })
+                })
+                map.addLayer(borders);
             }
 
             function sovraCheck() {
@@ -583,7 +580,8 @@
                     flag_sovrapposizione = true;
                 }
             }
-
+            
+            /*
             function nextKML(){
                 
                 if( i > parseInt("{{session['durata']}}")) {
@@ -824,6 +822,7 @@
                 console.log("Ora successiva - load kml path : ", '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + i ).toString().padStart(2, '0') + ".kml");
 
             }
+            */
             
             function bufferCheck3km() {
                 attivoBuffer3km = !attivoBuffer3km;
