@@ -299,7 +299,7 @@
                         </div>
                     </div>
             
-<!----------------------------------------------------------------------------------------------------- TABELLA SIMULAZIONI TOTALI  ----------------------------------------------------------------------------------------------------->
+<!--------------------------------------------------------------------------------------------------------- TABELLA SIMULAZIONI TOTALI  ------------------------------------------------------------------------------------------------------------------------>
                  
 
                     <h3 class="text-dark mb-4" style="margin-top: 25px;">Totale Simulazioni Utenti</h3>
@@ -348,7 +348,6 @@
                                         {% for jobs_admin in all_jobs %}
                                         <tr>
                                             <td>{{ jobs_admin[0] }}</td>
-                                            <td>{{ jobs_admin[10] }}</td>
                                             <td>{{ jobs_admin[1] }}</td>
                                             <td>{{ jobs_admin[2] }}</td>
                                             <td>{{ jobs_admin[3] }}</td>
@@ -359,6 +358,7 @@
                                             <td>{{ jobs_admin[8] }}</td>
                                             <td>{{ jobs_admin[9] }}</td>
                                             <td>{{ jobs_admin[10] }}</td>
+                                            <td>{{ jobs_admin[12] }}</td>
                                             <td>
                                                 <form method="POST">
                                                     <input type="hidden" name="idJOB" value="{{ jobs_admin[0] }}">

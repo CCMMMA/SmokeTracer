@@ -143,8 +143,8 @@ def workflowStatus(id):
 @app.route('/', methods=['POST', 'GET'])
 def login():
     if "user" in session:   
-        return redirect(url_for('dashboard'))
-        # return redirect_to_dashboard(session["user"])
+        # return redirect(url_for('dashboard'))
+        return redirect_to_dashboard(session["user"])
  
     if request.method == "POST":
 
@@ -333,7 +333,6 @@ def coda():
     '''
 
     user_groups = db.get_groups_user(user)
-    
     count_false = 0
     for group in user_groups:
         permissions = db.get_permission_of_group(user, group[0])
@@ -351,9 +350,9 @@ def coda():
         if "generate" in request.form:
             session["tot_jobs_queue"] += 1
             area = request.form.get("area")
-            if not validate_string(area, "[a-zA-Z]"):
-                flash("Area inserita non valida. Unici caratteri consentiti: Lettere [a-z e A-Z]. Riprovare!")
-                return redirect(url_for('coda'))
+            #if not validate_string(area, "[a-zA-Z]"):
+            #    flash("Area inserita non valida. Unici caratteri consentiti: Lettere [a-z e A-Z]. Riprovare!")
+            #    return redirect(url_for('coda'))
 
             data = request.form.get("data")
             ora = request.form.get("hours")
@@ -381,9 +380,9 @@ def coda():
 
         elif "hshowbutton" in request.form:
             id_job = request.form.get("idJOB")
-            print("- coda - show button - id_job : " + id_job, flush=True)
+            # print("- coda - show button - id_job : " + id_job, flush=True)
             session["kml_info_show"] = db.get_all_groups()
-            print("coda - show button - session['kml_info_show] : " + str(session['kml_info_show']), flush=True)
+            # print("coda - show button - session['kml_info_show] : " + str(session['kml_info_show']), flush=True)
             # da finire quando ottengo gli out del workflow
 
         elif "hdeletebutton" in request.form:
@@ -567,17 +566,17 @@ def storico():
             if permission[0] == False:
                 count_false+=1
     if count_false == len(user_groups):
-        print("- simulazioni - User non ha i permessi di scrittura in nessun gruppo", flush=True)
+        # print("- simulazioni - User non ha i permessi di scrittura in nessun gruppo", flush=True)
+        flash("L'utente non ha i permessi di scrittura in nessun gruppo")
         return redirect(url_for('dashboard'))
 
     jobs = []
     string_search = ""
-
     
     for group in user_groups:
         # print("- requestmanager - group : " + str(group), flush=True)
         if str(group[0]) != str(user):
-            print("- requestmanager - group : " + str(group[0]) + " - user : " + str(user), flush=True)
+            # print("- requestmanager - group : " + str(group[0]) + " - user : " + str(user), flush=True)
             permissions = db.get_permission_of_group(user, group[0])
             if permission[0] == True:
                 jobs_of_user_group = db.fetch_user_group(user, group[0])
@@ -596,22 +595,18 @@ def storico():
         if "hsearchbutton" in request.form:
             print("[*] Search Button - coda", flush=True)
  
-        
         elif "hshowbutton" in request.form:
             print("[*] Show Button - coda", flush=True)
-
-        
+       
         elif "hdeletebutton" in request.form:
             job_to_remove=request.form.get("idJOB")
             db.delete_row('JOBINFO', 'JOBID', job_to_remove)
             print("[*] Delete Button - coda", flush=True)
             return redirect(url_for('storico'))
-
           
         elif "hresetmap" in request.form:
             print("[*] Reset Button - coda", flush=True)
             
-
         elif "hresetjob" in request.form:
             print("[*]  Button - coda", flush=True)
 
@@ -638,8 +633,8 @@ def getPermissionsUser():
     user = session['user']
     group = data.get('group')
     db = DBProxy()
-    print("- getPermissionsUser - user : " + str(session['user']), flush=True)
-    print("- getPermissionsUser - group : " + str(group), flush=True)
+    # print("- getPermissionsUser - user : " + str(session['user']), flush=True)
+    # print("- getPermissionsUser - group : " + str(group), flush=True)
     return jsonify(db.get_permission_of_group(user, group))
 
 @app.route('/interfaceUserGroup', methods=['POST', 'GET'])
@@ -727,14 +722,14 @@ def adminpane():
     #   return render_template('blank.html')
 
     user = session["user"] 
-
     last_access=db.get_last_access(user)
 
     users = db.fetch_users()
     # print("-coda - users : " + str(users), flush=True)
 
     all_jobs = db.return_all_jobs()
-    print("-adminpane- all jobs : " + str(all_jobs))
+    print("- adminpane - all_jobs : " + str(all_jobs), flush=True)
+
     # print("-coda - all-jobs : " + str(all_jobs), flush=True)
 
     all_group_with_user = db.get_all_groups_with_user()
@@ -747,8 +742,6 @@ def adminpane():
     if request.method=="POST":  
 
         if "savebutton" in request.form: 
-
-            print("coda - savebutton", flush=True)
 
             username = request.form.get("username")
             firstname = request.form.get("firstname")
@@ -791,17 +784,15 @@ def adminpane():
             return redirect(url_for('adminpane'))
 
         elif "button_change_group" in request.form:
-
-            print("coda - button change group ", flush=True)
-            db = DBProxy()
+            # db = DBProxy()
 
             user = request.form['modify-user-group']
             action = request.form['action-modify-group']
             group = request.form['modify-group-group']
 
-            print("[*] modify user permission : " + str(user), flush=True)
-            print("[*] modify action permission : " + str(action), flush=True)
-            print("[*] modify group permission : " + str(group), flush=True)
+            #print("[*] modify user permission : " + str(user), flush=True)
+            #print("[*] modify action permission : " + str(action), flush=True)
+            #print("[*] modify group permission : " + str(group), flush=True)
 
             if action == 'Rimuovi':
                 db.remove_user_to_group(user, group)
@@ -812,18 +803,15 @@ def adminpane():
 
         elif "button_change_permissions" in request.form:
 
-            print("coda - button change permission ", flush=True)
-
             user = request.form['modify-permission-user']
             action = request.form['modify-permission-action']
             type_permission = request.form['modify-permission-type']
             group = request.form['modify-permission-group']
             
-
-            print("-coda user : " + user, flush=True)
-            print("-coda action : " + action, flush=True)
-            print("-coda type : " + type_permission, flush=True)
-            print("-coda group : " + group, flush=True)
+            # print("-coda user : " + user, flush=True)
+            # print("-coda action : " + action, flush=True)
+            # print("-coda type : " + type_permission, flush=True)
+            # print("-coda group : " + group, flush=True)
 
             if action == 'Rimuovi':
                 action = False
@@ -835,7 +823,7 @@ def adminpane():
             elif type_permission == 'Scrittura':
                 type_permission = False
 
-            db = DBProxy()
+            # db = DBProxy()
             db.change_user_permissions(user, group, type_permission, action)
 
             return redirect(url_for('adminpane'))
@@ -899,63 +887,36 @@ def adminpane():
 
         elif "passwordbuttclon" in request.form:
             
-            print("coda - password button", flush=True)
-
-            # We get the user in that row
             username = request.form.get("passwordbutton").lower()
-
-            # We check if that user is active or not: 
             is_active = db.user_active(username)
 
-
-            # We create three empty vars, will be based on the user state
             link = ""
             title = ""
             body = ""
 
-            # Now, if the user is active
             if is_active:
-
-                # we generate a link to the password reset; also a title and body for the
-                # email msg
                 link = generate_unique_link(username, "ripristino")
                 title = "Ripristino Password FUMI2"
                 body = "Ciao {}! Hai richiesto un ripristino della password. Visitare il link per completare la procedura".format(username)
             
             else:
-
-                # Else, the user is not active; we generate a registration link
                 link = generate_unique_link(username, "registrazione")
                 title = "Registrazione al sistema FUMI2"
                 body = "Benvenuto al sistema FUMI2, {}!. Visitare il link per completare la registrazione".format(username)
 
-            # We get the email of the user 
-            # email = db.specific_select("USER", "EMAIL", "USERNAME", username)
             email = db.specific_select("\"USER\"", "EMAIL", "USERNAME", username)
-
-            # Send email with ripristination link
             msg = Message(title, sender = 'regionefumi2@gmail.com', recipients = [email])
             msg.body = f"{body}: {link}"
 
             try:
                 mail.send(msg)
             except:
-                
-                # Flash and category set
-                # session["category"] = "alert-danger"
                 flash("Errore nell'invio della mail. Rimandarla con l'apposito pulsante per generazione password!")
                 
-            # Flash success if no error given
-            # session["category"] = "alert-success"
             flash("Ripristino password effettuato per {}".format(username))
-
-            # Redirect to adminpane to load users again
             return redirect(url_for('adminpane'))
        
         elif "deactivatebutton" in request.form:
-
-            print("coda - deactivate button", flush=True)
-
             username = request.form.get("deactivatebutton").lower()
 
             try:
@@ -969,9 +930,6 @@ def adminpane():
             return redirect(url_for('adminpane'))
 
         elif "activatebutton" in request.form: 
-
-            print("coda - activate button", flush=True)
-
             username = request.form.get("activatebutton").lower()
 
             # Since an user can be inactive because he just got registered, we need to check
@@ -1087,56 +1045,31 @@ def adminpane():
 @app.route('/registrazione/<unique_id>', methods=['GET', 'POST'])
 def registration(unique_id):
 
-    # Simple registration mechanism. This page is uniquely visited when an admin does
-    # create a new user into the system, automatically sending him a mail to complete his registration.
-    # We got three argument there: Password, telephone number and 
     if request.method == "POST":    
-
-        # Istanciate a db object to perform queries
+        
         db = DBProxy()
 
-        # We first decode the username: following the unique id structure defined in the adminpane 
-        # save logic
         split = base64.b64encode("split".encode('utf-8')).decode('utf-8')
         user = unique_id.split(split)[0]
         decoded_name = base64.b64decode(user.encode('utf-8')).decode('utf-8')
 
-        # We fetch those info
         password = request.form.get("password")
         password_again = request.form.get("password-again")
         birthdate = request.form.get("date")
         
-        # telephone = request.form.get("telephone")
-        
         # We compare the password: if they're not equal, we flash a message
         # and basically reload the page again
-        #if not safe_str_cmp(password, password_again):
         if not hmac.compare_digest(password, password_again):
             flash("Le password non corrispondono.")
-
         else:
-            # We check if the password are at least: 8 character long and contains at least:
-            # 1 character / 1 number / 1 special char
             if not validate_password(password):
-
-                # If not we flash a message and render again 
                 flash("La password deve contenere 8 caratteri ed almeno una lettera, un carattere speciale ed un numero.")
             else:
-                # We then update the table 
-                #db.update_column("USER", "PASSWORD", "USERNAME", [generate_password_hash(password), decoded_name])
-                #db.update_column("USER", "BIRTHDATE", "USERNAME", [birthdate, decoded_name])
-                #db.update_column("USER", "TELEPHONE", "USERNAME", [telephone, decoded_name])
-                #db.update_column("USER", "ACTIVE", "USERNAME", [1, decoded_name])
-                # db.update_column("\"USER\"", "TELEPHONE", "USERNAME", [telephone, decoded_name])
                 db.update_column("\"USER\"", "\"PASSWORD\"", "USERNAME", [generate_password_hash(password), decoded_name])
                 db.update_column("\"USER\"", "BIRTHDATE", "USERNAME", [birthdate, decoded_name])
                 db.update_column("\"USER\"", "ACTIVE", "USERNAME", [1, decoded_name])
-
-                # After the registration, we redirect for login
                 return redirect(url_for('login'))
-
-    # render the registation form
-    return render_template('registrationform.html', user=session['user'])
+    return render_template('registrationform.html')
 
 @app.route('/ripristino/<unique_id>', methods=['GET', 'POST'])
 def restoration(unique_id):
