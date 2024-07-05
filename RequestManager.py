@@ -1150,7 +1150,6 @@ def getStatusJobsQueue():
         out_states.append([response_dagon])
     return jsonify(out_states)
 
-
 '''
 @app.route('/progress')
 def progress():

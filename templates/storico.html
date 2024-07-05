@@ -852,19 +852,68 @@
             }
             
             function evidenziaRiga(riga) {
+
                 var righe = document.querySelectorAll('tr');
                 righe.forEach(function(row) {
                     row.classList.remove('evidenziato');
                 });
                 riga.classList.add('evidenziato');
-                let name_user = document.getElementById('name_user_label').textContent
 
-                path_storage_user = '/static/smoketracer/' + name_user + '/' + name_user + '-' + riga.cells[1].value 
-                console.log("path_storage_user ", path_storage_user);
 
+                // let name_user = document.getElementById('name_user_label').textContent
+                let name_user = "{{session['user']}}";
+                let date_label = riga.cells[1].textContent;
+
+                fetch('static/centroidi_comuni/centroidi_comuni.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    for (let feature of data.features) {
+                        //console.log("COMUNE : ", feature.properties.COMUNE);
+                        //console.log("cell[4] :", riga.cells[4].textContent);
+                        if (feature.properties.COMUNE == riga.cells[4].textContent){
+                            var municipality_code = feature.properties.COD_COM;
+                            console.log("municipality_code : ", municipality_code);
+
+                            let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
+                
+                            console.log("url : " + url);
+
+                            var targetVectorLayer = new ol.layer.Vector({
+                                source: new ol.source.Vector({
+                                    url: url,
+                                    format: new ol.format.KML()
+                                })
+                            });
+
+                            map.addLayer(targetVectorLayer);
+                        }                        
+                    }
+                })
+                .catch(error => console.error('Errore durante il recupero del file:', error));
+
+
+                let data_standard = moment(date_label);
+                let data_formatted = data_standard.format('YYYY-MM-DD');
+                let int_durata = parseInt(this.cells[3].textContent);
+
+                let object_option = document.createElement('option');
+                object_option.value = data_formatted;
+                object_option.text = data_formatted;
+                document.getElementById("days_list").appendChild(object_option);
+
+                if( int_durata > 24) {
+                    let tot_giorni = int_durata / 24;
+                    for(let k=1; k<=tot_giorni; k++) {
+                        var_object = document.createElement('option');
+                        let next_day = (data_standard.add(1, 'day')).format('YYYY-MM-DD');
+                        var_object.value = next_day;
+                        var_object.text = next_day;
+                        document.getElementById('days_list').appendChild(var_object);             
+                    }
+                }
 
                 /*
-                let oraInizio = "{{ session['ora_inizio']}}";
+                let oraInizdio = "{{ session['ora_inizio']}}";
                 let sizeFlagsKML = parseInt("{{ session['durata'] }}")
                 let data = "{{ session['data'] }}";
                 
@@ -877,8 +926,6 @@
                     })
                 });
                 */
-                
-
             }
         </script>
 </body>
