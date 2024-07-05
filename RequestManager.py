@@ -134,12 +134,13 @@ def get_group_label(structure_label):
 ## WEBSITE ##
 #############
 
+'''
 @app.route('/get-status-workflow/<id>', methods=['GET'])
 def workflowStatus(id):
     dagonManager = DagonOnServiceManager('http://193.205.230.6:1727', ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'], 11)
     workflow_status = dagonManager.getStatusByID(id)
     return workflow_status
-
+'''
 @app.route('/', methods=['POST', 'GET'])
 def login():
     if "user" in session:   
@@ -366,7 +367,9 @@ def coda():
             job_info = ["./EmsSmoke.sh", area, "".join(data.split('-')), str(int(ora)), durata, comune, longit, latit, temp, codice_GISA]
             job_info.append(str(user))
             
-            id_workflow = sbatchmanager.run(user, job_info)
+            data_to_run = data.replace("-", "")
+
+            id_workflow = sbatchmanager.run(user, data_to_run, job_info)
            
             if id_workflow is not None:
                 job_info[0] = id_workflow
@@ -630,18 +633,21 @@ def storico():
 @app.route('/getPermissionsUser', methods=['POST'])
 def getPermissionsUser():
     data = request.get_json()
-    user = session['user']
+    user = data.get('user')
     group = data.get('group')
     db = DBProxy()
-    # print("- getPermissionsUser - user : " + str(session['user']), flush=True)
-    # print("- getPermissionsUser - group : " + str(group), flush=True)
+    print("- getPermissionsUser - user : " + str(user), flush=True)
+    print("- getPermissionsUser - group : " + str(group), flush=True)
     return jsonify(db.get_permission_of_group(user, group))
 
 @app.route('/interfaceUserGroup', methods=['POST', 'GET'])
 def interfaceUserGroup():
     db = DBProxy()
     all_names_groups = db.get_all_groups()
-    username = session['user']
+    username = session['user_to_interface']
+
+    # username = request.form.get('username_hidden')
+    # print("-interfaceUserGroup - username : " + str(username), flush=True)
     last_access=db.get_last_access(username)
     user_groups = db.get_groups_user(username)
     all_names_group_whitout_user_group = all_names_groups
@@ -657,7 +663,7 @@ def interfaceUserGroup():
         # ex [ 0, 'asl_napoli_nord ] , [1, 'asl_napolis_sud'], ... 
         x.append([str(i), all_names_group_whitout_user_group[i][0]])
 
-    print("- interfaceUserGroup - x : " + str(x), flush=True)
+
 
     # TODO : controllare se l'user fa parte del gruppo admin , se non fa parte ritorna al login
 
@@ -700,12 +706,10 @@ def interfaceUserGroup():
             elif read_permission == None:
                 db.change_user_permissions(user, group, True, False)
                
-            print("- interfaceUsersGroup - writePermission : " + str(write_permission), flush=True)
-            print("- interfaceUsersGroup - readPermission : " + str(read_permission), flush=True)
-            print("- interfaceUsersGroup - group : " + str(group), flush=True)
-            print("- interfaceUsersGroup - user : " + str(user), flush=True)
-            print("--")
-
+            #print("- interfaceUsersGroup - writePermission : " + str(write_permission), flush=True)
+            #print("- interfaceUsersGroup - readPermission : " + str(read_permission), flush=True)
+            #print("- interfaceUsersGroup - group : " + str(group), flush=True)
+            #print("- interfaceUsersGroup - user : " + str(user), flush=True)
             return redirect(url_for('interfaceUserGroup'))
 
     return render_template('interfaceUsersGroups.html', last_access=last_access, user=username, user_groups=user_groups, all_names_groups=x)
@@ -728,7 +732,7 @@ def adminpane():
     # print("-coda - users : " + str(users), flush=True)
 
     all_jobs = db.return_all_jobs()
-    print("- adminpane - all_jobs : " + str(all_jobs), flush=True)
+    # print("- adminpane - all_jobs : " + str(all_jobs), flush=True)
 
     # print("-coda - all-jobs : " + str(all_jobs), flush=True)
 
@@ -742,7 +746,6 @@ def adminpane():
     if request.method=="POST":  
 
         if "savebutton" in request.form: 
-
             username = request.form.get("username")
             firstname = request.form.get("firstname")
             lastname = request.form.get("lastname")
@@ -751,8 +754,9 @@ def adminpane():
             ruolo = request.form.get("ruolo")
             cellulare = request.form.get("cellulare")
 
-            user_ok = validate_string(username)
+            print("- adminpane - username : " + str(username), flush=True)
 
+            user_ok = validate_string(username)
             if user_ok==False: 
                 flash("Errore: caratteri non consentiti nell'username! (ammissibili: a-z A-z 0-9 . e _)")
                 return redirect(url_for('adminpane'))
@@ -845,45 +849,11 @@ def adminpane():
             # search_page = 1
 
         elif "deletebutton" in request.form:
-            print("coda - delete button", flush=True)
-            username = request.form('username_hidden')
+            username = request.form['username_hidden']
+            print("--adminpane -- username : " + str(username), flush=True)
             db.delete_user(username)
-            return redirect(url_for('adminpane'))
-
-            '''
-            # We wait for the confirmation of the alert box. Basically, what happens 
-            # When we click the confirm, is that the request is sent only when OK/BACK
-            # is presed. So it's an extension of the POST method.
-            confirmed = request.form.get("confirmed")
-
-            # Since the function return a name if confirmed and False otherwise, we 
-            # check directly if confirmed is different than false. If so, we do use the 
-            # confirmed value to delete the user (the name)
-            if confirmed!=False: 
-                
-                # Delete the users from the db
-                db.delete_user(confirmed)
-
-                # Delete the user from the user array 
-                for i, user in enumerate(users):
-                    #if safe_str_cmp(user[2], confirmed):
-                    if hmac.compare_digest(user[2], confirmed):
-                        del users[i]     
-
-                # We also need to check if the admin wants to delete data: 
-                if request.form.get("datacheck")=="on":
-
-                    # If the checkbox is checked, we delete the storage folder 
-                    # and the static containing the kml served files
-                    user_data_path = safe_join("root/storage/fumi2", confirmed)
-                    user_kml_path = safe_join("static/storage/fumi2", confirmed)
-                    safe_rmdir(user_data_path)
-                    safe_rmdir(user_kml_path)
-
-                # We flash the success of the elimination for that user
-                session["category"] = "alert-success"
-                flash("Utente cancellato correttamente: {}".format(confirmed))
-            '''   
+            flash("Utente cancellato correttamente: {}".format(confirmed))
+            return redirect(url_for('adminpane')) 
 
         elif "passwordbuttclon" in request.form:
             
@@ -977,29 +947,14 @@ def adminpane():
             # return redirect('adminpane.html')
             return render_template('adminpane.html')
 
-        # TODO
         elif "show_interface_usergroup" in request.form:
+            session['user_to_interface'] = request.form.get('username_hidden')
             return redirect(url_for('interfaceUserGroup'))
 
-            '''
-            print("adminpane - button showinterface", flush=True)
-            username = request.form.get('username_hidden')
-            user_groups = db.get_groups_user(username)
-            all_names_group_whitout_user_group = all_names_groups
-
-            for group in all_names_group_whitout_user_group:
-                for user_group in user_groups:
-                    if group == user_group:
-                        all_names_group_whitout_user_group.remove(group)
-            return render_template('interfaceUsersGroups.html', last_access=last_access, user=username, user_groups=user_groups, all_names_groups=all_names_group_whitout_user_group)
-            '''
-
-        # Last case: we want to reset the user info in the original search
         elif "aresetusers" in request.form:
             pass
 
-            # We reset the search val 
-            # session["searchval"] = ""
+    
         
 
     else: 
@@ -1194,6 +1149,7 @@ def getStatusJobsQueue():
         response_dagon = dagonManager.getStatusByID(str(job[0]))
         out_states.append([response_dagon])
     return jsonify(out_states)
+
 
 '''
 @app.route('/progress')

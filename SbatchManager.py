@@ -13,6 +13,7 @@ from datetime import date
 from ParserManager import Parser, JOBINFO
 from datetime import datetime
 from SpatialQueryManager import SpatialQueryManager
+from DagonOnServiceManager import DagonOnServiceManager
 
 
 
@@ -35,34 +36,27 @@ class SbatchManager():
         self.job_name = job_name
     
 
-    def run(self, user, params=None):
-        # print("[*] params : " + str(params))
-        script_path = "/home/fumi2/FUMI2"
-        scratch_path_container = script_path + "/scratch_user"
+    
+
+    def run(self, user, date_str, params=None):
+        
         millis = str(int(round(time.time() * 1000)))
         date = datetime.now()
         formatted_date_for_user_dir = date.strftime("%Y%m%dz%H%M%S")
         formatted_date_for_job = str(params[2]) + "Z" + str(params[3]).zfill(2) 
 
-        
+        gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
+        comune_name = params[5]
+        cod_com = gdf.loc[gdf['COMUNE'] == comune_name, 'COD_COM'].values
+        if cod_com.size <= 0:
+            print(f"Comune {comune_name} non trovato nel file.", flush=True)
+
+        script_path = "/home/fumi2/FUMI2"
         subprocess.run(['mkdir', '{}/tmp_script_lunch'.format(script_path)])
         subprocess.run(['cp', '{}/lunch_remote_job.sh'.format(script_path), '{}/tmp_script_lunch/lunch_remote_job_{}.sh'.format(script_path, millis)])
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "USER", user)
-        # self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "DATE", formatted_date_for_user_dir)
-
-
-        gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
-        comune_name = params[5]
-        print("-sbatch manager - comune_name : " + comune_name, flush=True)
-
-        cod_com = gdf.loc[gdf['COMUNE'] == comune_name, 'COD_COM'].values
-        if cod_com.size > 0:
-            print(f"Il codice COD_COM per il comune {comune_name} è {cod_com[0]}", flush=True)
-        else:
-            print(f"Comune {comune_name} non trovato nel file.", flush=True)
-
+        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "DATE", date_str)
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "CODICECOMUNE", cod_com[0])
-
         # self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "ID", millis)
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "LON", params[6])
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "LAT", params[7])
@@ -94,52 +88,48 @@ class SbatchManager():
             if id_match:
                 id_value = id_match.group(1)
                 print(f'[*] ID estratto: {id_value}', flush=True)
-                
                 subprocess.run(['rm', 'tmp/{}/out_from_job_{}_runcmd_{}.txt'.format(user, user, var_millis)])
-                path_old = 'static/smoketracer/' + user + '/' + user + '-' + cod_com[0] + '/out' 
-                path_new = 'static/smoketracer/' + user + '/' + user + '-' + cod_com[0] + '/' + id_value
-                subprocess.run(['mv', path_old, path_new])
+                path_out_user = 'static/smoketracer/' + user + '/' + date_str + '_' + cod_com[0]  
+                print("-- sbatch manager - start thread", flush=True)
+
+                # problema sul network filesystem del cluster. una volta creata la cartella nello storage non posso fare il mv. 
+                # una volta risolto il problema del cluster basta decommentare questo thread che aspetta la fine del workflow
+                # una volta completato invece di avere la cartella /data_codicecomune lo cambia in /data_codicecomune_idworkflow
+                #t1 = threading.Thread(target=self.check_progress, args=(id_value, path_out_user))
+                # t1.start()
+                
                 return id_value
         else:
             print('[*] ID non trovato nel file.', flush=True)
             return None
         
-        # subprocess.run(['nohup', './lunch_remote_job.sh', '>', 'tmp/out_from_job_{}_runcmd.txt'.format(user), '2>&1', '&'])
-        #subprocess.run(['./lunch_remote_job.sh', '>', 'tmp/out_from_job_{}_runcmd.txt'.format(user), '2>&1', '&'], shell=True)
+    def check_progress(self, id_workflow, path_out_user): 
+        dagonManager = DagonOnServiceManager('http://193.205.230.6:1727', ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'], 11)
+        array_jobs = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www']
+        while True:
+            response_dagon = dagonManager.getStatusByID(id_workflow)
+            # print("thread - response : " + str(response_dagon), flush=True)
+            count_finish = 0
 
-        # print("[*] Out DagOn Request : " + str(dagonManager.get_request()), flush=True)
-        
-        # user_dir =  self.tmpgen(user,params)
-        # if user_dir:
-            # return user_dir
-            # thread che effettua delle continue richieste al container dagon per capire lo stato
-            # t1 = threadinclearg.Thread(target=self.check_outputs, args=(tmp_path, dest_path, user, jobid))
-            # t1.start()
-            #t2 = threading.Thread(target=self.check_progress, args=(tmp_path, jobid))
-            #t2.start()
-        # We check if jobid is equal to 0 (job not submitted)
-        # or to error codes: -1 date error, -2 download error        
-        # if jobid == 0 or jobid == -1 or jobid == -2:
-            # In this case, we simply return since we can't do anything else
-        #    return jobid
-        # With the result given, create a folder into the storage path
-        # to store the script output
-        #dest_path = self.outgen(user, jobid, tmp_path)
-        # We then start the thread waiting for the script output
-        # to be completed after creating the output folder, we almost start istantly
-        # a thread that will check when the output of the scripts are finished.
-        # So we can continue our execution in the code
-        #t1 = threading.Thread(target=self.check_outputs, args=(tmp_path, dest_path, user, jobid))
-        #t1.start()
-        # We also create another thread to keep track of the progress of the script.
-        # This will be needed for the progress bar to fill up
-        #t2 = threading.Thread(target=self.check_progress, args=(tmp_path, jobid))
-        #t2.start()
-        # After that, we return the ID of the submitted job to be handled
-        # in other modules (such as the DB one)
-        #return jobid
+            for i in range(11):
+                if response_dagon[array_jobs[i]] == 'FINISHED':
+                    count_finish+=1
+            
+            if count_finish == 11:
+                print("- thread - finish workflow in thread", flush=True)
+                subprocess.run(['mv', path_out_user+'/out', path_out_user + '/' + id_workflow])
+                break
     
+    def substitute(self, filepath, tmp, sub):
+        with open(filepath, 'r') as file:
+            data = file.read()
+            data = data.replace(tmp, sub)
 
+        with open(filepath, 'w') as file:
+            file.write(data)
+
+
+    '''
     # Function that given an id (composed by the millis) will build a directory
     # in which all the middle operations of the root script will be performed.
     def tmpgen(self, user, params=None):
@@ -171,7 +161,7 @@ class SbatchManager():
         # per testare in locale decommentare la riga successiva 
         # return user + "-" + formatted_date_for_user_dir + "-" + millis
 
-        '''
+        
         if os.path.isdir(script_path + "/static/KML/" + user + "-" + formatted_date_for_user_dir + "-" + millis + "-out"):
             # print("[*] [check dir scratch user] : found", flush=True)
             # print("[*] [len file in dir] : " + str(len(os.listdir(script_path + "/static/KML/" + user + "-" + formatted_date_for_user_dir + "-" + millis + "-out/out_job"))))
@@ -186,7 +176,7 @@ class SbatchManager():
         else:
             print("----- [check dir scratch user] : not found", flush=True)
             return False
-        '''
+        
 
         # -- test spatial query con un punto 
         result_query_point = postgresql_query_handler.spatial_query_point(14.2681, 40.8518)
@@ -359,7 +349,7 @@ class SbatchManager():
         # return jobid, tmp_finalpath
         # return jobid
     ## --------------------------------------------------
-
+    
     # Function that given the user id of the performer of the job, will create
     # an apposite folder where to store the actual result of the script
     def outgen(self, userid, jobid, tmp_path):
@@ -388,29 +378,6 @@ class SbatchManager():
         # If the folder do not exists create one, else just return
         if not os.path.isdir(jobid):
             os.makedirs(safe_join(jobid))
-
-    def substitute(self, filepath, tmp, sub):
-
-        # Opening our text file in read only
-        # mode using the open() function
-        with open(filepath, 'r') as file:
-
-            # Reading the content of the file
-            # using the read() function and storing
-            # them in a new variable
-            data = file.read()
-
-            # Searching and replacing the text
-            # using the replace() function
-            data = data.replace(tmp, sub)
-
-        # Opening our text file in write only
-        # mode to write the replaced content
-        with open(filepath, 'w') as file:
-
-            # Writing the replaced data in our
-            # text file
-            file.write(data)
 
     def check_outputs(self, scratch_path, storage_path, user, jobid):
 
@@ -557,210 +524,6 @@ class SbatchManager():
         # We then remove the scratch path alongside all its content
         #rmtree(scratch_path)
 
-    def check_progress(self, scratch_path, jobid): 
-
-        # Declaring variables
-        # step is used to understand at which step in the list we currently are
-        step = 0
-
-        # steps represent the total possible step in the script, with .kml being the end 
-        steps = ["IN TERREL", "IN CTGPROC", "IN MAKEGEO", "IN CALWRF", "IN CALMET", "IN CALPUFF", "IN CALPOST", "IN WWW", ".kml"]
-
-        # We init a parser object
-        parser = Parser()
-        
-        # boolean for stopping the while and for checking errors
-        done = False
-        error = False
-        cancelled = False
-        error_line = ""
-
-        # Get today date
-        today = date.today()
-        d = today.strftime("%d-%m-%Y")
-
-        # We create a progress directory inside the scratch folder 
-        progress_dir = safe_join(scratch_path, "progress")
-        print(progress_dir)
-        os.makedirs(progress_dir)
-
-        # Wait for the file to be created
-        while(os.path.exists(safe_join(scratch_path, "fumi2.out")) == False):
-
-            # sleeping 0.1msec wile output isn´t ready yet
-            time.sleep(100/1000)
-
-        # Now open the file.
-        # With open that file to catch eventual errors
-        with open(safe_join(scratch_path, "fumi2.out"), "r") as f:    
-
-            # While the end has not been reached
-            while not done:
-        
-                # Read a line
-                line = f.readline()
-
-                # If there is no line (file hasn't been written yet)
-                if not line:
-
-                    # When waking up from the sleep while there are no new lines, we want to check
-                    # if the job we're currently waiting for has been CANCELLED. 
-                    # This means that the job has been cancelled for some reason from the squeue.
-                    # We check that using the parser to return the squeue as dictionary, and check 
-                    # if our jobid is still in:
-                    if str(jobid) not in parser.dictionarize("squeue"):
-
-                        # We open the error file and read the last line 
-                        with open(safe_join(scratch_path, "fumi2.err"), "r") as e:
-                            
-                            # We read the entire file 
-                            errorfile = e.readlines()
-
-                            # If the last line contains the keyword for which a job has been cancelled:
-                            if errorfile[-1].find("slurmstepd") != -1 and errorfile[-1].find("CANCELLED") != -1:
-                                
-                                # If here that means the job isn't on anymore, while we're waiting still on 
-                                # some step to finish (file hasn't reached the end yet). In addition to that, 
-                                # the error file reported that the job has been cancelled, so we set cancelled to true.
-                                done = True
-                                cancelled = True
-                                error_line = errorfile[-1]
-
-                            else: 
-                                
-                                # Else, the jobid isn't on the queue anymore but the error isnt a cancellation.
-                                # So we continue skip to the next iteration and read the next lines; that could 
-                                # happen since the jobid can be cancelled before we fetch the output lines of the 
-                                # out file.
-                                continue
-                            
-                    else:
-
-                        # We cycle a little and skip iteration
-                        time.sleep(100/1000)
-                        continue
-
-                else:
-
-                    # The first thing we do, is check if there are any errors in the line. 
-                    # That's because the model scripts output an error line whenever it encounters
-                    # one. If so, we just break the cycle and exit, assigning true to error.
-                    # The errors here are ERROR (error in one of the phase of the script)
-                    # and Usage (script called incorrectly).
-                    if line.find("ERROR") != -1 or line.find("Usage") != -1:
-                        done = True
-                        error = True
-                        error_line = line
-
-
-                    # We could add if line contains download finished we change the state to 0
-
-                    # else, the end hasn't been reached and we got no error:, we need to check what's the content.
-                    # check what's the content. Basically we want to check at which step we're in: to do so,
-                    # we check if in the current line is contained one of the steps in the steps list:
-                    # To do so we use the find function on the line, positioned at the current 
-                    # step (step variable) that we need to find.
-                    elif line.find(steps[step]) != -1:
-
-                        print("At step: {} - {}".format(step, line))
-
-                        # We create a new file named as the step we're in: 
-                        # Since we do have 9 different steps in our step list, and we do start at 0, that means 
-                        # in the range 0-7 we need to check the first 8 elements and in the 8th step, we need to 
-                        # check the last. Since the last step does not contain a space like the rest of them does, 
-                        # we need to split the logic.
-                        # If we're not at the last step (.kml in the step list does not have spaces to split)
-                        filename = ""
-                        if step < 8:
-
-                            # Assign to filename the current element at step in the steps list 
-                            # and split it by spaces, assigning the second occurrence (i.e: IN CALMET -> CALMET)
-                            filename = safe_join(progress_dir, steps[step].split(" ")[1])
-
-                        elif step == 8: 
-                            # Else assign a static name 
-                            filename = safe_join(progress_dir, "KMLOUT")
-                        
-                        # Now create a file and write into it the name of the file (TERREL, CTGPROC)
-                        # currently analized followed by ok; that means we're at that step
-                        with open(filename, 'w') as file:
-                            file.write('{} OK'.format(filename))
-
-                        # If the line contains the .kml token that means that an output has been produced.
-                        # We set done to true and exit
-                        if line.find(".kml") != -1:
-                            done = True
-
-                        # If the current step in the line, we update the step variable to +1
-                        # (going to the next element of the list)
-                        step += 1
-                        
-        # Before writing the file, we need to check the error file again to find is some allocation
-        # Problems has been found
-        done = False 
-        xrealloc = False
-        error_line = ""
-
-        # We open the error file and read the last line 
-        with open(safe_join(scratch_path, "fumi2.err"), "r") as e:
-            
-            while(not done):
-
-                # We read the entire file 
-                errorfile = e.readline()
-                
-                # If the line is the end of file, break
-                if len(errorfile) == 0:
-                    done = True
-                    break
-
-                # If xrealloc happened
-                if errorfile.find("xrealloc") != -1:
-                    
-                    # MEMORY ALLOCATION PROBLEM
-                    done = True
-                    xrealloc = True
-                    error_line = errorfile
-
-        # Now, after the cycle, we want to control two things: 
-        # If we're done because the progress is finished or because we did encounter an error:
-        # If we got no error, we write a JOB_OK file. If not, we write a JOB_ERROR file, 
-        # Writing the error line in it. 
-        # If we completed with no error
-        if done and not error and not cancelled:
-    
-            # Create a file within the scratch path
-            # and write date + status inside 
-            filename = safe_join(scratch_path, "JOB_OK")
-            with open(filename, 'w') as file:
-                file.write('{}: OK'.format(d))
-
-        # Else: completed with error
-        elif done and error: 
-
-            # Create a file within the scratch path
-            # and write date + error inside 
-            filename = safe_join(scratch_path, "JOB_ERROR")
-            with open(filename, 'w') as file:
-                file.write('{}: {}'.format(d, error_line))
-
-        elif done and xrealloc: 
-            
-            # Create a file within the scratch path
-            # and write date + error inside 
-            filename = safe_join(scratch_path, "JOB_ERROR")
-            with open(filename, 'w') as file:
-                file.write('{}: {}'.format(d, error_line))
-
-        # Else: canceled for some reason 
-        elif done and cancelled: 
-
-            # Create a file within the scratch path
-            # and write date + error inside 
-            filename = safe_join(scratch_path, "JOB_CANCELLED")
-            with open(filename, 'w') as file:
-                file.write('{}: {}'.format(d, error_line))
-
     # Simple function that given a jobid, will cancel it from the queue
     def cancel_job(self, jobid):
 
@@ -807,33 +570,5 @@ class SbatchManager():
 
         # Return a string containing the result of the operation.
         return result, jobid
-
-    def read_polygon_from_kml(name_file):
-        namespace = {"ns": nsmap[None]}
-        coordinates_list_out = []
-        coordinates_list_out2 = []
-
-        with open(name_file) as f:
-            root = parser.parse(f).getroot()
-            pms = root.xpath(".//ns:Placemark[.//ns:LineString]",   namespaces=namespace)
-
-            for pm in pms:
-
-                string_coordinates = pm.LineString.coordinates
-
-                '''
-                print("[*] LineString ------------------------- ")
-                print(string_coordinates)
-                print("[*] LineString ------------------------- ")
-                '''
-
-                coordinates_list = str(string_coordinates).split()
-                # Itera attraverso le coppie di coordinate e aggiungi all'array
-                for coordinate_pair in coordinates_list:
-                    lon, lat = coordinate_pair.split(',')
-                    coordinates_list_out.append([float(lon), float(lat)])
-
-                coordinates_list_out2.append(coordinates_list_out)
-                # print("Array di coordinate:")
-                # print(coordinates_array)
-        return coordinates_list_out2
+    '''
+    

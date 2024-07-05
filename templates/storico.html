@@ -60,7 +60,8 @@
     </style>
 </head>
 
-<body id="page-top" onload="controlKmlOnLoad()">
+<!-- onload="controlKmlOnLoad()" -->
+<body id="page-top">
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
             <div class="container-fluid d-flex flex-column p-0">
@@ -292,10 +293,6 @@
                 let rows_match = []
                 let tbody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
                 
-                //console.log("text_input : ", text_input_search);
-                //console.log("tot rows : ", tbody.rows.length);
-                //console.log("tbody : ", tbody);
-
                 if(tbody.rows.length > 0) {
 
                     for(let i=0; i<tbody.rows.length; i++) {
@@ -312,11 +309,11 @@
 
                     rows_match.reverse().forEach(function(riga) {
                         tbody.insertBefore(riga, tbody.firstChild);
-                            riga.classList.add('evidenziato');
-                            setTimeout(function() {
-                                riga.classList.remove('evidenziato');
-                            }, 10000);
-                        });      
+                        riga.classList.add('evidenziato');
+                        setTimeout(function() {
+                            riga.classList.remove('evidenziato');
+                        }, 10000);
+                    });      
                 }
 
                 /*
@@ -369,9 +366,10 @@
                 */
             }
 
+            /*
             function controlKmlOnLoad(){
                 
-                /*
+                
                 if("{{session['path_show_kml']}}"==""){
                     console.log("[CHECK] session[path_show_kml] : empty");
 
@@ -379,7 +377,7 @@
                         console.log("[CHECK] session[durata] : empty");
                     }
 
-                } else { */
+                } else { 
                     //var oraInizio = "{{ session['ora_inizio']}}";
                     let oraInizio = "0"
                     //sizeFlagsKML = parseInt("{{ session['durata'] }}")
@@ -400,7 +398,7 @@
                     //map.getView().setZoom(13);
                     map.addLayer(targetVectorLayer);
 
-                    /*
+                    
                     document.getElementById('options_simulation').style.visibility = 'visible';
                     document.getElementById('options_map').style.visibility = 'visible';
                     document.getElementById('div_slider').style.visibility = 'visible';
@@ -408,7 +406,7 @@
                     document.getElementById('buffer3km').style.visibility = 'visible';
                     document.getElementById('buffer500mt').style.visibility = 'visible';
                     document.getElementById('div_slider').style.visibility = 'visible';
-                    */ 
+                    
 
                     let data_standard = moment(data);
                     let data_formatted = data_standard.format('YYYY-MM-DD');
@@ -431,6 +429,7 @@
                     }
                 //}
             }
+            */
 
             function changeInput() {
                 console.log("cambio input slider");
@@ -863,7 +862,12 @@
                 path_storage_user = '/static/smoketracer/' + name_user + '/' + name_user + '-' + riga.cells[1].value 
                 console.log("path_storage_user ", path_storage_user);
 
+
                 /*
+                let oraInizio = "{{ session['ora_inizio']}}";
+                let sizeFlagsKML = parseInt("{{ session['durata'] }}")
+                let data = "{{ session['data'] }}";
+                
                 var targetVectorLayer = new ol.layer.Vector({
                     source: new ol.source.Vector({
                         // url: '/static/KML/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}")).toString().padStart(2, '0') + ".kml",
@@ -873,6 +877,7 @@
                     })
                 });
                 */
+                
 
             }
         </script>

@@ -366,10 +366,7 @@ class DBProxy():
         string_search = ""
 
         for info in jobinfo:
-            string_search = string_search + "; " + info + "; "
-
-        print("- dbmanager - new job - " + str(string_search), flush=True)
-        
+            string_search = string_search + "; " + info + "; "        
          
         query_jobinfo = "INSERT INTO JOBINFO VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')".format(
             jobinfo[0], # job_id

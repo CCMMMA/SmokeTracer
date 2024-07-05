@@ -55,7 +55,8 @@
                 </nav>
             </div>
 
-            <h6 id="name_user">Utente : {{user}}</h6>
+            
+            <h6 id="name_user">{{user}}</h6>
 
             <div class="card shadow">
                 <div class="card-body">
@@ -197,11 +198,13 @@
             document.getElementById('group_selected').value = name_group;
             // document.getElementById('group_selected_input').value = name_group;
 
-            let name_user = document.getElementById('name_user');
+            let name_user = document.getElementById('name_user').textContent;
+            console.log("name_user : " , name_user);
 
             let url = "/getPermissionsUser/" + name_user + "/" + name_group;
 
             let dati = {
+                'user': name_user,
                 'group': name_group
             };
 
