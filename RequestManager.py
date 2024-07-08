@@ -658,17 +658,12 @@ def interfaceUserGroup():
                 all_names_group_whitout_user_group.remove(group)
 
     x = []
-
     for i in range(len(all_names_group_whitout_user_group)):
         # ex [ 0, 'asl_napoli_nord ] , [1, 'asl_napolis_sud'], ... 
         x.append([str(i), all_names_group_whitout_user_group[i][0]])
 
-
-
     # TODO : controllare se l'user fa parte del gruppo admin , se non fa parte ritorna al login
-
     if request.method == "POST":
-        
         if "add_group_action" in request.form:
             button_value = request.form.get('add_group_action')
             if button_value is not None:
@@ -693,7 +688,7 @@ def interfaceUserGroup():
         elif "button_change_permissions" in request.form:
             write_permission = request.form.get('writePermission')
             read_permission = request.form.get('readPermission')
-            user = session['user']
+            user = request.form.get('name_user')
             group = request.form.get('group_selected')
 
             if write_permission == 'on':
@@ -706,10 +701,10 @@ def interfaceUserGroup():
             elif read_permission == None:
                 db.change_user_permissions(user, group, True, False)
                
-            #print("- interfaceUsersGroup - writePermission : " + str(write_permission), flush=True)
-            #print("- interfaceUsersGroup - readPermission : " + str(read_permission), flush=True)
-            #print("- interfaceUsersGroup - group : " + str(group), flush=True)
-            #print("- interfaceUsersGroup - user : " + str(user), flush=True)
+            # print("- interfaceUsersGroup - writePermission : " + str(write_permission), flush=True)
+            # print("- interfaceUsersGroup - readPermission : " + str(read_permission), flush=True)
+            # print("- interfaceUsersGroup - group : " + str(group), flush=True)
+            # print("- interfaceUsersGroup - user : " + str(user), flush=True)
             return redirect(url_for('interfaceUserGroup'))
 
     return render_template('interfaceUsersGroups.html', last_access=last_access, user=username, user_groups=user_groups, all_names_groups=x)

@@ -153,12 +153,12 @@
                                                         <button class="btn btn-success" type="submit" name="hdownloadbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Scarica&nbsp;&nbsp;<i class="fas fa-file-download"></i>&nbsp;</button>   
                                                     </form>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <form method="post">
                                                         <input type="hidden" name="idJOB" value="{{ job[9] }}">
                                                         <button class="btn btn-warning" type="submit" name="hshowbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Mostra&nbsp;<i class="fas fa-chalkboard-teacher"></i>&nbsp;</button>
                                                     </form> 
-                                                </td>
+                                                </td> -->
                                                 <td>
                                                     <form method="post">
                                                         <input type="hidden" name="idJOB" value="{{ job[9] }}">
@@ -252,6 +252,9 @@
             var attivoBuffer500mt = true;
             var flag_buffer500mt = false;
             var flag_sovrapposizione = false;
+
+            var base_global_path = "";
+
             var map = new ol.Map({
                 target: 'map',
                 layers: [
@@ -468,7 +471,11 @@
 
                 // creo dinamicamente il path del file kml in base ai parametri impostati dall'utente
                 // let url_var =  '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
-                let url_var = '/static/KML/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
+                // let url_var = '/static/KML/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
+
+                
+                let url_var = base_global_path + value_without_char + "Z" + selected_hour_str + ".kml"; 
+                console.log("change_input url :", url_var);
 
                 // carica il file kml in un vector-layer
                 let targetVectorLayer = new ol.layer.Vector({
@@ -868,11 +875,10 @@
                 .then(response => response.json())
                 .then(data => {
                     for (let feature of data.features) {
-                        //console.log("COMUNE : ", feature.properties.COMUNE);
-                        //console.log("cell[4] :", riga.cells[4].textContent);
                         if (feature.properties.COMUNE == riga.cells[4].textContent){
                             var municipality_code = feature.properties.COD_COM;
-                            console.log("municipality_code : ", municipality_code);
+
+                            base_global_path = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/"
 
                             let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
                 
@@ -894,7 +900,7 @@
 
                 let data_standard = moment(date_label);
                 let data_formatted = data_standard.format('YYYY-MM-DD');
-                let int_durata = parseInt(this.cells[3].textContent);
+                let int_durata = parseInt(riga.cells[3].textContent);
 
                 let object_option = document.createElement('option');
                 object_option.value = data_formatted;

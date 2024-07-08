@@ -156,6 +156,7 @@
                                         <!-- <th id="group_selected" name="group_selected"> -->
                                         <th>
                                             <!-- Non selezionato -->
+                                            <input id="name_user" name="name_user" type="hidden" value="{{user}}">
                                             <input id="group_selected" name="group_selected" type="text">
                                         </th>
                                         <th id="read_selected">
@@ -194,12 +195,12 @@
             // effettua altre operazioni 
             console.log("riga : ", riga);
             let name_group = riga.cells[0].textContent;
-            console.log("name_group : ", name_group);
+            //console.log("name_group : ", name_group);
             document.getElementById('group_selected').value = name_group;
             // document.getElementById('group_selected_input').value = name_group;
 
             let name_user = document.getElementById('name_user').textContent;
-            console.log("name_user : " , name_user);
+            //console.log("name_user : " , name_user);
 
             let url = "/getPermissionsUser/" + name_user + "/" + name_group;
 
