@@ -604,7 +604,7 @@ def storico():
         elif "hdeletebutton" in request.form:
             job_to_remove=request.form.get("idJOB")
             db.delete_row('JOBINFO', 'JOBID', job_to_remove)
-            print("[*] Delete Button - coda", flush=True)
+            # print("[*] Delete Button - coda", flush=True)
             return redirect(url_for('storico'))
           
         elif "hresetmap" in request.form:
@@ -636,8 +636,8 @@ def getPermissionsUser():
     user = data.get('user')
     group = data.get('group')
     db = DBProxy()
-    print("- getPermissionsUser - user : " + str(user), flush=True)
-    print("- getPermissionsUser - group : " + str(group), flush=True)
+    # print("- getPermissionsUser - user : " + str(user), flush=True)
+    # print("- getPermissionsUser - group : " + str(group), flush=True)
     return jsonify(db.get_permission_of_group(user, group))
 
 @app.route('/interfaceUserGroup', methods=['POST', 'GET'])
