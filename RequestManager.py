@@ -143,11 +143,17 @@ def workflowStatus(id):
 '''
 @app.route('/', methods=['POST', 'GET'])
 def login():
-    if "user" in session:   
+    #if "user" in session:   
         # return redirect(url_for('dashboard'))
-        return redirect_to_dashboard(session["user"])
+    #    return redirect_to_dashboard(session["user"])
  
     if request.method == "POST":
+
+        if 'button_admin_panel' in request.form:
+            return redirect(url_for('adminpane'))
+        
+        if 'button_user_panel' in request.form:
+           return redirect(url_for('dashboard'))
 
         db = DBProxy()
 
@@ -168,6 +174,7 @@ def login():
                 # tiene traccia dei dati sottomessi per le simulazioni nella queue
                 session["info_jobs_queue"] = []
                 session['path_show_kml'] = ""
+                session['admin'] = False
 
                 db.update_access(session["user"])
                 session["access"] = db.get_last_access(session["user"])
@@ -175,16 +182,20 @@ def login():
                 groups_user = db.get_groups_user(username)
 
                 if 'admin' in str(groups_user):
-                    return redirect(url_for('redirectTo'))
+                    session["admin"] = True
+                    return redirect(url_for('login'))
+                    # return redirect(url_for('redirectTo'))
 
                 # return redirect_to_dashboard(session["user"])
                 return redirect(url_for('dashboard'))
 
             else:
                 flash("Utente non attivo. Richiederne l'attivazione!")
+                session['admin'] = False
                 return redirect(url_for('login'))
         else:
             flash("Username o Password non corrette.")
+            session['admin'] = False
             return redirect(url_for('login'))
 
     # Assign the redirectionn to the template login
@@ -1018,6 +1029,7 @@ def registration(unique_id):
                 db.update_column("\"USER\"", "\"PASSWORD\"", "USERNAME", [generate_password_hash(password), decoded_name])
                 db.update_column("\"USER\"", "BIRTHDATE", "USERNAME", [birthdate, decoded_name])
                 db.update_column("\"USER\"", "ACTIVE", "USERNAME", [1, decoded_name])
+                
                 return redirect(url_for('login'))
     return render_template('registrationform.html')
 
@@ -1087,7 +1099,8 @@ def logout():
     # Simple logout mechanism. We do pop the user from the session stack
     # and redirect to login.
     session.pop("user", None)
-
+    session['admin'] = False
+    
     return redirect(url_for('login'))
 
 @app.route('/download', methods=['POST', 'GET'])
@@ -1144,6 +1157,14 @@ def getStatusJobsQueue():
         response_dagon = dagonManager.getStatusByID(str(job[0]))
         out_states.append([response_dagon])
     return jsonify(out_states)
+
+@app.route('/adminGroupYesOrNot', methods=['POST', 'GET'])
+def adminGroupTesOrNot():
+    username = request.form.get("username")
+    if 'admin' in db.get_groups_user(username):
+        return "True"
+    else:
+        return "False"
 
 '''
 @app.route('/progress')

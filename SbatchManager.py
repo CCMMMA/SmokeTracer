@@ -36,8 +36,6 @@ class SbatchManager():
         self.job_name = job_name
     
 
-    
-
     def run(self, user, date_str, params=None):
         
         millis = str(int(round(time.time() * 1000)))

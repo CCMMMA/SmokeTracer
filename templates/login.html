@@ -10,10 +10,93 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/css/Login-Form-Basic-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/VentasPro-Login.css') }}">
+
+    <style>
+
+        /* style for right and left sections */
+        .left-half {
+            background-color: #3498db; 
+            height: 100vh;
+        }
+        .right-half {
+            background-color: #ffffff; 
+            height: 100vh;
+        }
+
+        /* style for dynamic change */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        /* Darken columns when overlay is active */
+        .dimmed {
+            opacity: 0.3;
+        }
+    </style>
+
 </head>
 
-<body class="bg-gradient-primary" style="background: url(&quot;static/img/regione.png&quot;) center / cover repeat-x;">
+<!-- <body class="bg-gradient-primary" style="background: url(&quot;static/img/regione.png&quot;) center / cover repeat-x;"> -->
+<body>
+    <div class="container-fluid">
+        <div class="row no-gutters">
+            <!-- Colonna sinistra -->
+            <div class="col-md-6 left-half d-flex align-items-center justify-content-center" id="left_contents">
+                <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" style="width: 100px;min-width: 100px;height: 100px;margin-bottom: 10px;">
+            </div>
+            
+            <!-- Colonna destra -->
+            <div class="col-md-6 right-half d-flex align-items-center justify-content-center" id="right_contents">
+                <div class="card mb-5" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1);">
+                    <div class="card-body d-flex flex-column align-items-center" style="backdrop-filter: opacity(0);-webkit-backdrop-filter: opacity(0);">
+                        <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" style="width: 80px;min-width: 80px;height: 80px;margin-bottom: 10px;">
+                        <!-- <p>Inserisci le credenziali per accedere al sistema FUMI</p> -->
+                        <p>{% for mesg in get_flashed_messages() %}
+                        <div class="alert alert-danger text-center">Errore: {{ mesg }}</div>
+                        {% endfor %}</p>
+                        <form class="text-center" method="post">
+                            <div class="mb-3"><input class="form-control form-control" type="username" id="user_login" name="username" placeholder="Username"></div>
+                            <div class="mb-3"><input class="form-control form-control" type="password" id="password_login" name="password" placeholder="Password"></div>
+                            <div class="mb-3"><button class="btn btn-primary d-block w-100" id="loginbutton_login" type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1);">Login</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="overlay" style="display: none;" id="overlay_contents">
+        <div class="overlay-content">
+            <div class="card-body d-flex flex-column align-items-center" style="backdrop-filter: opacity(0);-webkit-backdrop-filter: opacity(0);"><img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" style="width: 80px;min-width: 80px;height: 80px;margin-bottom: 10px;">      
+                <form method="POST">
+                    <button class="btn btn-primary d-block w-100" name="button_admin_panel" type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-bottom: 10px;">Admin Panel</button>
+                    <button class="btn btn-primary d-block w-100" name="button_user_panel" type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-bottom: 10px;">User Panel</button></div>
+                    <button class="btn btn-secondary d-block w-100" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1);" onclick="closeOverlay()">Chiudi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    
+<!-- 
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-9 col-lg-12 col-xl-10">
@@ -44,9 +127,32 @@
             </div>
         </div>
     </section>
+-->
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+
+    <script>
+
+    
+        var flag_admin = "{{ session['admin'] }}";
+  
+        if (flag_admin == "True") {
+            document.getElementById('left_contents').classList.add("dimmed")
+            document.getElementById('right_contents').classList.add("dimmed")
+            document.getElementById('overlay_contents').style.display = 'flex';
+            console.log(flag_admin);
+        } else {
+            console.log("False");
+        }
+
+        function closeOverlay() {
+            document.querySelector('.overlay').style.display = 'none';
+            document.querySelectorAll('.dimmed').forEach(el => el.classList.remove('dimmed'));
+        }
+
+        
+    </script>
 </body>
 
 </html>
