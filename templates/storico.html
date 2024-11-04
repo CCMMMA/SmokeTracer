@@ -252,7 +252,8 @@
             var attivoBuffer500mt = true;
             var flag_buffer500mt = false;
             var flag_sovrapposizione = false;
-
+            let var_lon, var_lat;
+        
             var base_global_path = "";
 
             var map = new ol.Map({
@@ -267,12 +268,14 @@
                         }),
                     }),
 
+                    /*
                     new ol.layer.Vector({
                         source: new ol.source.Vector({
                         url: '/static/limits_comuni/limits_IT_municipalities.geojson',
                         format: new ol.format.GeoJSON()
                         })
                     })
+                    */
                 ],
                 view: new ol.View({
                     center: [0, 0],
@@ -464,7 +467,7 @@
                     feature.setStyle(new ol.style.Style({
                         stroke: new ol.style.Stroke({
                             color: color,
-                            width: 1
+                            width: 2
                         })
                     }));
                 }
@@ -500,10 +503,14 @@
                 
                 // Controllo del buffer da 500m
                 if( flag_buffer500mt == true) {
-                    let lon = 14.32745; // for test
-                    let lat = 40.84294; // for test
-                    // let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")];  correct
+                    //let lon = 14.32745; // for test
+                    //let lat = 40.84294; // for test
+                    let lon = var_lon;
+                    let lat = var_lat;
+                    // let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")];
+                    //let center = [lon, lat];
                     let center = [lon, lat];
+                    console.log("center : ", center);
                     let radius = 500;
                     let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
                     let circleFeature = new ol.Feature(circle);
@@ -532,9 +539,11 @@
                 
                 // Controllo del buffer da 3km
                 if( flag_buffer3km == true ) {
-                    let lon = 14.32745; // for test
-                    let lat = 40.84294; // for test
-                    // let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")]; // correct
+                    //let lon = 14.32745; // for test
+                    //let lat = 40.84294; // for test
+                    //let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")]; // correct
+                    let lon = var_lon;
+                    let lat = var_lat;
                     let center = [lon, lat]; // for test
                     let radius = 3000;
                     let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
@@ -563,6 +572,7 @@
                 }
                 map.addLayer(targetVectorLayer); 
 
+                /*
                 // aggiunge i confini dei comuni sulla mappa
                 let borders = new ol.layer.Vector({
                     source: new ol.source.Vector({
@@ -571,6 +581,7 @@
                     })
                 })
                 map.addLayer(borders);
+                */
             }
 
             function sovraCheck() {
@@ -835,7 +846,7 @@
                 var bottone = document.getElementById("buffer3km");
                 if (attivoBuffer3km) {
                     bottone.classList.remove("disattivato");
-                    console.log("BUFFER [3km] : disattivato");
+                    console.log("BUFFER [3km] : disattivato");
                     flag_buffer3km = false;
                 } else {
                     bottone.classList.add("disattivato");
@@ -866,6 +877,11 @@
                 });
                 riga.classList.add('evidenziato');
 
+                var_lon = parseFloat(riga.cells[5].textContent);
+                var_lat = parseFloat(riga.cells[6].textContent); 
+
+                console.log("var_lon : ", var_lon);
+                console.log("var_lat : ", var_lat);
 
                 // let name_user = document.getElementById('name_user_label').textContent
                 let name_user = "{{session['user']}}";
@@ -897,6 +913,8 @@
                 })
                 .catch(error => console.error('Errore durante il recupero del file:', error));
 
+                document.getElementById('myRange').value = (parseInt(riga.cells[2].textContent) * 5);
+                document.getElementById('demo').textContent = riga.cells[2].textContent;
 
                 let data_standard = moment(date_label);
                 let data_formatted = data_standard.format('YYYY-MM-DD');

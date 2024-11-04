@@ -75,11 +75,15 @@ class SbatchManager():
             )
 
         time.sleep(5)
+
+        try:
+            with open('tmp/{}/out_from_job_{}_runcmd_{}.txt'.format(user, user, var_millis), 'r') as f:
+                file_tmp = f.read()
+        except Exception as e:
+            print(e, flush=True)
         
-        with open('tmp/{}/out_from_job_{}_runcmd_{}.txt'.format(user, user, var_millis), 'r') as f:
-            file_tmp = f.read()
-            
         line_match = re.search(r'.*Workflow registration success id = \w+.*', file_tmp)
+        print(line_match, flush=True)
         if line_match:
             line = line_match.group(0)
             id_match = re.search(r'id = (\w+)', line)

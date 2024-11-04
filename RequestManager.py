@@ -1030,6 +1030,7 @@ def registration(unique_id):
                 db.update_column("\"USER\"", "BIRTHDATE", "USERNAME", [birthdate, decoded_name])
                 db.update_column("\"USER\"", "ACTIVE", "USERNAME", [1, decoded_name])
                 
+                session['admin'] = False
                 return redirect(url_for('login'))
     return render_template('registrationform.html')
 
