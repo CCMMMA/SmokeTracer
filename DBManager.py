@@ -210,12 +210,22 @@ class DBProxy():
         # We build up a custom query because we'd like to show only users that are not admin. 
         #query = "SELECT FIRSTNAME, LASTNAME, USERNAME, TELEPHONE, EMAIL, ACTIVE FROM USER WHERE ROLE!=1"
         # query = "SELECT firstname, lastname, username, telephone, email, struttura, ruolotec, active FROM \"USER\" WHERE \"ROLE\"!=1"
-        query = "SELECT firstname, lastname, username, telephone, email, struttura, ruolotec, active FROM \"USER\" ;"
+        query = "SELECT firstname, lastname, username, telephone, email, struttura, ruolotec, active, search_field FROM \"USER\" ;"
         return self.__db.execute(query)
 
     def add_user(self, username, firstname, lastname, email, cellulare, struttura, ruolo):
         values = [username, firstname, lastname, email, cellulare, struttura, ruolo, 0]
-        query = "INSERT INTO \"USER\" (USERNAME, FIRSTNAME, LASTNAME, EMAIL, TELEPHONE, STRUTTURA, RUOLOTEC, ACTIVE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+        string_search = ""
+
+        for info in values:
+            string_search = string_search + "; " + str(info) + "; "  
+        
+        values = [username, firstname, lastname, email, cellulare, struttura, ruolo, 0, string_search]
+
+        # print("values : " + str(values), flush=True)
+        
+        query = "INSERT INTO \"USER\" (USERNAME, FIRSTNAME, LASTNAME, EMAIL, TELEPHONE, STRUTTURA, RUOLOTEC, ACTIVE, SEARCH_FIELD) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         self.__db.update(query, values)
 
     def add_group(self, name_group):

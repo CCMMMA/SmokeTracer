@@ -737,7 +737,14 @@ def adminpane():
     users = db.fetch_users()
     # print("-coda - users : " + str(users), flush=True)
 
+    #for user in users:
+    #    print(str(user), flush=True)
+
     all_jobs = db.return_all_jobs()
+
+    #for elem in all_jobs:
+    #    print(str(elem), flush=True)
+    
     # print("- adminpane - all_jobs : " + str(all_jobs), flush=True)
 
     # print("-coda - all-jobs : " + str(all_jobs), flush=True)
@@ -760,7 +767,7 @@ def adminpane():
             ruolo = request.form.get("ruolo")
             cellulare = request.form.get("cellulare")
 
-            print("- adminpane - username : " + str(username), flush=True)
+            # print("- adminpane - username : " + str(username), flush=True)
 
             user_ok = validate_string(username)
             if user_ok==False: 
@@ -777,7 +784,8 @@ def adminpane():
                 # aggiungi l'utente al suo gruppo personale con i permessi di scrittura 
                 db.add_user_to_group(username.lower(), username.lower(), True, True)
             except Exception as e:
-                flash("Errore nell'inserimento dell'utente e del gruppo. Riprovare!")       
+                flash("Errore nell'inserimento dell'utente e del gruppo. Riprovare!")
+                print("Error insert : {}".format(str(e)), flush=True)       
                 return redirect(url_for('adminpane'))
 
             link = generate_unique_link(username, "registrazione")
@@ -843,27 +851,16 @@ def adminpane():
             db.create_group(new_group_name)
             return redirect(url_for('adminpane'))
 
-        elif "searchbutton" in request.form:
-            print("coda - search button", flush=True)
-            # Given the search value as filter 
-            # search_filter = request.form.get("searchvalue").lower()
-            # Update the list with filtered users
-            # users = filters(search_filter, users)
-            # Insert into session a value representing the actual search
-            # session["searchval"] = search_filter
-            # Reset search page 
-            # search_page = 1
-
         elif "deletebutton" in request.form:
             username = request.form['username_hidden']
-            print("--adminpane -- username : " + str(username), flush=True)
+            # print("--adminpane -- username : " + str(username), flush=True)
             db.delete_user(username)
-            flash("Utente cancellato correttamente: {}".format(confirmed))
+            flash("Utente cancellato correttamente")
             return redirect(url_for('adminpane')) 
 
         elif "passwordbuttclon" in request.form:
             
-            username = request.form.get("passwordbutton").lower()
+            username = request.form.get("username_hidden").lower()
             is_active = db.user_active(username)
 
             link = ""
@@ -894,7 +891,7 @@ def adminpane():
        
         elif "deactivatebutton" in request.form:
             username = request.form.get("deactivatebutton").lower()
-
+ 
             try:
                 db.update_column("\"USER\"", "ACTIVE", "USERNAME", [0, username])
 
