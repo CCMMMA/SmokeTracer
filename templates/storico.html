@@ -165,7 +165,7 @@
                                                         <button class="btn btn-danger" type="submit" name="hdeletebutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Elimina&nbsp;<i class="fas fa-eraser"></i>&nbsp;</button>
                                                     </form>
                                                 </td>
-                                                <td style="display: none;">{{job[12]}}</td>                            
+                                                <td style="display: none;">{{job[10]}}</td>                            
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -302,7 +302,7 @@
                     for(let i=0; i<tbody.rows.length; i++) {
 
                         console.log("row : ", tbody.rows[i]);
-                        let field_search_of_row = tbody.rows[i].cells[14].textContent;
+                        let field_search_of_row = tbody.rows[i].cells[13].textContent;
                         console.log("text_search_field : ". field_search_of_row);
 
                         if(field_search_of_row.includes(text_input_search)){
@@ -869,6 +869,9 @@
             
             function evidenziaRiga(riga) {
 
+                if( riga.classList.contains('evidenziato') )
+                    return;
+
                 var righe = document.querySelectorAll('tr');
                 righe.forEach(function(row) {
                     row.classList.remove('evidenziato');
@@ -878,8 +881,12 @@
                 var_lon = parseFloat(riga.cells[5].textContent);
                 var_lat = parseFloat(riga.cells[6].textContent); 
 
-                console.log("var_lon : ", var_lon);
-                console.log("var_lat : ", var_lat);
+                var coordinate = ol.proj.fromLonLat([var_lon, var_lat]);
+                map.getView().setCenter(coordinate);
+                map.getView().setZoom(11);
+
+                //console.log("var_lon : ", var_lon);
+                //console.log("var_lat : ", var_lat);
 
                 // let name_user = document.getElementById('name_user_label').textContent
                 let name_user = "{{session['user']}}";
@@ -896,7 +903,7 @@
 
                             let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
                 
-                            console.log("url : " + url);
+                            // console.log("url : " + url);
 
                             var targetVectorLayer = new ol.layer.Vector({
                                 source: new ol.source.Vector({

@@ -83,7 +83,6 @@ class SbatchManager():
             print(e, flush=True)
         
         line_match = re.search(r'.*Workflow registration success id = \w+.*', file_tmp)
-        print(line_match, flush=True)
         if line_match:
             line = line_match.group(0)
             id_match = re.search(r'id = (\w+)', line)
@@ -92,25 +91,26 @@ class SbatchManager():
                 print(f'[*] ID estratto: {id_value}', flush=True)
                 subprocess.run(['rm', 'tmp/{}/out_from_job_{}_runcmd_{}.txt'.format(user, user, var_millis)])
                 path_out_user = 'static/smoketracer/' + user + '/' + date_str + '_' + cod_com[0]  
-                print("-- sbatch manager - start thread", flush=True)
 
                 # problema sul network filesystem del cluster. una volta creata la cartella nello storage non posso fare il mv. 
                 # una volta risolto il problema del cluster basta decommentare questo thread che aspetta la fine del workflow
                 # una volta completato invece di avere la cartella /data_codicecomune lo cambia in /data_codicecomune_idworkflow
                 #t1 = threading.Thread(target=self.check_progress, args=(id_value, path_out_user))
-                # t1.start()
-                
+                #t1.start()
+
                 return id_value
         else:
             print('[*] ID non trovato nel file.', flush=True)
             return None
         
-    def check_progress(self, id_workflow, path_out_user): 
+    
+    def check_progress(self, id_workflow, path_out_user):
+        print("Start thread : check_progress()", flush=True)
         dagonManager = DagonOnServiceManager('http://193.205.230.6:1727', ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'], 11)
         array_jobs = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www']
+        db = DBProxy()
         while True:
             response_dagon = dagonManager.getStatusByID(id_workflow)
-            # print("thread - response : " + str(response_dagon), flush=True)
             count_finish = 0
 
             for i in range(11):
@@ -118,9 +118,12 @@ class SbatchManager():
                     count_finish+=1
             
             if count_finish == 11:
-                print("- thread - finish workflow in thread", flush=True)
-                subprocess.run(['mv', path_out_user+'/out', path_out_user + '/' + id_workflow])
-                break
+                print("End thread : workflow finished", flush=True)
+                # subprocess.run(['mv', path_out_user+'/out', path_out_user + '/' + id_workflow])
+                # subprocess.run(['rm', path_out_user+'/out'])
+                # Set the workflow as completed
+                db.update_column("JOBINFO", "COMPLETED", "JOBID", [1, id_workflow])
+                break        
     
     def substitute(self, filepath, tmp, sub):
         with open(filepath, 'r') as file:

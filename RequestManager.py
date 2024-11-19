@@ -19,6 +19,7 @@ import requests
 import random
 import time
 import json
+import threading
 # Custom Import
 from DBManager import DBProxy, DBManager
 from SbatchManager import SbatchManager
@@ -387,7 +388,12 @@ def coda():
                 db.new_job(job_info, user_groups, id_workflow)
                 var_info = [id_workflow, area, data, ora, durata, longit, latit, temp, codice_GISA, comune]
                 session["info_jobs_queue"].append(var_info)
-                # print("[*][from coda] session[info_jobs_queue] : " + str(session['info_jobs_queue']), flush=True)
+
+                # Create thread to check workflow status
+                # Workflow finished update db
+                t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), "test"))                
+                t1.start()
+
             else:
                 flash("Non è stato possibile inserire l'operazione in coda. Riprovare!")
                 return redirect(url_for('dashboard'))
@@ -604,7 +610,10 @@ def storico():
                 for jobs_var in jobs_of_user_group:
                     jobs.append(jobs_var)
         '''
-    
+    for job in jobs:
+        print(str(job), flush=True)
+
+
     if request.method=="POST":  
         if "hsearchbutton" in request.form:
             print("[*] Search Button - coda", flush=True)

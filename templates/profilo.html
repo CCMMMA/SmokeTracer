@@ -34,7 +34,7 @@
                 <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
         </nav>
-        <div class="d-flex flex-column" id="content-wrapper">
+        <div class="d-flex flex-column" id="content-wrapper" style="width: 100%;">
             <div id="content">
                 <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
                     <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><small class="form-text fs-4 fw-semibold" style="width: auto;height: auto;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
@@ -58,37 +58,82 @@
                                         </div>
                                         <div class="card-body">
                                             <form method="POST">
+
                                                 <div class="row">
                                                     <div class="col">
-                                                        <div class="mb-3" style="margin-bottom: 0px;"><label class="form-label" for="username"><strong>Username</strong></label></div><small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small>
+                                                        <div class="mb-3" style="margin-bottom: 0px;">
+                                                            <label class="form-label" for="username"><strong>Username</strong></label>
+                                                        </div>
+                                                        <!-- <small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small> -->
+                                                        <small class="form-text"><h4><b>{{ user }}</b></h4></small>
                                                     </div>
+
+                                                    
                                                     <div class="col">
-                                                        <div class="mb-3"><label class="form-label" for="firstname"><strong>Nome</strong></label><input class="form-control" type="text" id="firstname_profile" placeholder="{{ profile[0] }}" name="firstname"></div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="firstname"><strong>Nome</strong></label>
+                                                            <input class="form-control" type="text" id="firstname_profile" placeholder="{{ profile[0] }}" name="firstname">
+                                                        </div>
                                                     </div>
                                                 </div>
+
+
                                                 <div class="row">
                                                     <div class="col">
-                                                        <div class="mb-3"><label class="form-label" for="password"><strong>Password</strong></label><i class="far fa-eye" id="togglePassword" onclick="show()" style="margin-left: 10px; cursor: pointer;"></i>
-                                                            <input class="form-control" type="password" id="password_profile" placeholder="Inserisci una nuova password" name="password"></div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="password"><strong>Password</strong></label>
+                                                            <i class="far fa-eye" id="togglePassword" onclick="show()" style="margin-left: 10px; cursor: pointer;"></i>
+                                                            <input class="form-control" type="password" id="password_profile" placeholder="Inserisci una nuova password" name="password">
+                                                        </div>
                                                     </div>
+                                                    
                                                     <div class="col">
-                                                        <div class="mb-3"><label class="form-label" for="lastname"><strong>Cognome</strong></label><input class="form-control" type="text" id="lastname_profile" placeholder="{{ profile[1] }}" name="lastname"></div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="lastname"><strong>Cognome</strong></label>
+                                                            <input class="form-control" type="text" id="lastname_profile" placeholder="{{ profile[1] }}" name="lastname">
+                                                        </div>
                                                     </div>
                                                 </div>
+
                                                 <div class="row">
                                                     <div class="col">
-                                                        <div class="mb-3"><label class="form-label" for="telephone"><strong>Telefono</strong></label><input id="password_profile-1" class="form-control" type="text" name="telephone" placeholder="{{ profile[2] }}" name="password" /></div>
+                                                        <div class="mb-3" style="margin-bottom: 0px;">
+                                                            <label class="form-label" for=""><strong>Gruppi Utente</strong></label>
+                                                        </div>
+                                                        <small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>Gruppo 1</b></h4></small>
+                                                        <small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>Gruppo 2</b></h4></small>
+                                                        <small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>Gruppo 3</b></h4></small>
+                                                    </div>
+
+                                                    
+                                                    <div class="col">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for=""><strong>Nome</strong></label>
+                                                            <input class="form-control" type="text" id="" placeholder="{{ profile[0] }}" name="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="telephone"><strong>Telefono</strong></label>
+                                                            <input id="password_profile-1" class="form-control" type="text" name="telephone" placeholder="{{ profile[2] }}" name="password" />
+                                                        </div>
                                                     </div>
                                                     <div class="col">
                                                         <div class="mb-3"></div>
                                                     </div>
                                                 </div>
+                                                
                                                 <div class="mb-3">
                                                     <button class="btn btn-primary btn-sm" id="savebutton_profile" type="submit" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;">Salva Impostazioni</button>
                                                     <p>{% for mesg in get_flashed_messages() %}
                                                     <div class="alert {{ category }} text-center">{{ mesg }}</div>
                                                     {% endfor %}</p>
                                                 </div>
+
                                             </form>
                                         </div>
                                     </div>
