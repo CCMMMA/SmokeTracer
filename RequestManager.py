@@ -610,8 +610,7 @@ def storico():
                 for jobs_var in jobs_of_user_group:
                     jobs.append(jobs_var)
         '''
-    for job in jobs:
-        print(str(job), flush=True)
+    
 
 
     if request.method=="POST":  

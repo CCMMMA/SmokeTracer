@@ -320,9 +320,9 @@ class DBProxy():
         #        '''.format(user, group) 
 
         query = '''
-        SELECT DISTINCT JI.NAME_SIM, JI."DATE", JI."TIME", JI.DURATION, JI.COMMON, JI.LONG, JI.LAT, JI.TEMPERATURE, JI.CODICE_GISA, J.JOBID, JI.SEARCH_FIELD, (SELECT DISTINCT STRING_AGG(SG.NAME_GROUP, ', ')
-                                                                                                                                                               FROM SIMULATION_GROUP SG
-                                                                                                                                                               WHERE SG.JOBID = J.JOBID) AS GROUPS
+        SELECT DISTINCT JI.NAME_SIM, JI."DATE", JI."TIME", JI.DURATION, JI.COMMON, JI.LONG, JI.LAT, JI.TEMPERATURE, JI.CODICE_GISA, J.JOBID, JI.SEARCH_FIELD, JI.COMPLETED, (SELECT DISTINCT STRING_AGG(SG.NAME_GROUP, ', ')
+                                                                                                                                                                            FROM SIMULATION_GROUP SG
+                                                                                                                                                                            WHERE SG.JOBID = J.JOBID) AS GROUPS
         FROM 
             "USER" U JOIN JOBS J ON U.USERNAME = J.USERNAME JOIN JOBINFO JI ON J.JOBID = JI.JOBID
         WHERE 

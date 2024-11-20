@@ -20,6 +20,10 @@
             background-color: yellow !important;
         }
 
+        .evidenziato_coda {
+            background-color: grey !important;
+        }
+
         .slider {
             -webkit-appearance: none;
             width: 100%;
@@ -114,7 +118,8 @@
                                 <!-- </form> -->
                                 <label class="form-label"></label>
                                 </div>
-                                <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
+                                <!-- <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info"> -->
+                                <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
                                     <table class="table my-0" id="dataTable">
                                         <thead>
                                             <tr>
@@ -145,7 +150,7 @@
                                                 <td>{{ job[7] }}</td>
                                                 <td>{{ job[8] }}</td>
                                                 <td>{{ job[9] }}</td>
-                                                <td>{{ job[11] }}</td>
+                                                <td>{{ job[12] }}</td>
                                                 
                                                 <!-- <form action="{{ url_for('download') }}" method="post"> -->
                                                 <td>
@@ -165,7 +170,8 @@
                                                         <button class="btn btn-danger" type="submit" name="hdeletebutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Elimina&nbsp;<i class="fas fa-eraser"></i>&nbsp;</button>
                                                     </form>
                                                 </td>
-                                                <td style="display: none;">{{job[10]}}</td>                            
+                                                <td style="display: none;">{{job[10]}}</td> 
+                                                <td style="display: none;">{{job[11]}}</td>                           
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -292,6 +298,21 @@
                     output.innerHTML = this.value / 5;
             }
             
+         
+            var table_body = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+
+           
+            if (table_body.rows.length > 0 ) {
+                for (let i=0; i<table_body.rows.length; i++) {
+                    if (table_body.rows[i].cells[14].textContent == '0')
+                        table_body.rows[i].classList.add("evidenziato_coda");
+                        setTimeout(function() {
+                            riga.classList.remove('evidenziato');
+                        }, 10000);
+                }
+            }
+
+
             function search() {
                 let text_input_search = document.getElementById('searchnamebar').value;
                 let rows_match = []
