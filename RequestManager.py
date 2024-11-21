@@ -356,6 +356,38 @@ def coda():
         print("- simulazioni - User non ha i permessi di scrittura in nessun gruppo", flush=True)
         return redirect(url_for('dashboard'))
 
+    # Sezione dedicata per assicurare che l'utente quando fa il logout con una simulazione ancora in corso
+    # al suo prossimo login ritroverà la simulazione in corso
+
+    #TODO : effettuare una query su tutte i jobs dell'utente ed filtrare solo le tuple che hanno completed='0' 
+    #       In questo caso quelle non ancora completate devono apparire sotto con lo stato del workflow
+
+
+    # [id_workflow, area, data, ora, durata, longit, latit, temp, codice_GISA, comune]
+
+    # query = '''SELECT NAME_SIM,\"DATE\",\"TIME\",DURATION,COMMON,LONG,LAT,TEMPERATURE,CODICE_GISA,JOBINFO.JOBID,GROUPS.NAME_GROUP, JOBINFO.COMPLETED
+
+    query = '''SELECT JOBINFO.JOBID, NAME_SIM, \"DATE\", \"TIME\", DURATION, LONG, LAT, TEMPERATURE, CODICE_GISA, COMMON, JOBINFO.COMPLETED
+                FROM JOBINFO 
+                JOIN JOBS ON JOBINFO.JOBID=JOBS.JOBID 
+                JOIN \"USER\" ON JOBS.USERNAME=\"USER\".USERNAME 
+                JOIN SIMULATION_GROUP ON JOBINFO.JOBID = SIMULATION_GROUP.JOBID
+                JOIN GROUPS ON SIMULATION_GROUP.NAME_GROUP = GROUPS.NAME_GROUP
+                WHERE \"USER\".USERNAME=\'{}\' 
+                '''.format(user) 
+
+    all_jobs_user = db.get_db().execute(query)
+
+    for i in range(0, len(all_jobs_user), 2):
+        if all_jobs_user[i][10] == 0:
+            var_info = [all_jobs_user[i][0], all_jobs_user[i][1], all_jobs_user[i][2], all_jobs_user[i][3], all_jobs_user[i][4], all_jobs_user[i][5], all_jobs_user[i][6], all_jobs_user[i][7], all_jobs_user[i][8], all_jobs_user[i][9]]
+            session["info_jobs_queue"].append(var_info)
+            session["tot_jobs_queue"] += 1
+            # print("job in progress", flush=True)
+    # print(f"all_jobs_user : {all_jobs_user}", flush=True)
+
+    # ---------------------------------------------------------    
+
     hours = [f"0{i}" if i < 10 else f"{i}" for i in range(24)]
 
     if request.method == "POST":
@@ -381,17 +413,18 @@ def coda():
             
             data_to_run = data.replace("-", "")
 
+            # id_workflow, path_out_user = sbatchmanager.run(user, data_to_run, job_info)
             id_workflow = sbatchmanager.run(user, data_to_run, job_info)
-           
+
             if id_workflow is not None:
                 job_info[0] = id_workflow
                 db.new_job(job_info, user_groups, id_workflow)
                 var_info = [id_workflow, area, data, ora, durata, longit, latit, temp, codice_GISA, comune]
                 session["info_jobs_queue"].append(var_info)
-
                 # Create thread to check workflow status
-                # Workflow finished update db
-                t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), "test"))                
+                # Once the Workflow finished, the thread update db
+                # t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), str(path_out_user)))                
+                t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), )) 
                 t1.start()
 
             else:

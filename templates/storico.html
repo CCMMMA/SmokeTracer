@@ -21,7 +21,7 @@
         }
 
         .evidenziato_coda {
-            background-color: grey !important;
+            background-color: rgb(154, 152, 152) !important;
         }
 
         .slider {
@@ -306,9 +306,11 @@
                 for (let i=0; i<table_body.rows.length; i++) {
                     if (table_body.rows[i].cells[14].textContent == '0')
                         table_body.rows[i].classList.add("evidenziato_coda");
-                        setTimeout(function() {
-                            riga.classList.remove('evidenziato');
-                        }, 10000);
+                }
+
+                for (let i=0; i<table_body.rows.length; i++) {
+                    if (table_body.rows[i].contains("evidenziato_coda") && (table_body.rows[i].cells[14].textContent == '1'))
+                        table_body.rows[i].classList.remove("evidenziato_coda");
                 }
             }
 

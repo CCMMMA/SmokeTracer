@@ -103,6 +103,9 @@ class DBProxy():
     # dbpath='gdal/sqlite-autoconf-3400100/FUMI2.db'
     def __init__(self):
         self.__db = DBManager()
+    
+    def get_db(self):
+        return self.__db
 
     def return_user(self):
         record = self.__db.execute("SELECT * FROM USER;")
