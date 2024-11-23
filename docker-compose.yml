@@ -31,8 +31,9 @@ services:
     networks:
       - net_FUMI2
   
-  # obbiettivo usare mongo db per fare resotre dei places e utilizzare quei dati per creare una collezione places per postgresql 
-  # l'idea è che all'avvio del container , manualmente :
+  # L'idea è usare mongo db per fare resotre dei places e utilizzare quei dati per creare una collezione places per postgresql.
+  # All'avvio del container , manualmente :
+  #
   # 1) entrare nel container di fumi2 e lanciare lo script python 'inizialize_spatial_queries_dbs.py'
   # 2) uscire dal container e killare il container di mongo db 
   

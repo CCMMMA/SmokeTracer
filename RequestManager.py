@@ -26,7 +26,7 @@ from SbatchManager import SbatchManager
 from NcDumper import NCODump
 from ParserManager import Parser
 from DagonOnServiceManager import DagonOnServiceManager
-from SpatialQueryManager import SpatialQueryManager
+from HandlerSpatialQuery import HandlerSpatialQuery
 
 ##############
 ##  INIT   ##
@@ -359,14 +359,6 @@ def coda():
     # Sezione dedicata per assicurare che l'utente quando fa il logout con una simulazione ancora in corso
     # al suo prossimo login ritroverà la simulazione in corso
 
-    #TODO : effettuare una query su tutte i jobs dell'utente ed filtrare solo le tuple che hanno completed='0' 
-    #       In questo caso quelle non ancora completate devono apparire sotto con lo stato del workflow
-
-
-    # [id_workflow, area, data, ora, durata, longit, latit, temp, codice_GISA, comune]
-
-    # query = '''SELECT NAME_SIM,\"DATE\",\"TIME\",DURATION,COMMON,LONG,LAT,TEMPERATURE,CODICE_GISA,JOBINFO.JOBID,GROUPS.NAME_GROUP, JOBINFO.COMPLETED
-
     query = '''SELECT JOBINFO.JOBID, NAME_SIM, \"DATE\", \"TIME\", DURATION, LONG, LAT, TEMPERATURE, CODICE_GISA, COMMON, JOBINFO.COMPLETED
                 FROM JOBINFO 
                 JOIN JOBS ON JOBINFO.JOBID=JOBS.JOBID 
@@ -385,7 +377,6 @@ def coda():
             session["tot_jobs_queue"] += 1
             # print("job in progress", flush=True)
     # print(f"all_jobs_user : {all_jobs_user}", flush=True)
-
     # ---------------------------------------------------------    
 
     hours = [f"0{i}" if i < 10 else f"{i}" for i in range(24)]
@@ -1184,10 +1175,13 @@ def download():
         response.headers.set('Content-Disposition', 'attachment', filename="{}.zip".format(jobid))
         return response
 
+#TODO: Is safe ? 
+#    : Should get a password of requested user ? 
 @app.route('/getInfoJobsQueue')
 def getInfoJobsQueue():
     return jsonify(session['info_jobs_queue'])
 
+#TODO: Is safe ? 
 @app.route('/getStatusJobsQueue', methods=['POST', 'GET'])
 def getStatusJobsQueue():
     out_states = []
@@ -1197,6 +1191,7 @@ def getStatusJobsQueue():
         out_states.append([response_dagon])
     return jsonify(out_states)
 
+#TODO: Is safe ? 
 @app.route('/adminGroupYesOrNot', methods=['POST', 'GET'])
 def adminGroupTesOrNot():
     username = request.form.get("username")
@@ -1204,6 +1199,17 @@ def adminGroupTesOrNot():
         return "True"
     else:
         return "False"
+
+#TODO: Is safe ? 
+@app.route('/extractCommons', methods=['GET'])
+def extractCommons():
+    spatial_handler_query = HandlerSpatialQuery()
+    path_kml = path_kml = request.args.get('path_kml') 
+    result = spatial_handler_query.read_polygon_from_kml(path_kml)
+    # chiudo il ring  ( box di coordinate ) dell'isolinea piu esterna del kml
+    result[-1][-1] = result[-1][0]
+    extracted_commons = spatial_handler_query.spazial_query_box(result[-1])
+    return jsonify(extracted_commons)
 
 '''
 @app.route('/progress')

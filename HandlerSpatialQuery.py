@@ -19,10 +19,10 @@ class HandlerSpatialQuery:
 
     client_postgresql = None
 
-    def __init__(self, client_postgresql) -> None:
+    def __init__(self) -> None:
         self.client_postgresql = client_postgresql
 
-    def read_polygon_from_kml(name_file):
+    def read_polygon_from_kml(self, name_file):
         namespace = {"ns": nsmap[None]}
         coordinates_list_out = []
         coordinates_list_out2 = []
@@ -35,9 +35,9 @@ class HandlerSpatialQuery:
 
                 string_coordinates = pm.LineString.coordinates
                 
-                print("[*] LineString ------------------------- ")
-                print(string_coordinates)
-                print("[*] LineString ------------------------- ")
+                # print("[*] LineString ------------------------- ")
+                # print(string_coordinates)
+                # print("[*] LineString ------------------------- ")
                 
                 coordinates_list = str(string_coordinates).split()
                 # Itera attraverso le coppie di coordinate e aggiungi all'array
@@ -51,7 +51,7 @@ class HandlerSpatialQuery:
         return coordinates_list_out2
 
     
-    def inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql):
+    def inizialize_postgresql_from_mongodb(self, client_mongodb, client_postgresql):
         # create a table with 2 fields : long_name (text) - box (geometry-polygon - projection 4326)
         cur = client_postgresql.cursor()
 
@@ -132,15 +132,15 @@ class HandlerSpatialQuery:
 
 
 
-'''
+
 if __name__ == '__main__':
-
-    inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql)
     
-    # postgresql_query_handler = HandlerSpatialQuery(client_postgresql)
+    postgresql_query_handler = HandlerSpatialQuery(client_postgresql)
+    postgresql_query_handler.inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql)
 
+    '''
     result_query_point = postgresql_query_handler.spatial_query_point(14.2681, 40.8518)
-
+    
     print("[*] point spatial query : ")
     for i in result_query_point:
         print("Common : " + str(i))
@@ -173,16 +173,19 @@ if __name__ == '__main__':
     print("[*] box spatial query - campania :")
     for i in result_query_box2:
         print("Common : " + str(i[1]))
-    
+        
 
-    # result_linestring = read_polygon_from_kml('/mydata.kml')
+    print("[*] box spatial query - from .kml file ")
+    result_linestring = postgresql_query_handler.read_polygon_from_kml('/home/fumi2/FUMI2/static/smoketracer/dario/20240814_064/20240814Z05.kml')
+    # print(str(result_linestring[-1]))
     # print(result_linestring)
     # print(str(type(result_linestring)))
-
-    
+    result_linestring[-1][-1] = result_linestring[-1][0] 
     query_result = postgresql_query_handler.spazial_query_box(result_linestring[-1])
 
     for i in query_result:
         print("Common : " + str(i[1]))
+    
     '''
+    
 

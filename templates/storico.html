@@ -941,6 +941,16 @@
                 })
                 .catch(error => console.error('Errore durante il recupero del file:', error));
 
+                
+                fetch('extractCommons?path_kml=' + url)
+                .then(response => response.json())
+                .then(data => {
+                    for (let elem of data) {
+                        console.log("Common : ", elem[1])
+                    }
+                })
+                .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
+
                 document.getElementById('myRange').value = (parseInt(riga.cells[2].textContent) * 5);
                 document.getElementById('demo').textContent = riga.cells[2].textContent;
 
