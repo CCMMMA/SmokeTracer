@@ -226,6 +226,20 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="col-lg-12 col-xl-12" style="color: var(--bs-card-bg);background: var(--bs-card-cap-bg);" id="options_map">
+                        <div class="card shadow mb-4" style="margin-left: 12px; margin-top: 9px; margin-right: 12px;">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="text-primary fw-bold m-0">Comuni Estratti</h6>
+                            </div>
+                            <div class="card-body" style="height: 50%; margin-bottom: 0px;">
+                                <ul id="commons_list">
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
                     <footer class="bg-white sticky-footer">
                         <div class="container my-auto">
                             <div class="text-center my-auto copyright"><span>Copyright © Uniparthenope 2023</span></div>
@@ -892,8 +906,27 @@
             
             function evidenziaRiga(riga) {
 
+                var layers = map.getLayers(); 
+
+                // Rimuovi tutti i layers tranne il primo
+                layers.forEach(function (layer, index) {
+                    if (index > 0) { 
+                        map.removeLayer(layer);
+                    }
+                });
+
+
                 if( riga.classList.contains('evidenziato') )
                     return;
+                
+
+                var ul_common_list = document.getElementById('commons_list')
+
+                if( ul_common_list.children.length > 0 ) {
+                    for( let i=0; i<ul_common_list.children.length; i++) {
+                        ul_common_list.removeChild(ul_common_list.children[i])
+                    }
+                }
 
                 var righe = document.querySelectorAll('tr');
                 righe.forEach(function(row) {
@@ -934,22 +967,27 @@
                                     format: new ol.format.KML()
                                 })
                             });
-
                             map.addLayer(targetVectorLayer);
+
+                            //console.log("map : ", map)
+
+                            let var_commons_list = document.getElementById('commons_list')
+                        
+                            fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url)
+                            .then(response => response.json())
+                            .then(data => {
+                                for (let elem of data) {
+                                    console.log("Common : ", elem[1])
+                                    let newCommon = document.createElement('li')
+                                    newCommon.textContent = elem[1].toString()
+                                    var_commons_list.appendChild(newCommon)
+                                }
+                            })
+                            .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
                         }                        
                     }
                 })
                 .catch(error => console.error('Errore durante il recupero del file:', error));
-
-                
-                fetch('extractCommons?path_kml=' + url)
-                .then(response => response.json())
-                .then(data => {
-                    for (let elem of data) {
-                        console.log("Common : ", elem[1])
-                    }
-                })
-                .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
 
                 document.getElementById('myRange').value = (parseInt(riga.cells[2].textContent) * 5);
                 document.getElementById('demo').textContent = riga.cells[2].textContent;
@@ -957,6 +995,12 @@
                 let data_standard = moment(date_label);
                 let data_formatted = data_standard.format('YYYY-MM-DD');
                 let int_durata = parseInt(riga.cells[3].textContent);
+
+                let selectElement = document.getElementById('days_list');
+                while (selectElement.options.length > 0) {
+                    selectElement.remove(0);
+                }
+
 
                 let object_option = document.createElement('option');
                 object_option.value = data_formatted;

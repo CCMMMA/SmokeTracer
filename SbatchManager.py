@@ -74,7 +74,7 @@ class SbatchManager():
                 start_new_session=True
             )
 
-        time.sleep(5)
+        time.sleep(9)
 
         try:
             with open('tmp/{}/out_from_job_{}_runcmd_{}.txt'.format(user, user, var_millis), 'r') as f:

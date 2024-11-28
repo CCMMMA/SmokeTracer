@@ -13,7 +13,7 @@ services:
     # -  /home/d.caramiello/FUMI2/src/root:/home/fumi2/FUMI2/dati_prova
     depends_on:
       - db
-    #  - db_mongo
+      - db_mongo
     networks:
       - net_FUMI2
   
@@ -37,13 +37,15 @@ services:
   # 1) entrare nel container di fumi2 e lanciare lo script python 'inizialize_spatial_queries_dbs.py'
   # 2) uscire dal container e killare il container di mongo db 
   
-  #db_mongo:
-  #  container_name: container_mongodb_FUMI2
-  #  build:
-  #    dockerfile: Dockerfile-mongodb
-  #  restart: always
-  #  networks:
-  #    - net_FUMI2
+  db_mongo:
+    container_name: container_mongodb_FUMI2
+    build:
+      dockerfile: Dockerfile-mongodb
+    restart: always
+    networks:
+      - net_FUMI2
+    depends_on:
+      - db 
   
 
 networks:

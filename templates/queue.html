@@ -305,7 +305,7 @@
 
             let tot_jobs = parseInt("{{session['tot_jobs_queue']}}");
 
-            if( parseInt(tot_jobs) > 0 ) {                
+            if( parseInt(tot_jobs) > 0 ){                
                 let tbody = document.getElementById("info-table").getElementsByTagName("tbody")[0];
                 fetch('/getInfoJobsQueue')
                 .then(response => response.json())

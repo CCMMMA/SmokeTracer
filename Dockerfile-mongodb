@@ -4,9 +4,9 @@ COPY ccmmma-database/places.bson /data/ccmmma-database/places.bson
 
 COPY ccmmma-database/places.metadata.json /data/ccmmma-database/places.metadata.json
 
-COPY extraction_from_bbox/requirements.txt /app_extraction/requirements.txt
+# COPY extraction_from_bbox/requirements.txt /app_extraction/requirements.txt
 
-COPY extraction_from_bbox/python_script_mongo.py /app_extraction/python_script_mongo.py
+# COPY extraction_from_bbox/python_script_mongo.py /app_extraction/python_script_mongo.py
 
 COPY ccmmma-database /ccmmma-database 
 
@@ -14,7 +14,9 @@ COPY restore_mongodb.sh /docker-entrypoint-initdb.d/restore_mongodb.sh
 
 RUN chmod +x /docker-entrypoint-initdb.d/restore_mongodb.sh
 
-RUN apt-get update && apt-get install -y python3 python3-pip && apt-get install -y vim && pip install --no-cache-dir -r /app_extraction/requirements.txt 
+# RUN apt-get update && apt-get install -y python3 python3-pip && apt-get install -y vim && pip install --no-cache-dir -r /app_extraction/requirements.txt 
+
+RUN apt-get update && apt-get install -y python3 python3-pip && apt-get install -y vim
 
 CMD ["mongod"]
 

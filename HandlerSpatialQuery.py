@@ -4,23 +4,24 @@ from psycopg2 import sql
 from pykml import parser
 from pykml.factory import nsmap
 
-conn_params = {
+class HandlerSpatialQuery:
+
+    client_postgresql = None
+    client_mongodb = None
+
+    def __init__(self) -> None:
+
+        conn_params = {
             "host": "db",
             "database": "citizix_db",
             "user": "citizix_user",
             "password": "S3cret"
         }
+        
+        self.client_postgresql = psycopg2.connect(**conn_params)
+        self.client_mongodb = MongoClient("mongodb://container_mongodb_FUMI2:27017/")
 
-client_postgresql = psycopg2.connect(**conn_params)
-
-client_mongodb = MongoClient("mongodb://container_mongodb_FUMI2:27017/")
-
-class HandlerSpatialQuery:
-
-    client_postgresql = None
-
-    def __init__(self) -> None:
-        self.client_postgresql = client_postgresql
+        
 
     def read_polygon_from_kml(self, name_file):
         namespace = {"ns": nsmap[None]}
@@ -51,9 +52,10 @@ class HandlerSpatialQuery:
         return coordinates_list_out2
 
     
-    def inizialize_postgresql_from_mongodb(self, client_mongodb, client_postgresql):
+    # def inizialize_postgresql_from_mongodb(self, client_mongodb, client_postgresql):
+    def inizialize_postgresql_from_mongodb(self):
         # create a table with 2 fields : long_name (text) - box (geometry-polygon - projection 4326)
-        cur = client_postgresql.cursor()
+        cur = self.client_postgresql.cursor()
 
         create_table_query = sql.SQL("""
         CREATE TABLE IF NOT EXISTS comune (
@@ -65,10 +67,10 @@ class HandlerSpatialQuery:
 
         cur.execute(create_table_query)
         cur.close()
-        client_postgresql.commit()
+        self.client_postgresql.commit()
 
         # extracting collection places from MONGODB
-        db = client_mongodb['test-db']
+        db = self.client_mongodb['test-db']
         collection = db['places']
         places = collection.find()
 
@@ -84,7 +86,7 @@ class HandlerSpatialQuery:
             # create a new tupla with long_name and bounding_box extracted
             # insert the new tupla into the table in postgresql
             polygon_wkt = f"POLYGON(({', '.join([f'{x} {y}' for x, y in bounding_box['coordinates']])}))"
-            cur = client_postgresql.cursor()
+            cur = self.client_postgresql.cursor()
             query = sql.SQL("INSERT INTO comune (id, nome_comune, box) VALUES (%s, %s, ST_GeomFromText(%s))")
             # if long_name == "Comune di Valverde" or long_name == "Comune di Calliano":
             #    pass
@@ -93,7 +95,7 @@ class HandlerSpatialQuery:
             id_test+=1
             print("[*] Insert : " + long_name + " -- box : " + str(bounding_box['coordinates']))
             cur.close()
-            client_postgresql.commit()
+            self.client_postgresql.commit()
 
         print("[*] Municipalities table created and populated")
 
@@ -133,12 +135,29 @@ class HandlerSpatialQuery:
 
 
 
+# Tale file deve essere eseguito nel container dell'applicativo per inizializzare il db-postgresql con i places e bbox dai place di db mongodb 
+# Dopo aver eseguito tale script si deve 'tirare giu' il container di mongodb_FUMI2 e rimuoverlo. 
+# Alla fine in postgres1l si avrà un db chiamato 'comune' con tutti i place e i bbox per poter effettuare le spatial queries 
 if __name__ == '__main__':
-    
-    postgresql_query_handler = HandlerSpatialQuery(client_postgresql)
-    postgresql_query_handler.inizialize_postgresql_from_mongodb(client_mongodb, client_postgresql)
 
     '''
+    conn_params = {
+            "host": "db",
+            "database": "citizix_db",
+            "user": "citizix_user",
+            "password": "S3cret"
+        }
+
+    client_postgresql = psycopg2.connect(**conn_params)
+
+    client_mongodb = MongoClient("mongodb://container_mongodb_FUMI2:27017/")
+    '''
+
+    postgresql_query_handler = HandlerSpatialQuery()
+    postgresql_query_handler.inizialize_postgresql_from_mongodb()
+
+    '''
+    ## TEST ## 
     result_query_point = postgresql_query_handler.spatial_query_point(14.2681, 40.8518)
     
     print("[*] point spatial query : ")
