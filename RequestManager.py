@@ -370,11 +370,12 @@ def coda():
 
     all_jobs_user = db.get_db().execute(query)
 
-    for i in range(0, len(all_jobs_user), 2):
-        if all_jobs_user[i][10] == 0:
-            var_info = [all_jobs_user[i][0], all_jobs_user[i][1], all_jobs_user[i][2], all_jobs_user[i][3], all_jobs_user[i][4], all_jobs_user[i][5], all_jobs_user[i][6], all_jobs_user[i][7], all_jobs_user[i][8], all_jobs_user[i][9]]
-            session["info_jobs_queue"].append(var_info)
-            session["tot_jobs_queue"] += 1
+    if session["tot_jobs_queue"] == 0: 
+        for i in range(0, len(all_jobs_user), 2):
+            if all_jobs_user[i][10] == 0:
+                var_info = [all_jobs_user[i][0], all_jobs_user[i][1], all_jobs_user[i][2], all_jobs_user[i][3], all_jobs_user[i][4], all_jobs_user[i][5], all_jobs_user[i][6], all_jobs_user[i][7], all_jobs_user[i][8], all_jobs_user[i][9]]
+                session["info_jobs_queue"].append(var_info)
+                session["tot_jobs_queue"] += 1
             # print("job in progress", flush=True)
     # print(f"all_jobs_user : {all_jobs_user}", flush=True)
     # ---------------------------------------------------------    

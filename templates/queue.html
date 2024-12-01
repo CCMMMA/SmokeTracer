@@ -305,25 +305,32 @@
 
             let tot_jobs = parseInt("{{session['tot_jobs_queue']}}");
 
-            if( parseInt(tot_jobs) > 0 ){                
-                let tbody = document.getElementById("info-table").getElementsByTagName("tbody")[0];
-                fetch('/getInfoJobsQueue')
-                .then(response => response.json())
-                .then(data =>{
-                    for(let i=0; i<tot_jobs; i++) {
-                        if(!tbody.rows[i]){
-                            let new_row = tbody.insertRow();
-                            for(let j=0; j<10; j++) {
-                                new_row.insertCell().textContent = data[i][j];
+            let tbody = document.getElementById("info-table").getElementsByTagName("tbody")[0];
+
+            
+
+            if( (parseInt(tot_jobs) > 0) ){  
+
+                if( parseInt(tot_jobs) > tbody.rows.length ) {
+                    
+                    fetch('/getInfoJobsQueue')
+                    .then(response => response.json())
+                    .then(data =>{
+                        for(let i=0; i<tot_jobs; i++) {
+                            if(!tbody.rows[i]){
+                                let new_row = tbody.insertRow();
+                                for(let j=0; j<10; j++) {
+                                    new_row.insertCell().textContent = data[i][j];
+                                }
                             }
                         }
-                    }
-                    //console.log("rows : " , tbody.rows.length);
-                    //console.log("tot_jobs : ", tot_jobs);
-                })
-                .catch(error => console.error('Errore durante il recupero del file:', error));           
-                    
-                    
+                        //console.log("rows : " , tbody.rows.length);
+                        //console.log("tot_jobs : ", tot_jobs);
+                    })
+                    .catch(error => console.error('Errore durante il recupero del file:', error)); 
+
+                }
+            
                 fetch('/getStatusJobsQueue')
                 .then(response => response.json())
                 .then(data => {
