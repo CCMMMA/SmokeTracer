@@ -310,6 +310,9 @@
             let legendElement, legendControl;
             let hourToLegend, colorToLegend;
 
+            // variabili per gestire il vector Layer dei buffer sulla mappa 
+            var vectorLayer_buffer500, vectorLayer_buffer3000;
+
             let previous_hour = 0;
         
             var base_global_path = "";
@@ -514,7 +517,10 @@
 
             function changeInput() {
 
-                console.log("cambio input slider");
+                map.removeLayer(vectorLayer_buffer3000);
+                map.removeLayer(vectorLayer_buffer500);
+
+                console.log("Change input slider");
 
                 let selected_choice = document.getElementById('days_list');
                 let value_selected_choice = selected_choice.options[selected_choice.selectedIndex].value;
@@ -540,14 +546,13 @@
                         })
                     }));
                 }
-
-                // creo dinamicamente il path del file kml in base ai parametri impostati dall'utente
+                
                 // let url_var =  '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
                 // let url_var = '/static/KML/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
 
-                
+                // creo dinamicamente il path del file kml in base ai parametri impostati dall'utente
                 let url_var = base_global_path + value_without_char + "Z" + selected_hour_str + ".kml"; 
-                console.log("change_input url :", url_var);
+                //console.log("change_input url :", url_var);
 
                 // carica il file kml in un vector-layer
                 let targetVectorLayer = new ol.layer.Vector({
@@ -583,50 +588,19 @@
 
                 
                 // Controllo del buffer da 500m
-                if( flag_buffer500mt == true) {
+                //if( flag_buffer500mt == true) {
                     //let lon = 14.32745; // for test
                     //let lat = 40.84294; // for test
-                    let lon = var_lon;
-                    let lat = var_lat;
                     // let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")];
                     //let center = [lon, lat];
+
+                    /*
                     let center = [lon, lat];
-                    console.log("center : ", center);
-                    let radius = 500;
-                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
-                    let circleFeature = new ol.Feature(circle);
-                    let circleStyle = new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: 'red',
-                            width: 1
-                        }),
-                    });
-
-                    circleFeature.setStyle(circleStyle);
-
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
-                    let vectorSource = new ol.source.Vector({
-                        features: [circleFeature]
-                        });
-
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
-                    let vectorLayer = new ol.layer.Vector({
-                        source: vectorSource
-                        });
-
-                    map.addLayer(vectorLayer);                
-                    
-                }
-                
-                // Controllo del buffer da 3km
-                if( flag_buffer3km == true ) {
-                    //let lon = 14.32745; // for test
-                    //let lat = 40.84294; // for test
-                    //let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")]; // correct
                     let lon = var_lon;
                     let lat = var_lat;
-                    let center = [lon, lat]; // for test
-                    let radius = 3000;
+                    console.log("center : ", center);
+                    let radius = 500;
+
                     let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
                     let circleFeature = new ol.Feature(circle);
                     let circleStyle = new ol.style.Style({
@@ -635,8 +609,6 @@
                             width: 1
                         }),
                     });
-                    
-
                     circleFeature.setStyle(circleStyle);
 
                     // Crea un'istanza di ol.source.Vector per contenere la circonferenza
@@ -649,9 +621,56 @@
                         source: vectorSource
                         });
 
+                    map.addLayer(vectorLayer);     
+                    */          
+
+
+                   
+                    //map.addLayer(vectorLayer_buffer500);
+                    //console.log("BUFFER [500mt] : Added to map")
+                    
+                //}
+                
+                // Controllo del buffer da 3km
+                //if( flag_buffer3km == true ) {
+                    //let lon = 14.32745; // for test
+                    //let lat = 40.84294; // for test
+                    //let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")]; // correct
+
+                    /*
+                    let lon = var_lon;
+                    let lat = var_lat;
+                    let center = [lon, lat]; // for test
+                    let radius = 3000;
+
+                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
+                    let circleFeature = new ol.Feature(circle);
+                    let circleStyle = new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: 'black',
+                            width: 1
+                        }),
+                    });
+                    circleFeature.setStyle(circleStyle);
+
+                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
+                    let vectorSource = new ol.source.Vector({
+                        features: [circleFeature]
+                        });
+
+                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
+                    let vectorLayer = new ol.layer.Vector({
+                        source: vectorSource
+                        });
+                    
+
                     map.addLayer(vectorLayer);
-                    console.log("BUFFER [3km] : Added to map")
-                }
+
+                    */
+                    
+                    //map.addLayer(vectorLayer_buffer3000);
+                    //console.log("BUFFER [3km] : Added to map")
+                //}
 
 
                 if(flag_sovrapposizione==false){
@@ -672,31 +691,25 @@
 
                 } else { 
 
-                     // caso in cui l'utente torna indietro con le ora
+                    // caso in cui l'utente torna indietro con le ora
                     // bisogna eliminare l'ultimo layer inserito sulla mappa e nella legenda 
-
-                    // console.log("selected_hour : ", parseInt(selected_hour));
-                    // console.log("previous_hour : ", previous_hour);
 
                     if ( (parseInt(selected_hour_str)) <= previous_hour ) {
 
                         // rimuovo l'ultimo layer inserito 
-                        var layers_map = map.getLayers().getArray();
+                        let layers_map = map.getLayers().getArray();
                         map.removeLayer(layers_map[layers_map.length-1]);
-
 
                          // rimuovo l'ultima voce della legenda 
                         let array_lines_html_string = (legendElement.innerHTML).split('\n');
-                        // array_lines_html_string = array_lines_html_string.pop();
-                        
                         let new_string_html = " ";
+
                         for(let i=0; i<array_lines_html_string.length-2; i++) {
                             console.log("line : ", array_lines_html_string[i]);
                             new_string_html += array_lines_html_string[i] + '\n';
                         }
 
                         legendElement.innerHTML = new_string_html;
-                        //legendElement.innerHTML = (legendElement.innerHTML).replace(/<div[^>]*>[^<]*<\/div>\s*$/, '');
                         legendControl = new ol.control.Control({
                             element: legendElement
                         });
@@ -707,7 +720,6 @@
                     } else {
                     
                         // Aggiungo alla leggenda il campo dell'attuale ora della simulazione.
-
                         let hour_legend = (hourToLegend.toString()).padStart(2, '0') + ':00 UTC';
                         legendElement.innerHTML = legendElement.innerHTML + ` <div><span style="background-color: ` + new_color.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend  + ` </div> \n`;
 
@@ -726,7 +738,6 @@
                 // aggiorno l'ora precedente in base a quella selezionata 
                 previous_hour = parseInt(hourToLegend)-1;
 
-
                 //map.addLayer(targetVectorLayer); 
 
                 /*
@@ -740,7 +751,13 @@
                 map.addLayer(borders);
                 */
 
+                if(flag_buffer3km)
+                    map.addLayer(vectorLayer_buffer3000);
+                else if(flag_buffer500mt)
+                    map.addLayer(vectorLayer_buffer500);
 
+
+                // sezione che implemente l'estrazione dei comuni basato sul .kml dell'ora selezionata 
                 let var_commons_list = document.getElementById('commons_list')
                 var_commons_list.textContent = '';
 
@@ -756,8 +773,6 @@
                     }
                 })
                 .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
-
-
 
             }
 
@@ -1033,32 +1048,97 @@
 
             }
             */
-            
+        
             function bufferCheck3km() {
+
                 attivoBuffer3km = !attivoBuffer3km;
-                var bottone = document.getElementById("buffer3km");
+                let bottone = document.getElementById("buffer3km");
+                
                 if (attivoBuffer3km) {
                     bottone.classList.remove("evidenziato");
                     console.log("BUFFER [3km] : disattivato");
                     flag_buffer3km = false;
+                    map.removeLayer(vectorLayer_buffer3000);
+
                 } else {
                     bottone.classList.add("evidenziato");
                     console.log("BUFFER [3km] : attivato");
                     flag_buffer3km = true;
+
+                    let lon = var_lon;
+                    let lat = var_lat;
+                    let center = [lon, lat]; // for test
+                    let radius = 3000;
+
+                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
+                    let circleFeature = new ol.Feature(circle);
+                    let circleStyle = new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: 'black',
+                            width: 1
+                        }),
+                    });
+                    circleFeature.setStyle(circleStyle);
+
+                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
+                    let vectorSource = new ol.source.Vector({
+                        features: [circleFeature]
+                        });
+
+                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
+                    vectorLayer_buffer3000 = new ol.layer.Vector({
+                        source: vectorSource
+                        });
+
+                    map.addLayer(vectorLayer_buffer3000);
+                    console.log("BUFFER [3km] : Added to map")
+
                 }
             }
 
             function bufferCheck500mt() {
+
                 attivoBuffer500mt = !attivoBuffer500mt;
-                var bottone = document.getElementById("buffer500mt");
+                let bottone = document.getElementById("buffer500mt");
+
                 if (attivoBuffer500mt) {
                     bottone.classList.remove("evidenziato");
                     console.log("BUFFER [500mt] : disattivato");
                     flag_buffer500mt = false;
+                    map.removeLayer(vectorLayer_buffer500);
+
                 } else {
                     bottone.classList.add("evidenziato");
                     console.log("BUFFER [500mt]: attivato");
                     flag_buffer500mt = true;
+
+                    let lon = var_lon;
+                    let lat = var_lat;
+                    let center = [lon, lat]; // for test
+                    let radius = 500;
+
+                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
+                    let circleFeature = new ol.Feature(circle);
+                    let circleStyle = new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: 'black',
+                            width: 1
+                        }),
+                    });
+                    circleFeature.setStyle(circleStyle);
+
+                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
+                    let vectorSource = new ol.source.Vector({
+                        features: [circleFeature]
+                        });
+
+                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
+                    vectorLayer_buffer500 = new ol.layer.Vector({
+                        source: vectorSource
+                        });
+
+                    map.addLayer(vectorLayer_buffer500);
+                    console.log("BUFFER [3km] : Added to map")
                 }
             }
             
@@ -1073,9 +1153,9 @@
 
                 flag_sovrapposizione = false;
                 document.getElementById("bottoneSovrapposizione").classList.remove('evidenziato');
+                
                 // nel caso in cui l'utente abbia lasciato True il flag di sovrapposizione ed ha cambiato simulazione
                 // pulisce la leggenda 
-
                 map.removeControl(legendControl);
 
                 var layers = map.getLayers(); 
