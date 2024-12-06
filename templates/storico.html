@@ -14,6 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
     <link rel="stylesheet" href="http://unpkg.com/leaflet@1.4.0/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
     <style>
         .evidenziato {
@@ -61,6 +62,39 @@
         form {
             display: inline;
         }
+
+        /* Stile per la legenda */
+        .ol-legend {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: #ffffff;  /* Sfondo bianco */
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        font-family: Arial, sans-serif;
+        z-index: 1000;
+        width: 150px;  /* Imposta la larghezza della legenda */
+        }
+
+        .ol-legend h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        }
+
+        .ol-legend div {
+        margin-bottom: 5px;
+        }
+
+        .ol-legend span {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        margin-right: 5px;
+        }
+
     </style>
 </head>
 
@@ -230,7 +264,7 @@
                     <div class="col-lg-12 col-xl-12" style="color: var(--bs-card-bg);background: var(--bs-card-cap-bg);" id="options_map">
                         <div class="card shadow mb-4" style="margin-left: 12px; margin-top: 9px; margin-right: 12px;">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary fw-bold m-0">Comuni Estratti</h6>
+                                <h6 class="text-primary fw-bold m-0">Comuni Coinvolti</h6>
                             </div>
                             <div class="card-body" style="height: 50%; margin-bottom: 0px;">
                                 <ul id="commons_list">
@@ -271,6 +305,12 @@
             var flag_buffer500mt = false;
             var flag_sovrapposizione = false;
             let var_lon, var_lat;
+
+            // variabili per la leggenda dinamica della mappa ( sovrapposizione .kml )
+            let legendElement, legendControl;
+            let hourToLegend, colorToLegend;
+
+            let previous_hour = 0;
         
             var base_global_path = "";
 
@@ -312,10 +352,9 @@
                     output.innerHTML = this.value / 5;
             }
             
-         
+            // sezione per evidenziare le simulazioni ancora non terminate o per eliminare la visualizzazione di 'simulazione ancora in corso'
             var table_body = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
 
-           
             if (table_body.rows.length > 0 ) {
                 for (let i=0; i<table_body.rows.length; i++) {
                     if (table_body.rows[i].cells[14].textContent == '0')
@@ -472,12 +511,14 @@
             }
             */
 
+
             function changeInput() {
+
                 console.log("cambio input slider");
+
                 let selected_choice = document.getElementById('days_list');
                 let value_selected_choice = selected_choice.options[selected_choice.selectedIndex].value;
                 let value_without_char = value_selected_choice.replace(/-/g, "");
-                // console.log("[*] data : ", value_without_char);
 
                 // prendo l'ora dall'input slider 
                 let selected_hour = slider.value / 5;
@@ -487,16 +528,9 @@
                 }
                 // console.log("[*] ora : ", selected_hour_str);
 
-                // pulisce la mappa dai precedenti .kml
-                if(flag_sovrapposizione==false){
-                    var layers = map.getLayers().getArray();
-                    layers.forEach(function(layer) {
-                    if (layer instanceof ol.layer.Vector) {
-                            layer.getSource().clear();
-                        }
-                    });
-                }
-
+                
+                hourToLegend = parseInt(selected_hour_str);
+            
                 // crea lo stile ( cambio colore ) per le linee del .kml
                 function changeKMLColor(feature, color) {
                     feature.setStyle(new ol.style.Style({
@@ -523,18 +557,30 @@
                     })
                 });
 
+                // aggiorno la variabile del colore per la leggenda 
+                let new_color = tinycolor.random().toHexString();
+                colorToLegend = new_color;
+          
+
                 // cambia effettivamente colore alle vector features nel kml
                 targetVectorLayer.getSource().once('change', function(event) {
                     if (targetVectorLayer.getSource().getState() === 'ready') {
                             var features = targetVectorLayer.getSource().getFeatures();
-                            color = tinycolor.random().toHexString();
+                            // color = tinycolor.random().toHexString();
+                            // colorToLegend = color;
+                            color = new_color;
+
+                            // console.log("colorToLegend : ", colorToLegend);
+
                             features.forEach(function(feature) {
                                 changeKMLColor(feature, color);
                             });
                         }
                     });
-
                 
+                // aggiungo alla mappa il .kml ( layer )
+                //map.addLayer(targetVectorLayer); 
+
                 
                 // Controllo del buffer da 500m
                 if( flag_buffer500mt == true) {
@@ -589,6 +635,7 @@
                             width: 1
                         }),
                     });
+                    
 
                     circleFeature.setStyle(circleStyle);
 
@@ -605,7 +652,82 @@
                     map.addLayer(vectorLayer);
                     console.log("BUFFER [3km] : Added to map")
                 }
-                map.addLayer(targetVectorLayer); 
+
+
+                if(flag_sovrapposizione==false){
+
+                    // pulisce la mappa dai precedenti .kml
+                    var layers = map.getLayers().getArray();
+                    layers.forEach(function(layer) {
+                    if (layer instanceof ol.layer.Vector) {
+                            layer.getSource().clear();
+                        }
+                    });
+
+                    // pulisce la leggenda dalla mappa nel caso in cui prima era 'True' la sovrapposizione
+                    map.removeControl(legendControl);
+
+                    // aggiungo alla mappa il .kml ( layer )
+                    map.addLayer(targetVectorLayer); 
+
+                } else { 
+
+                     // caso in cui l'utente torna indietro con le ora
+                    // bisogna eliminare l'ultimo layer inserito sulla mappa e nella legenda 
+
+                    // console.log("selected_hour : ", parseInt(selected_hour));
+                    // console.log("previous_hour : ", previous_hour);
+
+                    if ( (parseInt(selected_hour_str)) <= previous_hour ) {
+
+                        // rimuovo l'ultimo layer inserito 
+                        var layers_map = map.getLayers().getArray();
+                        map.removeLayer(layers_map[layers_map.length-1]);
+
+
+                         // rimuovo l'ultima voce della legenda 
+                        let array_lines_html_string = (legendElement.innerHTML).split('\n');
+                        // array_lines_html_string = array_lines_html_string.pop();
+                        
+                        let new_string_html = " ";
+                        for(let i=0; i<array_lines_html_string.length-2; i++) {
+                            console.log("line : ", array_lines_html_string[i]);
+                            new_string_html += array_lines_html_string[i] + '\n';
+                        }
+
+                        legendElement.innerHTML = new_string_html;
+                        //legendElement.innerHTML = (legendElement.innerHTML).replace(/<div[^>]*>[^<]*<\/div>\s*$/, '');
+                        legendControl = new ol.control.Control({
+                            element: legendElement
+                        });
+                        // aggiungo la legenda modificata alla mappa 
+                        map.addControl(legendControl);
+            
+                        
+                    } else {
+                    
+                        // Aggiungo alla leggenda il campo dell'attuale ora della simulazione.
+
+                        let hour_legend = (hourToLegend.toString()).padStart(2, '0') + ':00 UTC';
+                        legendElement.innerHTML = legendElement.innerHTML + ` <div><span style="background-color: ` + new_color.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend  + ` </div> \n`;
+
+                        legendControl = new ol.control.Control({
+                            element: legendElement
+                        });
+
+                        map.addControl(legendControl);
+
+                        // aggiungo alla mappa il .kml ( layer )
+                        map.addLayer(targetVectorLayer);  
+                        
+                    }
+                }
+
+                // aggiorno l'ora precedente in base a quella selezionata 
+                previous_hour = parseInt(hourToLegend)-1;
+
+
+                //map.addLayer(targetVectorLayer); 
 
                 /*
                 // aggiunge i confini dei comuni sulla mappa
@@ -617,19 +739,55 @@
                 })
                 map.addLayer(borders);
                 */
+
+
+                let var_commons_list = document.getElementById('commons_list')
+                var_commons_list.textContent = '';
+
+            
+                fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url_var)
+                .then(response => response.json())
+                .then(data => {
+                    for (let elem of data) {
+                        console.log("Common : ", elem[1])
+                        let newCommon = document.createElement('li')
+                        newCommon.textContent = elem[1].toString()
+                        var_commons_list.appendChild(newCommon)
+                    }
+                })
+                .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
+
+
+
             }
 
             function sovraCheck() {
                 attivo = !attivo;
                 var bottone = document.getElementById("bottoneSovrapposizione");
                 if (attivo) {
-                    bottone.classList.remove("disattivato");
+                    bottone.classList.remove("evidenziato");
                     console.log("SOVRAPPOSIZIONE : disattivato");
                     flag_sovrapposizione = false;
+                    map.removeControl(legendControl);
                 } else {
-                    bottone.classList.add("disattivato");
+                    bottone.classList.add("evidenziato");
                     console.log("SOVRAPPOSIZIONE : attivato");
                     flag_sovrapposizione = true;
+
+                    let hour_legend = ((hourToLegend).toString()).padStart(2, '0') + ':00 UTC'
+                    legendElement = document.createElement('div');
+                    legendElement.className = 'ol-legend';
+                    legendElement.innerHTML = `
+                        <h4>Legenda</h4>
+                        <div><span style="background-color: ` + colorToLegend.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend.toString() + ` </div> \n`;
+
+                    // crea un controllo personalizzato per la legenda
+                    legendControl = new ol.control.Control({
+                        element: legendElement
+                    });
+
+                    // cggiungi il controllo della legenda alla mappa
+                    map.addControl(legendControl);
                 }
             }
             
@@ -880,11 +1038,11 @@
                 attivoBuffer3km = !attivoBuffer3km;
                 var bottone = document.getElementById("buffer3km");
                 if (attivoBuffer3km) {
-                    bottone.classList.remove("disattivato");
+                    bottone.classList.remove("evidenziato");
                     console.log("BUFFER [3km] : disattivato");
                     flag_buffer3km = false;
                 } else {
-                    bottone.classList.add("disattivato");
+                    bottone.classList.add("evidenziato");
                     console.log("BUFFER [3km] : attivato");
                     flag_buffer3km = true;
                 }
@@ -894,11 +1052,11 @@
                 attivoBuffer500mt = !attivoBuffer500mt;
                 var bottone = document.getElementById("buffer500mt");
                 if (attivoBuffer500mt) {
-                    bottone.classList.remove("disattivato");
+                    bottone.classList.remove("evidenziato");
                     console.log("BUFFER [500mt] : disattivato");
                     flag_buffer500mt = false;
                 } else {
-                    bottone.classList.add("disattivato");
+                    bottone.classList.add("evidenziato");
                     console.log("BUFFER [500mt]: attivato");
                     flag_buffer500mt = true;
                 }
@@ -906,12 +1064,34 @@
             
             function evidenziaRiga(riga) {
 
+
+                flag_buffer3km = false;
+                document.getElementById("buffer3km").classList.remove('evidenziato');
+
+                flag_buffer500mt = false;
+                document.getElementById("buffer500mt").classList.remove('evidenziato');
+
+                flag_sovrapposizione = false;
+                document.getElementById("bottoneSovrapposizione").classList.remove('evidenziato');
+                // nel caso in cui l'utente abbia lasciato True il flag di sovrapposizione ed ha cambiato simulazione
+                // pulisce la leggenda 
+
+                map.removeControl(legendControl);
+
                 var layers = map.getLayers(); 
 
                 // Rimuovi tutti i layers tranne il primo
+                /*
                 layers.forEach(function (layer, index) {
                     if (index > 0) { 
                         map.removeLayer(layer);
+                    }
+                });
+                var layers = map.getLayers().getArray();
+                */
+                layers.forEach(function(layer) {
+                if (layer instanceof ol.layer.Vector) {
+                        layer.getSource().clear();
                     }
                 });
 
@@ -957,8 +1137,12 @@
 
                             base_global_path = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/"
 
+
                             let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
-                
+                            
+                            hourToLegend = (parseInt(riga.cells[2].textContent));
+                            previous_hour = parseInt(riga.cells[2].textContent);
+
                             // console.log("url : " + url);
 
                             var targetVectorLayer = new ol.layer.Vector({
@@ -968,6 +1152,9 @@
                                 })
                             });
                             map.addLayer(targetVectorLayer);
+
+                            // il primo plot di isolinee sarà sempre rosso 
+                            colorToLegend = "red"
 
                             //console.log("map : ", map)
 
@@ -1033,6 +1220,12 @@
                 });
                 */
             }
+        
+            
+            //TODO :
+            // mi serve una funzione che prende in input le ore plottate e i colori associati 
+            // tale funzione restituisce la leggenda
+
         </script>
 </body>
 </html>
