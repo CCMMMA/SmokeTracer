@@ -256,6 +256,7 @@
                                     <button class="btn btn-primary btn-sm" id="bottoneSovrapposizione" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="sovraCheck()">Sovrapposizione</button>
                                     <button class="btn btn-primary btn-sm" id="buffer500mt" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="bufferCheck500mt()">Buffer 500MT</button>
                                     <button class="btn btn-primary btn-sm" id="buffer3km" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="bufferCheck3km()">Buffer 3KM</button>
+                                    <button class="btn btn-primary btn-sm" id="buttonHighlightCommons" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="highlightsCommon()">Evidenzia comuni</button>
                                 </div> 
                             </div>
                         </div>
@@ -298,23 +299,35 @@
 
             var output = document.getElementById("demo");
             var slider = document.getElementById("myRange");
-            var attivo=true;
+
+            // variabile per gestire la logica dei bottoni 
             var attivoBuffer3km = true;
             var flag_buffer3km = false;
+
             var attivoBuffer500mt = true;
             var flag_buffer500mt = false;
+
+            var attivo=true;
             var flag_sovrapposizione = false;
-            let var_lon, var_lat;
+
+            var attivoEvidenziaComuni = true;
+            var flagEvidenziaComuni = false;
+
+            // variabili per tenere traccia della lon e lat dell'attuale simulazione 
+            var var_lon, var_lat;
 
             // variabili per la leggenda dinamica della mappa ( sovrapposizione .kml )
-            let legendElement, legendControl;
-            let hourToLegend, colorToLegend;
+            var legendElement, legendControl;
+            var hourToLegend, colorToLegend;
+            var previous_hour = 0;
 
             // variabili per gestire il vector Layer dei buffer sulla mappa 
             var vectorLayer_buffer500, vectorLayer_buffer3000;
 
-            let previous_hour = 0;
-        
+            // variabile per gestire i vectorLayert dei polygon dei comuni 
+            var vectorLayersCommons = [];
+
+            
             var base_global_path = "";
 
             var map = new ol.Map({
@@ -449,6 +462,7 @@
                 */
             }
 
+
             /*
             function controlKmlOnLoad(){
                 
@@ -517,11 +531,15 @@
 
             function changeInput() {
 
+                // Sezione pulizia mappa dai precedenti layer 
                 map.removeLayer(vectorLayer_buffer3000);
                 map.removeLayer(vectorLayer_buffer500);
-
-                console.log("Change input slider");
-
+                
+                for( let layer of vectorLayersCommons )
+                    map.removeLayer(layer);
+                
+                vectorLayersCommons = [];
+                
                 let selected_choice = document.getElementById('days_list');
                 let value_selected_choice = selected_choice.options[selected_choice.selectedIndex].value;
                 let value_without_char = value_selected_choice.replace(/-/g, "");
@@ -534,7 +552,6 @@
                 }
                 // console.log("[*] ora : ", selected_hour_str);
 
-                
                 hourToLegend = parseInt(selected_hour_str);
             
                 // crea lo stile ( cambio colore ) per le linee del .kml
@@ -582,97 +599,79 @@
                             });
                         }
                     });
-                
-                // aggiungo alla mappa il .kml ( layer )
-                //map.addLayer(targetVectorLayer); 
-
-                
-                // Controllo del buffer da 500m
-                //if( flag_buffer500mt == true) {
-                    //let lon = 14.32745; // for test
-                    //let lat = 40.84294; // for test
-                    // let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")];
-                    //let center = [lon, lat];
-
-                    /*
-                    let center = [lon, lat];
-                    let lon = var_lon;
-                    let lat = var_lat;
-                    console.log("center : ", center);
-                    let radius = 500;
-
-                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
-                    let circleFeature = new ol.Feature(circle);
-                    let circleStyle = new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: 'black',
-                            width: 1
-                        }),
-                    });
-                    circleFeature.setStyle(circleStyle);
-
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
-                    let vectorSource = new ol.source.Vector({
-                        features: [circleFeature]
-                        });
-
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
-                    let vectorLayer = new ol.layer.Vector({
-                        source: vectorSource
-                        });
-
-                    map.addLayer(vectorLayer);     
-                    */          
-
-
-                   
-                    //map.addLayer(vectorLayer_buffer500);
-                    //console.log("BUFFER [500mt] : Added to map")
                     
-                //}
+                                
+                // sezione che implemente l'estrazione dei comuni basato sul .kml dell'ora selezionata 
+                let var_commons_list = document.getElementById('commons_list')
+                var_commons_list.textContent = '';
                 
-                // Controllo del buffer da 3km
-                //if( flag_buffer3km == true ) {
-                    //let lon = 14.32745; // for test
-                    //let lat = 40.84294; // for test
-                    //let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")]; // correct
+                
+                fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url_var)
+                .then(response => {
 
-                    /*
-                    let lon = var_lon;
-                    let lat = var_lat;
-                    let center = [lon, lat]; // for test
-                    let radius = 3000;
+                    if (response.status == 500 || response.status == 404) {
+                        document.getElementById('myRange').style.backgroundColor = "red";
+                    } else {
+                        document.getElementById('myRange').style.backgroundColor = "#d3d3d3";
+                    }
 
-                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
-                    let circleFeature = new ol.Feature(circle);
-                    let circleStyle = new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: 'black',
-                            width: 1
-                        }),
-                    });
-                    circleFeature.setStyle(circleStyle);
+                    return response.json();
+                }) 
+                .then(data => {
 
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
-                    let vectorSource = new ol.source.Vector({
-                        features: [circleFeature]
+                    let wkt_strings_box_extracted_commons = [];
+                    vectorLayersCommons = [];
+
+                    for (let elem of data) {
+                        console.log("Common : ", elem[1])
+                        let newCommon = document.createElement('li')
+                        newCommon.textContent = elem[1].toString()
+                        var_commons_list.appendChild(newCommon)
+
+                        wkt_strings_box_extracted_commons.push(elem[2]);
+
+                    }
+ 
+                    // Sezione manipolazione della stringa wkt delle coordinate del box
+                    for( let elem of wkt_strings_box_extracted_commons) {
+
+                        let wktFormat = new ol.format.WKT();
+                        let polygonGeometry = wktFormat.readGeometry(elem);
+                        let polygonFeature = new ol.Feature(polygonGeometry);
+
+                        //  Le coordinate sono memorizzate in EPSG:4326 ( causa natura dei place di mongodb ), converto in EPSG:3857 
+                        polygonGeometry = polygonGeometry.transform('EPSG:4326', 'EPSG:3857');
+
+                        let vectorSource = new ol.source.Vector({
+                            features: [polygonFeature]
                         });
 
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
-                    let vectorLayer = new ol.layer.Vector({
-                        source: vectorSource
-                        });
+                        // Crea il layer del vettore con un colore di riempimento
+                        let vectorLayer = new ol.layer.Vector({
+                            source: vectorSource,
+                            style: new ol.style.Style({
+                                fill: new ol.style.Fill({
+                                    color: 'rgba(255, 0, 0, 0.2)' // colore rosso con trasparenza
+                                }),
+                                stroke: new ol.style.Stroke({
+                                    color: 'red', // bordi rossi
+                                    width: 0.5
+                                })
+                            })
+                        });                        
                     
-
-                    map.addLayer(vectorLayer);
-
-                    */
-                    
-                    //map.addLayer(vectorLayer_buffer3000);
-                    //console.log("BUFFER [3km] : Added to map")
-                //}
-
-
+                        if( flagEvidenziaComuni ) 
+                            // aggiunge i vectorLayer alla mappa
+                            map.addLayer(vectorLayer);
+                        else 
+                            // aggiunge i vectorLayer dei  polygon estratti nell'array che tiene traccia di tali layer per l'utente 
+                            vectorLayersCommons.push(vectorLayer);
+                    }
+                })
+                .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
+                
+                
+                                 
                 if(flag_sovrapposizione==false){
 
                     // pulisce la mappa dai precedenti .kml
@@ -686,8 +685,10 @@
                     // pulisce la leggenda dalla mappa nel caso in cui prima era 'True' la sovrapposizione
                     map.removeControl(legendControl);
 
-                    // aggiungo alla mappa il .kml ( layer )
+                    // aggiungo alla mappa il .kml ( layer ) della simulazione
                     map.addLayer(targetVectorLayer); 
+
+                    
 
                 } else { 
 
@@ -713,7 +714,7 @@
                         legendControl = new ol.control.Control({
                             element: legendElement
                         });
-                        // aggiungo la legenda modificata alla mappa 
+                        // Aggiungo la legenda aggiornata alla mappa 
                         map.addControl(legendControl);
             
                         
@@ -727,9 +728,10 @@
                             element: legendElement
                         });
 
+                        // Aggiungo la legenda aggiornata alla mappa 
                         map.addControl(legendControl);
 
-                        // aggiungo alla mappa il .kml ( layer )
+                        // Aggiungo alla mappa il .kml ( layer )
                         map.addLayer(targetVectorLayer);  
                         
                     }
@@ -738,7 +740,6 @@
                 // aggiorno l'ora precedente in base a quella selezionata 
                 previous_hour = parseInt(hourToLegend)-1;
 
-                //map.addLayer(targetVectorLayer); 
 
                 /*
                 // aggiunge i confini dei comuni sulla mappa
@@ -751,42 +752,49 @@
                 map.addLayer(borders);
                 */
 
+
+
+                /*
+                console.log("flagEvidenziaComuni : ", flagEvidenziaComuni);
+                console.log("flag_buffer3km : ", flag_buffer3km);
+                console.log("flag_buffer500mt : ", flag_buffer500mt);
+                console.log("flag_sovrapposizione : ", flag_sovrapposizione);
+
+                console.log("--------------------------------------------")
+
+                console.log("attivoEvidenziaComuni : ", attivoEvidenziaComuni);
+                console.log("attivoBuffer3km : ", attivoBuffer3km);
+                console.log("attivoBuffer500mt : ", attivoBuffer500mt);
+                console.log("attivo : ", attivo);
+                */
+
+
+                // Sezione controllo dei layer aggiunti sulla mappa 
                 if(flag_buffer3km)
                     map.addLayer(vectorLayer_buffer3000);
-                else if(flag_buffer500mt)
+                if(flag_buffer500mt)
                     map.addLayer(vectorLayer_buffer500);
 
-
-                // sezione che implemente l'estrazione dei comuni basato sul .kml dell'ora selezionata 
-                let var_commons_list = document.getElementById('commons_list')
-                var_commons_list.textContent = '';
-
-            
-                fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url_var)
-                .then(response => response.json())
-                .then(data => {
-                    for (let elem of data) {
-                        console.log("Common : ", elem[1])
-                        let newCommon = document.createElement('li')
-                        newCommon.textContent = elem[1].toString()
-                        var_commons_list.appendChild(newCommon)
-                    }
-                })
-                .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
-
+             
             }
 
+
             function sovraCheck() {
+
                 attivo = !attivo;
                 var bottone = document.getElementById("bottoneSovrapposizione");
+
                 if (attivo) {
+
                     bottone.classList.remove("evidenziato");
-                    console.log("SOVRAPPOSIZIONE : disattivato");
+                    // console.log("SOVRAPPOSIZIONE : disattivato");
                     flag_sovrapposizione = false;
                     map.removeControl(legendControl);
+
                 } else {
+
                     bottone.classList.add("evidenziato");
-                    console.log("SOVRAPPOSIZIONE : attivato");
+                    // console.log("SOVRAPPOSIZIONE : attivato");
                     flag_sovrapposizione = true;
 
                     let hour_legend = ((hourToLegend).toString()).padStart(2, '0') + ':00 UTC'
@@ -803,9 +811,11 @@
 
                     // cggiungi il controllo della legenda alla mappa
                     map.addControl(legendControl);
+
                 }
             }
             
+
             /*
             function nextKML(){
                 
@@ -1049,6 +1059,7 @@
             }
             */
         
+
             function bufferCheck3km() {
 
                 attivoBuffer3km = !attivoBuffer3km;
@@ -1096,20 +1107,23 @@
                 }
             }
 
+
             function bufferCheck500mt() {
 
                 attivoBuffer500mt = !attivoBuffer500mt;
                 let bottone = document.getElementById("buffer500mt");
 
                 if (attivoBuffer500mt) {
+
                     bottone.classList.remove("evidenziato");
                     console.log("BUFFER [500mt] : disattivato");
                     flag_buffer500mt = false;
                     map.removeLayer(vectorLayer_buffer500);
 
                 } else {
+
                     bottone.classList.add("evidenziato");
-                    console.log("BUFFER [500mt]: attivato");
+                    // console.log("BUFFER [500mt]: attivato");
                     flag_buffer500mt = true;
 
                     let lon = var_lon;
@@ -1142,88 +1156,126 @@
                 }
             }
             
+            
+            function highlightsCommon() {
+
+                attivoEvidenziaComuni = !attivoEvidenziaComuni;
+                let buttonHighlightsCommons = document.getElementById('buttonHighlightCommons');
+                // console.log("attivoEvidenzia : ", attivoEvidenziaComuni);
+
+                if(attivoEvidenziaComuni) {
+
+                    buttonHighlightsCommons.classList.remove("evidenziato");
+                    //console.log("Highlights Commons : disattivato");
+                    flagEvidenziaComuni = false;
+
+                    for( let layer of vectorLayersCommons ) 
+                        map.removeLayer(layer);
+
+                } else {
+                
+                    buttonHighlightsCommons.classList.add("evidenziato");
+                    //console.log("Highlights Commons : attivato");
+                    flagEvidenziaComuni = true;
+
+                    for ( let layer of vectorLayersCommons ) 
+                        map.addLayer(layer);
+                    
+                }
+
+            }
+            
+            
             function evidenziaRiga(riga) {
 
+                if( riga.classList.contains('evidenziato') )
+                    return;
 
+                // ---------------- INIZIO SEZIONE PULIZIA MAPPA ---------------------------
+
+                // pulisce l'array dei layers ( poligoni dei places ) della simulazione precedente 
+                vectorLayersCommons = [];
+                console.log("vectorLayersCommons pulito !");
+
+                // inizializza i flag per la loggica dei bottoni 
                 flag_buffer3km = false;
+                attivoBuffer3km = true;
                 document.getElementById("buffer3km").classList.remove('evidenziato');
 
                 flag_buffer500mt = false;
+                attivoBuffer500mt = true;
                 document.getElementById("buffer500mt").classList.remove('evidenziato');
 
                 flag_sovrapposizione = false;
+                attivo = true;
                 document.getElementById("bottoneSovrapposizione").classList.remove('evidenziato');
-                
-                // nel caso in cui l'utente abbia lasciato True il flag di sovrapposizione ed ha cambiato simulazione
+
+                flagEvidenziaComuni = false;
+                attivoEvidenziaComuni = true;
+                document.getElementById('buttonHighlightCommons').classList.remove('evidenziato');
+
+
                 // pulisce la leggenda 
                 map.removeControl(legendControl);
 
-                var layers = map.getLayers(); 
 
-                // Rimuovi tutti i layers tranne il primo
-                /*
-                layers.forEach(function (layer, index) {
-                    if (index > 0) { 
-                        map.removeLayer(layer);
-                    }
-                });
-                var layers = map.getLayers().getArray();
-                */
+                // pulisce la mappa dai layers della simulazione precednete  
+                var layers = map.getLayers(); 
                 layers.forEach(function(layer) {
                 if (layer instanceof ol.layer.Vector) {
                         layer.getSource().clear();
                     }
                 });
-
-
-                if( riga.classList.contains('evidenziato') )
-                    return;
                 
 
+                // pulisce il campo del nome dei comuni estratti dalla precedente simulazione
                 var ul_common_list = document.getElementById('commons_list')
-
                 if( ul_common_list.children.length > 0 ) {
                     for( let i=0; i<ul_common_list.children.length; i++) {
                         ul_common_list.removeChild(ul_common_list.children[i])
                     }
                 }
 
+                // elimina l'evidenziato della riga da tutte le righe presenti nella tabella trannel quella corrispondente lla simulazione attuale 
                 var righe = document.querySelectorAll('tr');
                 righe.forEach(function(row) {
                     row.classList.remove('evidenziato');
                 });
                 riga.classList.add('evidenziato');
 
+                // -------------------------FINE SEZIONE PULIZIA MAPPA --------------------------------------------
+            
+
                 var_lon = parseFloat(riga.cells[5].textContent);
                 var_lat = parseFloat(riga.cells[6].textContent); 
-
                 var coordinate = ol.proj.fromLonLat([var_lon, var_lat]);
+
+                // Imposto la lon e lat del centro della simulazione 
                 map.getView().setCenter(coordinate);
                 map.getView().setZoom(11);
 
-                //console.log("var_lon : ", var_lon);
-                //console.log("var_lat : ", var_lat);
 
                 // let name_user = document.getElementById('name_user_label').textContent
                 let name_user = "{{session['user']}}";
                 let date_label = riga.cells[1].textContent;
 
+
                 fetch('static/centroidi_comuni/centroidi_comuni.geojson')
                 .then(response => response.json())
                 .then(data => {
+
                     for (let feature of data.features) {
+                        
                         if (feature.properties.COMUNE == riga.cells[4].textContent){
+
                             var municipality_code = feature.properties.COD_COM;
+                            let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
+
 
                             base_global_path = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/"
-
-
-                            let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
                             
                             hourToLegend = (parseInt(riga.cells[2].textContent));
                             previous_hour = parseInt(riga.cells[2].textContent);
-
-                            // console.log("url : " + url);
 
                             var targetVectorLayer = new ol.layer.Vector({
                                 source: new ol.source.Vector({
@@ -1231,31 +1283,88 @@
                                     format: new ol.format.KML()
                                 })
                             });
+
                             map.addLayer(targetVectorLayer);
 
                             // il primo plot di isolinee sarà sempre rosso 
                             colorToLegend = "red"
 
-                            //console.log("map : ", map)
-
                             let var_commons_list = document.getElementById('commons_list')
-                        
+                            let wkt_strings_box_extracted_commons = [];                         
+                            
                             fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url)
                             .then(response => response.json())
                             .then(data => {
+
+
                                 for (let elem of data) {
-                                    console.log("Common : ", elem[1])
-                                    let newCommon = document.createElement('li')
-                                    newCommon.textContent = elem[1].toString()
-                                    var_commons_list.appendChild(newCommon)
+                                    // console.log("Common : ", elem[1]);
+                                    let newCommon = document.createElement('li');
+                                    newCommon.textContent = elem[1].toString();
+                                    var_commons_list.appendChild(newCommon);
+
+                                    wkt_strings_box_extracted_commons.push(elem[2]);
                                 }
+
+                               
+                                // sezione  manipolazione della stringa wkt delle coordinate del box 
+                                for( let elem of wkt_strings_box_extracted_commons) {
+
+                                    let wktFormat = new ol.format.WKT();
+                                    let polygonGeometry = wktFormat.readGeometry(elem);
+
+                                    // Crea una feature che rappresenta il poligono
+                                    let polygonFeature = new ol.Feature(polygonGeometry);
+                                    // Le Coordinate sono memorizzate in EPSG:4326 ( causa natura dei place di mongodb ), converto in EPSG:3857 
+                                    polygonGeometry = polygonGeometry.transform('EPSG:4326', 'EPSG:3857');
+
+                                    // Crea il source per il vector layer
+                                    let vectorSource = new ol.source.Vector({
+                                        features: [polygonFeature]
+                                    });
+
+                                    // Crea il layer del vettore con un colore di riempimento
+                                    let vectorLayer = new ol.layer.Vector({
+                                        source: vectorSource,
+                                        style: new ol.style.Style({
+                                            fill: new ol.style.Fill({
+                                                color: 'rgba(255, 0, 0, 0.2)' // colore rosso con trasparenza
+                                            }),
+                                            stroke: new ol.style.Stroke({
+                                                color: 'red', // bordi rossi
+                                                width: 0.5
+                                            })
+                                        })
+                                    });
+
+                                    // map.addLayer(vectorLayer);
+                                    // aggiunge i vectorLayer dei  polygon estratti nell'array che tiene traccia di tali layer per l'utente 
+                                    vectorLayersCommons.push(vectorLayer);
+                                }
+                            
+                                
                             })
                             .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
+                            
                         }                        
                     }
+                    
+
+                    /*
+
+                    console.log("----------------------------------------------------------");
+                    console.log("before to end the fetch");
+                    console.log("length vectorLayersCommons : ", vectorLayersCommons.length);
+                    for( let layer of vectorLayersCommons ) {
+                        console.log("layer : ", layer);
+                    }
+                    console.log("----------------------------------------------------------");
+                    */
+
                 })
                 .catch(error => console.error('Errore durante il recupero del file:', error));
-
+                
+            
                 document.getElementById('myRange').value = (parseInt(riga.cells[2].textContent) * 5);
                 document.getElementById('demo').textContent = riga.cells[2].textContent;
 
@@ -1267,7 +1376,6 @@
                 while (selectElement.options.length > 0) {
                     selectElement.remove(0);
                 }
-
 
                 let object_option = document.createElement('option');
                 object_option.value = data_formatted;
@@ -1283,29 +1391,11 @@
                         var_object.text = next_day;
                         document.getElementById('days_list').appendChild(var_object);             
                     }
-                }
-
-                /*
-                let oraInizdio = "{{ session['ora_inizio']}}";
-                let sizeFlagsKML = parseInt("{{ session['durata'] }}")
-                let data = "{{ session['data'] }}";
-                
-                var targetVectorLayer = new ol.layer.Vector({
-                    source: new ol.source.Vector({
-                        // url: '/static/KML/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}")).toString().padStart(2, '0') + ".kml",
-                        url: '/static/KML/out_job/' + data + "Z" + (parseInt(oraInizio)).toString().padStart(2, '0') + ".kml",
-                        // url: '/static/KML/' + "{{session['path_show_kml']}}" + '-out/out_job/' + data + 'Z' + (parseInt("{{ session['ora_inizio'] }}")).toString().padStart(2, '0') + '.kml',
-                        format: new ol.format.KML()
-                    })
-                });
-                */
+                }  
             }
         
             
-            //TODO :
-            // mi serve una funzione che prende in input le ore plottate e i colori associati 
-            // tale funzione restituisce la leggenda
-
+        
         </script>
 </body>
 </html>

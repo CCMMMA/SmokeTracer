@@ -119,7 +119,8 @@ class HandlerSpatialQuery:
         srid = 4326
         polygon_wkt = f"SRID={srid};POLYGON(({', '.join([f'{x} {y}' for x, y in b_box])}))"
         cur = self.client_postgresql.cursor()
-        query = sql.SQL("SELECT * FROM comune WHERE ST_Intersects(box, ST_GeomFromText(%s))")
+        # query = sql.SQL("SELECT * FROM comune WHERE ST_Intersects(box, ST_GeomFromText(%s))")
+        query = sql.SQL("SELECT id, nome_comune, ST_AsText(box) FROM comune WHERE ST_Intersects(box, ST_GeomFromText(%s))")
         cur.execute(query, [polygon_wkt])
         result = cur.fetchall()
         cur.close()
