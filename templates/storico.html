@@ -300,7 +300,7 @@
             var output = document.getElementById("demo");
             var slider = document.getElementById("myRange");
 
-            // variabile per gestire la logica dei bottoni 
+            // Variabili per gestire la logica dei bottoni 
             var attivoBuffer3km = true;
             var flag_buffer3km = false;
 
@@ -316,18 +316,17 @@
             // variabili per tenere traccia della lon e lat dell'attuale simulazione 
             var var_lon, var_lat;
 
-            // variabili per la leggenda dinamica della mappa ( sovrapposizione .kml )
+            // Variabili per la leggenda dinamica della mappa ( sovrapposizione .kml )
             var legendElement, legendControl;
             var hourToLegend, colorToLegend;
             var previous_hour = 0;
 
-            // variabili per gestire il vector Layer dei buffer sulla mappa 
+            // Variabili per gestire il vector Layer dei buffer sulla mappa 
             var vectorLayer_buffer500, vectorLayer_buffer3000;
 
-            // variabile per gestire i vectorLayert dei polygon dei comuni 
+            // Vettore per gestire i VectorLayer dei polygon dei comuni 
             var vectorLayersCommons = [];
 
-            
             var base_global_path = "";
 
             var map = new ol.Map({
@@ -357,10 +356,10 @@
                 })
             });
 
-            const fullScreenControl = new ol.control.FullScreen();
+            var fullScreenControl = new ol.control.FullScreen();
             map.addControl(fullScreenControl);
 
-            const rotateMap = new ol.interaction.DragRotateAndZoom();
+            var rotateMap = new ol.interaction.DragRotateAndZoom();
             map.addInteraction(rotateMap);
 
             output.innerHTML = slider.value;
@@ -368,38 +367,39 @@
                     output.innerHTML = this.value / 5;
             }
             
-            // sezione per evidenziare le simulazioni ancora non terminate o per eliminare la visualizzazione di 'simulazione ancora in corso'
-            var table_body = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
+            // sezione per evidenziare le simulazioni ancora non terminate o per eliminare l'evidenziazione delle simulazioni terminate 
+            let table_body = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
 
-            if (table_body.rows.length > 0 ) {
-                for (let i=0; i<table_body.rows.length; i++) {
-                    if (table_body.rows[i].cells[14].textContent == '0')
+            if( table_body.rows.length > 0 ) {
+                for( let i=0; i<table_body.rows.length; i++ ) {
+                    if( table_body.rows[i].cells[14].textContent == '0' )
                         table_body.rows[i].classList.add("evidenziato_coda");
                 }
 
-                for (let i=0; i<table_body.rows.length; i++) {
-                    if (table_body.rows[i].contains("evidenziato_coda") && (table_body.rows[i].cells[14].textContent == '1'))
+                for( let i=0; i<table_body.rows.length; i++ ) {
+                    if( table_body.rows[i].contains("evidenziato_coda") && (table_body.rows[i].cells[14].textContent == '1') )
                         table_body.rows[i].classList.remove("evidenziato_coda");
                 }
             }
 
 
             function search() {
+
                 let text_input_search = document.getElementById('searchnamebar').value;
                 let rows_match = []
                 let tbody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
                 
-                if(tbody.rows.length > 0) {
+                if( tbody.rows.length > 0 ) {
 
-                    for(let i=0; i<tbody.rows.length; i++) {
+                    for( let i=0; i<tbody.rows.length; i++ ) {
 
-                        console.log("row : ", tbody.rows[i]);
                         let field_search_of_row = tbody.rows[i].cells[13].textContent;
-                        console.log("text_search_field : ". field_search_of_row);
 
-                        if(field_search_of_row.includes(text_input_search)){
+                        if( field_search_of_row.includes(text_input_search) ){
+
                             rows_match.push(tbody.rows[i]);
                             console.log("occorrenza trovata");
+
                         }
                     }
 
@@ -463,98 +463,33 @@
             }
 
 
-            /*
-            function controlKmlOnLoad(){
-                
-                
-                if("{{session['path_show_kml']}}"==""){
-                    console.log("[CHECK] session[path_show_kml] : empty");
-
-                    if("{{session['durata']}}"==""){
-                        console.log("[CHECK] session[durata] : empty");
-                    }
-
-                } else { 
-                    //var oraInizio = "{{ session['ora_inizio']}}";
-                    let oraInizio = "0"
-                    //sizeFlagsKML = parseInt("{{ session['durata'] }}")
-                    let sizeFlagsKML = 8
-                    // data = "{{ session['data'] }}";
-                    let data = "20240319"
-
-                    var targetVectorLayer = new ol.layer.Vector({
-                        source: new ol.source.Vector({
-                            // url: '/static/KML/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}")).toString().padStart(2, '0') + ".kml",
-                            url: '/static/KML/out_job/' + data + "Z" + (parseInt(oraInizio)).toString().padStart(2, '0') + ".kml",
-                            // url: '/static/KML/' + "{{session['path_show_kml']}}" + '-out/out_job/' + data + 'Z' + (parseInt("{{ session['ora_inizio'] }}")).toString().padStart(2, '0') + '.kml',
-                            format: new ol.format.KML()
-                        })
-                    });
-
-                    //map.getView().setCenter(ol.proj.fromLonLat([parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")]));
-                    //map.getView().setZoom(13);
-                    map.addLayer(targetVectorLayer);
-
-                    
-                    document.getElementById('options_simulation').style.visibility = 'visible';
-                    document.getElementById('options_map').style.visibility = 'visible';
-                    document.getElementById('div_slider').style.visibility = 'visible';
-                    document.getElementById('bottoneSovrapposizione').style.visibility = 'visible';
-                    document.getElementById('buffer3km').style.visibility = 'visible';
-                    document.getElementById('buffer500mt').style.visibility = 'visible';
-                    document.getElementById('div_slider').style.visibility = 'visible';
-                    
-
-                    let data_standard = moment(data);
-                    let data_formatted = data_standard.format('YYYY-MM-DD');
-                    let int_durata = parseInt("{{session['durata']}}");
-
-                    let object_option = document.createElement('option');
-                    object_option.value = data_formatted;
-                    object_option.text = data_formatted;
-                    document.getElementById("days_list").appendChild(object_option);
-
-                    if( int_durata > 24) {
-                        let tot_giorni = int_durata / 24;
-                        for(let k=1; k<=tot_giorni; k++) {
-                            var_object = document.createElement('option');
-                            let next_day = (data_standard.add(1, 'day')).format('YYYY-MM-DD');
-                            var_object.value = next_day;
-                            var_object.text = next_day;
-                            document.getElementById('days_list').appendChild(var_object);             
-                        }
-                    }
-                //}
-            }
-            */
-
-
             function changeInput() {
 
                 // Sezione pulizia mappa dai precedenti layer 
                 map.removeLayer(vectorLayer_buffer3000);
                 map.removeLayer(vectorLayer_buffer500);
                 
+                // Rimuove tutti i Layer ( inerenti ai poligoni dei comuni ) dalla mappa 
                 for( let layer of vectorLayersCommons )
                     map.removeLayer(layer);
                 
+                // Pulizia del vettore che tiene traccia dei Layer inerenti ai poligoni dei comuni 
                 vectorLayersCommons = [];
                 
                 let selected_choice = document.getElementById('days_list');
                 let value_selected_choice = selected_choice.options[selected_choice.selectedIndex].value;
                 let value_without_char = value_selected_choice.replace(/-/g, "");
 
-                // prendo l'ora dall'input slider 
+
                 let selected_hour = slider.value / 5;
                 let selected_hour_str = selected_hour.toString();
                 if( selected_hour < 10 ) {
                     selected_hour_str = selected_hour_str.padStart(2, '0')
                 }
-                // console.log("[*] ora : ", selected_hour_str);
 
                 hourToLegend = parseInt(selected_hour_str);
             
-                // crea lo stile ( cambio colore ) per le linee del .kml
+                // Crea lo stile ( cambio colore ) per le linee del .kml
                 function changeKMLColor(feature, color) {
                     feature.setStyle(new ol.style.Style({
                         stroke: new ol.style.Stroke({
@@ -567,11 +502,11 @@
                 // let url_var =  '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
                 // let url_var = '/static/KML/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
 
-                // creo dinamicamente il path del file kml in base ai parametri impostati dall'utente
+                // Creazione dinamica path del file kml in base ai parametri impostati dall'utente
                 let url_var = base_global_path + value_without_char + "Z" + selected_hour_str + ".kml"; 
-                //console.log("change_input url :", url_var);
 
-                // carica il file kml in un vector-layer
+
+                // Caricamento file kml in un vector-layer
                 let targetVectorLayer = new ol.layer.Vector({
                     source: new ol.source.Vector({
                         url: url_var,
@@ -579,12 +514,12 @@
                     })
                 });
 
-                // aggiorno la variabile del colore per la leggenda 
+                // Aggiornamento della variabile del colore per la leggenda 
                 let new_color = tinycolor.random().toHexString();
                 colorToLegend = new_color;
           
 
-                // cambia effettivamente colore alle vector features nel kml
+                // Cambio effettivo del colore alle vector features nel kml
                 targetVectorLayer.getSource().once('change', function(event) {
                     if (targetVectorLayer.getSource().getState() === 'ready') {
                             var features = targetVectorLayer.getSource().getFeatures();
@@ -601,20 +536,19 @@
                     });
                     
                                 
-                // sezione che implemente l'estrazione dei comuni basato sul .kml dell'ora selezionata 
+                // Sezione che implemente l'estrazione dei comuni basato sul .kml dell'ora selezionata 
                 let var_commons_list = document.getElementById('commons_list')
                 var_commons_list.textContent = '';
-                
+    
                 
                 fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url_var)
                 .then(response => {
 
-                    if (response.status == 500 || response.status == 404) {
+                    if( response.status == 500 || response.status == 404 ) 
                         document.getElementById('myRange').style.backgroundColor = "red";
-                    } else {
+                    else 
                         document.getElementById('myRange').style.backgroundColor = "#d3d3d3";
-                    }
-
+                    
                     return response.json();
                 }) 
                 .then(data => {
@@ -622,8 +556,8 @@
                     let wkt_strings_box_extracted_commons = [];
                     vectorLayersCommons = [];
 
-                    for (let elem of data) {
-                        console.log("Common : ", elem[1])
+                    for( let elem of data ) {
+
                         let newCommon = document.createElement('li')
                         newCommon.textContent = elem[1].toString()
                         var_commons_list.appendChild(newCommon)
@@ -633,7 +567,7 @@
                     }
  
                     // Sezione manipolazione della stringa wkt delle coordinate del box
-                    for( let elem of wkt_strings_box_extracted_commons) {
+                    for( let elem of wkt_strings_box_extracted_commons ) {
 
                         let wktFormat = new ol.format.WKT();
                         let polygonGeometry = wktFormat.readGeometry(elem);
