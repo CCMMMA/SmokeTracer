@@ -1106,14 +1106,27 @@
                     for( let layer of vectorLayersCommons ) 
                         map.removeLayer(layer);
 
+                    // pulisce la mappa dai precedenti .kml
+                    var layers = map.getLayers().getArray();
+
+                    /* 
+                    layers.forEach(function(layer) {
+                    if ( layer instanceof ol.layer.Vector ) {
+                            layer.getSource().clear();
+                        }
+                    });
+                    */
+
                 } else {
                 
                     buttonHighlightsCommons.classList.add("evidenziato");
                     //console.log("Highlights Commons : attivato");
                     flagEvidenziaComuni = true;
 
-                    for ( let layer of vectorLayersCommons ) 
+                    for( let layer of vectorLayersCommons ) 
                         map.addLayer(layer);
+
+                    
                     
                 }
 
