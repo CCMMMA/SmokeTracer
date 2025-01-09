@@ -95,16 +95,19 @@ class SbatchManager():
                 return id_value
         else:
             print('[*] ID non trovato nel file.', flush=True)
-            #return None, None
-            return None
+            return None, None
+            # return None
             
     # Controlla lo stato del workflow e appena tutte le task sono completate aggiorna il la tupla di quella specifica simulazione come completata
-    # def check_progress(self, id_workflow, path_out_user):
+    # def check_progress(self, id_workflow, path_out_user, user):
     def check_progress(self, id_workflow):
         print("Start thread : check_progress()", flush=True)
-        dagonManager = DagonOnServiceManager('http://193.205.230.6:1727', ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'], 11)
+
+        # dagonManager = DagonOnServiceManager('http://193.205.230.6:1727', ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'], 11)
+        dagonManager = DagonOnServiceManager('http://193.205.230.7:1727', ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'], 11)
         array_jobs = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www']
         db = DBProxy()
+
         while True:
             response_dagon = dagonManager.getStatusByID(id_workflow)
             count_finish = 0
@@ -112,19 +115,12 @@ class SbatchManager():
             for i in range(11):
                 if response_dagon[array_jobs[i]] == 'FINISHED':
                     count_finish+=1
-
-            # idea iniziale : thread quando finiva il workflow spostava tutti i .kml in una direcotry nominata con il numero del workflow
-            #                 non funziona perche il thread non copia la directory /static/smoketracer essendo un volume montato sul container
-            # alternativa : trovare altro meotodo di nominazione delle directory dei jobs
             
             if count_finish == 11:
                 print("End thread : workflow finished", flush=True)
-                # subprocess.run(['mkdir', path_out_user + '/' + id_workflow])
-                # subprocess.run(['mv', path_out_user+'/*.kml', path_out_user + '/' + id_workflow])
-                # subprocess.run("ls /static/smoketracer")
-                # subprocess.run("ls /static/smoketracer/dario")
-                # subprocess.run("mv " + "/home/fumi2/FUMI/" + path_out_user + "/*.kml " + "/home/fumi2/FUMI/" + path_out_user + '/' + id_workflow)
-                # subprocess.run(['rm', '-rf', path_out_user+'/out'])
+                
+                # path_final = str(path_out_user) + '_' + str(id_workflow)
+                # subprocess.run(['mv', path_out_user, path_final])
 
                 # Set the workflow as completed
                 db.update_column("JOBINFO", "COMPLETED", "JOBID", [1, id_workflow])
@@ -137,7 +133,6 @@ class SbatchManager():
 
         with open(filepath, 'w') as file:
             file.write(data)
-
 
     '''
     # Function that given an id (composed by the millis) will build a directory

@@ -36,6 +36,8 @@ services:
   #
   # 1) entrare nel container di fumi2 e lanciare lo script python 'inizialize_spatial_queries_dbs.py'
   # 2) uscire dal container e killare il container di mongo db 
+
+  ## modifica : prendo i box da uno shapefile del comune trasformato in geojson , non mi serve piu il db mongo per i place.
   
   #db_mongo:
   #  container_name: container_mongodb_FUMI2

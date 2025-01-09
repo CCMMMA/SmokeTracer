@@ -1125,8 +1125,6 @@
 
                     for( let layer of vectorLayersCommons ) 
                         map.addLayer(layer);
-
-                    
                     
                 }
 
@@ -1205,7 +1203,9 @@
                 // let name_user = document.getElementById('name_user_label').textContent
                 let name_user = "{{session['user']}}";
                 let date_label = riga.cells[1].textContent;
-
+                
+                
+                //let id_workflow = riga.cells[9].textContent;
 
                 fetch('static/centroidi_comuni/centroidi_comuni.geojson')
                 .then(response => response.json())
@@ -1217,7 +1217,7 @@
 
                             var municipality_code = feature.properties.COD_COM;
                             let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
-
+                            // let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "_" + id_workflow + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
 
                             base_global_path = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/"
                             

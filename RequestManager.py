@@ -405,6 +405,8 @@ def coda():
             
             data_to_run = data.replace("-", "")
 
+            print("jobinfo : " + str(job_info), flush=True)
+
             # id_workflow, path_out_user = sbatchmanager.run(user, data_to_run, job_info)
             id_workflow = sbatchmanager.run(user, data_to_run, job_info)
 
@@ -415,7 +417,7 @@ def coda():
                 session["info_jobs_queue"].append(var_info)
                 # Create thread to check workflow status
                 # Once the Workflow finished, the thread update db
-                # t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), str(path_out_user)))                
+                # t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), str(path_out_user), str(user)))                
                 t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), )) 
                 t1.start()
 
@@ -658,6 +660,7 @@ def storico():
             print("[*]  Button - coda", flush=True)
 
         elif "hdownloadbutton" in request.form:
+            download()
             return redirect(url_for('download'))
 
     page = int(request.args.get('page', 1))
@@ -1187,6 +1190,7 @@ def getInfoJobsQueue():
 def getStatusJobsQueue():
     out_states = []
     dagonManager = DagonOnServiceManager('http://193.205.230.6:1727', ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'], 11)
+    # dagonManager = DagonOnServiceManager('http://193.205.230.7:1727', ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'], 11)
     for job in session['info_jobs_queue']:
         response_dagon = dagonManager.getStatusByID(str(job[0]))
         out_states.append([response_dagon])
