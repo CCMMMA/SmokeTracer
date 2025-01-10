@@ -33,8 +33,9 @@ class SpatialQueryManager:
         cur.close()
 
         result_filtrated = []
-
+        
         for place in result:
+
             if "Comune" in str(place):
                 result_filtrated.append(place)
 

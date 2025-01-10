@@ -1239,14 +1239,15 @@
                             let var_commons_list = document.getElementById('commons_list')
                             let wkt_strings_box_extracted_commons = [];                         
                             
-                            fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url)
+                            fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2' + url)
                             .then(response => response.json())
                             .then(data => {
 
-
+                                console.log("data : ",data);
                                 for (let elem of data) {
                                     // console.log("Common : ", elem[1]);
                                     let newCommon = document.createElement('li');
+                                    // newCommon.textContent = elem[1].toString();
                                     newCommon.textContent = elem[1].toString();
                                     var_commons_list.appendChild(newCommon);
 

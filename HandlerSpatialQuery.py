@@ -125,14 +125,20 @@ class HandlerSpatialQuery:
         result = cur.fetchall()
         cur.close()
 
-        result_filtrated = []
+        ''' 
+        result_filtrated = []        
 
+        for elem in result:
+            result_filtrated.append(elem[1])
+
+        
         for place in result:
             if "Comune" in str(place):
                 result_filtrated.append(place)
-
-        return result_filtrated
-
+        '''
+        
+        #return result_filtrated
+        return result
 
 
 
