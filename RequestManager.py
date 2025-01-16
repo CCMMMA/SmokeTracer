@@ -20,6 +20,8 @@ import random
 import time
 import json
 import threading
+import geopandas as gpd
+import io
 # Custom Import
 from DBManager import DBProxy, DBManager
 from SbatchManager import SbatchManager
@@ -27,6 +29,7 @@ from NcDumper import NCODump
 from ParserManager import Parser
 from DagonOnServiceManager import DagonOnServiceManager
 from HandlerSpatialQuery import HandlerSpatialQuery
+
 
 ##############
 ##  INIT   ##
@@ -144,9 +147,10 @@ def workflowStatus(id):
 '''
 @app.route('/', methods=['POST', 'GET'])
 def login():
+    
     #if "user" in session:   
         # return redirect(url_for('dashboard'))
-    #    return redirect_to_dashboard(session["user"])
+        # return redirect_to_dashboard(session["user"])
  
     if request.method == "POST":
 
@@ -166,19 +170,26 @@ def login():
 
         if exists:            
             if is_active:
+           
                 session["user"] = username
-                session["jobinfo_queue"] = []
+
+                session["jobinfo_queue"]= []
                 session["job_sim_singola"] = False
+
                 # tiene traccia dei dati sottomessi per la simulazione singola 
                 session["info_single_job"] = []
                 session["tot_jobs_queue"] = 0
+
                 # tiene traccia dei dati sottomessi per le simulazioni nella queue
                 session["info_jobs_queue"] = []
                 session['path_show_kml'] = ""
                 session['admin'] = False
 
-                db.update_access(session["user"])
-                session["access"] = db.get_last_access(session["user"])
+                # db.update_access(session["user"])
+                db.update_access(username)
+                # session["access"] = db.get_last_access(session["user"])
+                session["access"] = db.get_last_access(username)
+                
 
                 groups_user = db.get_groups_user(username)
 
@@ -334,7 +345,7 @@ def coda():
         return redirect(url_for('login'))
 
     db = DBProxy()
-
+    
     user = session["user"]
     last_access = session["access"]
 
@@ -380,7 +391,7 @@ def coda():
     # print(f"all_jobs_user : {all_jobs_user}", flush=True)
     # ---------------------------------------------------------    
 
-    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(24)]
+    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(5, 24)]
 
     if request.method == "POST":
         
@@ -416,8 +427,7 @@ def coda():
                 var_info = [id_workflow, area, data, ora, durata, longit, latit, temp, codice_GISA, comune]
                 session["info_jobs_queue"].append(var_info)
                 # Create thread to check workflow status
-                # Once the Workflow finished, the thread update db
-                # t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), str(path_out_user), str(user)))                
+                # Once the Workflow finished, the thread update db            
                 t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), )) 
                 t1.start()
 
@@ -621,13 +631,14 @@ def storico():
     string_search = ""
     
     for group in user_groups:
-        # print("- requestmanager - group : " + str(group), flush=True)
+        print("- requestmanager - group : " + str(group), flush=True)
         if str(group[0]) != str(user):
-            # print("- requestmanager - group : " + str(group[0]) + " - user : " + str(user), flush=True)
+            print("- requestmanager - group : " + str(group[0]) + " - user : " + str(user), flush=True)
             permissions = db.get_permission_of_group(user, group[0])
             if permission[0] == True:
                 jobs_of_user_group = db.fetch_user_group(user, group[0])
                 # print("- storico - jobs return to db query : " + str(jobs_of_user_group),  flush=True)
+                print(f"job_of_user_group : {jobs_of_user_group}")
                 for jobs_var in jobs_of_user_group:
                     jobs.append(jobs_var)
         '''
@@ -660,8 +671,9 @@ def storico():
             print("[*]  Button - coda", flush=True)
 
         elif "hdownloadbutton" in request.form:
-            download()
-            return redirect(url_for('download'))
+            redirect(url_for('storico'))
+            return download()
+            # return redirect(url_for('storico'))
 
     page = int(request.args.get('page', 1))
     per_page = 5
@@ -1139,8 +1151,6 @@ def logout():
 
 @app.route('/download', methods=['POST', 'GET'])
 def download(): 
-
-    
     # Fourth and last case of the historic, the download button. When this button is pressed,
     # We must organize an output zip file containing all the model output files for that given id.
     # NOTE that, to avoid memory consumption we'll make all the object in memory!
@@ -1149,11 +1159,27 @@ def download():
         # Istanciate a db object to perform queries
         db = DBProxy()
 
-        # Fetch the jobid
-        jobid = int(request.form['hdownloadbutton'])
+        # Fetch info in order to reconstruct the out path 
+        date = request.form['datesim']
+        user = request.form['user']
+        name_com = request.form['name_com']
+
+        # print(f"jobid : {jobid}", flush=True)
+
+
+        gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
+        # comune_name = params[5]
+        cod_com = gdf.loc[gdf['COMUNE'] == name_com, 'COD_COM'].values
+    
+        path = '/home/fumi2/FUMI2/static/smoketracer/' + user + '/' + date + '_' + cod_com[0] + '/'
+        
+        print("path : " + str(path))
+        print(f"date : {date}")
+        print(f"user : {user}")
+        print(f"name_com : {name_com}")
 
         # Get the output path based on the jobid 
-        OUTPATH = db.get_output_path(jobid, "root")
+        # OUTPATH = db.get_output_path(jobid, "root")
 
         # Init an IO object to store object in memory
         fileobj = io.BytesIO()
@@ -1162,13 +1188,22 @@ def download():
         with zipfile.ZipFile(fileobj, 'w') as zip_file:
 
             # For the element of the output folder: 
-            for file in os.listdir(OUTPATH):
-                
+            # for file in os.listdir(OUTPATH):
+            for file in os.listdir(path):
+
+                if file == 'out':
+                    pass
+
                 # Safe join the file and the filepath 
-                file_path = safe_join(OUTPATH, file)
+                file_path = safe_join(path, file)
 
                 # Add multiple files to the zip
                 zip_file.write(file_path, os.path.basename(file_path))
+
+                print(f"file : {file}", flush=True)
+
+
+        print(f"{fileobj}", flush=True)
 
         # Seek at 0th byte
         fileobj.seek(0)
@@ -1176,8 +1211,10 @@ def download():
         # Make a response to send back
         response = make_response(fileobj.read())
         response.headers.set('Content-Type', 'zip')
-        response.headers.set('Content-Disposition', 'attachment', filename="{}.zip".format(jobid))
+        filename_out = user + '_' + date + '_' + cod_com
+        response.headers.set('Content-Disposition', 'attachment', filename="{}.zip".format(filename_out))
         return response
+        
 
 #TODO: Is safe ? 
 #    : Should get a password of requested user ? 

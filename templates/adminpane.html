@@ -60,6 +60,11 @@
 
                 <div class="container-fluid" style="padding-left: 0px; padding-right: 0px;">
 
+                    <div class="row">
+                        <p>{% for mesg in get_flashed_messages() %}
+                            <div class="alert {{ category }} text-center"><b>{{ mesg }}</b></div>
+                            {% endfor %}</p>
+                    </div> 
 
                     <!------------------------------------------------------------------------- ADD USERS SECTION ------------------------------------------------------------------------->        
                     <div class="d-inline-block p-2"  style="background-color: rgba(2, 48, 71, 0.2); width: 100%; margin-top: 10px; margin-bottom: 10px;">
@@ -226,11 +231,13 @@
                                 
                                 <button class="btn btn-success btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick="showInputFormAddUsers()">&nbsp;Nascondi&nbsp;&nbsp;</button>
 
+                                <!--
                                 <div class="row">
                                     <p>{% for mesg in get_flashed_messages() %}
                                         <div class="alert {{ category }} text-center"><b>{{ mesg }}</b></div>
                                         {% endfor %}</p>
                                 </div>  
+                                -->
                             </div>
                         </div>
                     </div>

@@ -189,7 +189,11 @@
                                                 <!-- <form action="{{ url_for('download') }}" method="post"> -->
                                                 <td>
                                                     <form method="post">
-                                                        <button class="btn btn-success" type="submit" name="hdownloadbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Scarica&nbsp;&nbsp;<i class="fas fa-file-download"></i>&nbsp;</button>   
+                                                        <button class="btn btn-success" type="submit" name="hdownloadbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Scarica&nbsp;&nbsp;<i class="fas fa-file-download"></i>&nbsp;</button>
+                                                        <!-- <input type="hidden" name="idJOB" value="{{ job[9] }}"> -->
+                                                        <input type="hidden" name="datesim" value="{{ job[1] }}">
+                                                        <input type="hidden" name="user" value="{{ user }}">
+                                                        <input type="hidden" name="name_com" value="{{ job[4] }}">
                                                     </form>
                                                 </td>
                                                 <!-- <td>
