@@ -379,7 +379,7 @@ class DBProxy():
         string_search = ""
 
         for info in jobinfo:
-            string_search = string_search + "; " + info + "; "        
+            string_search = string_search + "; " + str(info) + "; "        
          
         query_jobinfo = "INSERT INTO JOBINFO VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')".format(
             jobinfo[0], # job_id

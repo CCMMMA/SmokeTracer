@@ -43,6 +43,17 @@ class SbatchManager():
         formatted_date_for_user_dir = date.strftime("%Y%m%dz%H%M%S")
         formatted_date_for_job = str(params[2]) + "Z" + str(params[3]).zfill(2) 
 
+        # example : 
+        # start sim = 15
+        # hours sim = 5
+        # calmet doto che inizia sempre da 00 dovrà calcolcolare una simulazione dalle 00 alle 15 e sommare la durata della simulazione 
+        # quindi la formula sarà : 00 + start_sim + durata_sim 
+
+        hour_calmet = int(params[3]) + int(params[4])
+        hour_calpuff = int(params[4])
+        formatted_date_calmet = str(params[2]) + "Z" + str("00")
+        formatted_date_calpuff = str(params[2]) + "Z" + str(params[3].zfill(2))
+
         gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
         comune_name = params[5]
         cod_com = gdf.loc[gdf['COMUNE'] == comune_name, 'COD_COM'].values
@@ -59,8 +70,15 @@ class SbatchManager():
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "LON", params[6])
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "LAT", params[7])
         self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "TEMPERATURE", params[8])
-        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "DATe", formatted_date_for_job)
-        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "HOURS", params[4])
+
+        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "DatE_CALMET", formatted_date_calmet)
+        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "HourS_Calmet", str(hour_calmet))
+        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "DATe", formatted_date_calpuff)
+        self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "HOURS", str(hour_calpuff))
+
+
+        # self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "DATe", formatted_date_for_job)
+        # self.substitute("{}/tmp_script_lunch/lunch_remote_job_{}.sh".format(script_path, millis), "HOURS", params[4])
         subprocess.run(['mkdir', '{}/tmp'.format(script_path,)])
         subprocess.run(['mkdir', '{}/tmp/{}'.format(script_path, user)])
 

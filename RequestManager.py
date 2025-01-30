@@ -391,7 +391,8 @@ def coda():
     # print(f"all_jobs_user : {all_jobs_user}", flush=True)
     # ---------------------------------------------------------    
 
-    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(5, 24)]
+    # hours = [f"0{i}" if i < 10 else f"{i}" for i in range(0, 24)]
+    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(0, 24)]
 
     if request.method == "POST":
         

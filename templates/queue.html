@@ -67,7 +67,7 @@
                     <!-- style="margin-bottom: 25px;" --> 
                     <div class="row" id="button-show" style="display: block;">
                         <div class="col" style="width: auto;margin-left: auto;margin-right: auto;text-align: center;">
-                            <button class="btn btn-success btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick='showInputForm()'>&nbsp;Avvia&nbsp;<i class="fas fa-edit"></i>&nbsp;</button>
+                            <button class="btn btn-success btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick='showInputForm()'>&nbsp;Nuova Simulazione&nbsp;<i class="fas fa-edit"></i>&nbsp;</button>
                         </div>
                     </div>
 
@@ -83,7 +83,7 @@
                                             <div class="card-body">
                                                 <div class="row align-items-center no-gutters">
                                                     <div class="col me-2">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DESCRIZIONE</span></div><input type="text" name="area" id="area_dash" style="width: 162px;" value="test" required>
+                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DESCRIZIONE</span></div><input type="text" name="area" id="area_dash" style="width: 162px;" required>
                                                         <div class="text-dark fw-bold h5 mb-0"></div>
                                                     </div>
                                                 </div>
@@ -93,8 +93,8 @@
                                             <div class="card-body">
                                                 <div class="row align-items-center no-gutters">
                                                     <div class="col me-2">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span style="color: var(--bs-purple);">Longitudine</span></div>
-                                                        <div class="text-dark fw-bold h5 mb-0"><span><input type="number" name="long" step="any" id="long_dash" style="width: 160px;" value="14.26" required></span></div>
+                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Longitudine</span></div>
+                                                        <div class="text-dark fw-bold h5 mb-0"><span><input type="number" name="long" step="any" id="long_dash" style="width: 160px;" required></span></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -108,8 +108,8 @@
                                     <div class="card-body">
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
-                                                <div class="text-uppercase text-success fw-bold text-xs mb-1"><span>DATA</span></div>
-                                                <div class="text-dark fw-bold h5 mb-0"><span><input id="date_dash" type="date" name="data" style="width: 168px;" value="03/03/2023" required></span></div>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DATA</span></div>
+                                                <div class="text-dark fw-bold h5 mb-0"><span><input id="date_dash" type="date" name="data" style="width: 168px;" required></span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -118,7 +118,7 @@
                                     <div class="card-body">
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
-                                                <div class="text-uppercase text-success fw-bold text-xs mb-1"><span style="color: var(--bs-indigo);">latitudine</span></div><input type="number" step="any" name="lat" id="lat_dash" style="width: 160px;" value="40.85" required>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>latitudine</span></div><input type="number" step="any" name="lat" id="lat_dash" style="width: 160px;" required>
                                                 <div class="text-dark fw-bold h5 mb-0"><span></span></div>
                                             </div>
                                         </div>
@@ -127,13 +127,14 @@
                             </div>
 
                             <div class="col">
+                                <!--
                                 <div class="card shadow border-start-info py-2" style="margin-bottom: 10px;height: 100.805px;">
                                     <div class="card-body">
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
-                                                <div class="text-uppercase text-warning fw-bold text-xs mb-1"><span style="color: var(--bs-red);">ora</span></div>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>ora</span></div>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>:00:00 UTC</span></div>
                                                 <div class="text-dark fw-bold h5 mb-0">
-
                                                     <select name="hours" class="Input">
                                                         {% for hour in hours %}
                                                         <option value="{{ hour }}">{{ hour }}</option>
@@ -144,11 +145,32 @@
                                         </div>
                                     </div>
                                 </div>
+                                -->
+                                <div class="card shadow border-start-info py-2" style="margin-bottom: 10px;height: 100.805px;">
+                                    <div class="card-body">
+                                        <div class="row align-items-center no-gutters">
+                                            <div class="col me-2">
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>ora</span></div>
+                                                <div class="text-dark fw-bold h5 mb-0">
+                                                    <div class="d-flex align-items-center">
+                                                        <select name="hours" class="Input me-2">
+                                                            {% for hour in hours %}
+                                                                <option value="{{ hour }}">{{ hour }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <span style="font-size: 0.75rem; font-weight: normal;">:00:00 UTC</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div class="card shadow border-start-info py-2">
                                     <div class="card-body">
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
-                                                <div class="text-uppercase text-info fw-bold text-xs mb-1"><span style="color: var(--bs-code-color);">Temperatura</span></div><input type="number" name="temp" id="temp_dash" style="width: 160px;" value="1200" required>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Temperatura</span></div><input type="number" name="temp" id="temp_dash" style="width: 160px;" required>
                                                 <div class="row g-0 align-items-center">
                                                     <div class="col-auto">
                                                         <div class="text-dark fw-bold h5 mb-0 me-3"></div>
@@ -165,7 +187,7 @@
                                     <div class="card-body">
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
-                                                <div class="text-uppercase text-warning fw-bold text-xs mb-1"><span>DURATA</span></div><input type="number" name="durata" id="duration_dash" style="width: 160px;" value="10" required>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DURATA</span></div><input type="number" name="durata" id="duration_dash" style="width: 160px;" required>
                                                 <div class="text-dark fw-bold h5 mb-0"></div>
                                             </div>
                                         </div>
@@ -175,7 +197,7 @@
                                     <div class="card-body">
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
-                                                <div class="text-uppercase text-info fw-bold text-xs mb-1"><span style="color: var(--bs-code-color);">Codice GISA</span></div><input type="text" name="codice_gisa" id="codice_gisa" style="width: 160px;" value="Codice_Na23">
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Codice GISA</span></div><input type="text" name="codice_gisa" id="codice_gisa" style="width: 160px;">
                                                 <div class="row g-0 align-items-center">
                                                     <div class="col-auto">
                                                         <div class="text-dark fw-bold h5 mb-0 me-3"></div>
@@ -192,8 +214,8 @@
                                     <div class="card-body">
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
-                                                <div class="text-uppercase text-success fw-bold text-xs mb-1">
-                                                    <span style="color: var(--bs-indigo);">COMUNE</span>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1">
+                                                    <span>COMUNE</span>
                                                 </div>
                                                 <input type="text" name="comune" id="comune_label" style="width: 160px;" list="comuni_list" required>
                                                 <datalist id="comuni_list">
@@ -208,9 +230,9 @@
                         </div>
                         <div class="row" style="margin-bottom: 25px;">
                             <div class="col" style="width: auto;margin-left: auto;margin-right: auto;text-align: center;">
-                                <button class="btn btn-danger btn-lg" type="submit" style="margin-left: 5px;font-weight: bold;width: auto;height: auto;margin-right: 8px;">&nbsp;Reset&nbsp;<i class="fas fa-eraser"></i>&nbsp; &nbsp;</button>
-                                <button class="btn btn-success btn-lg" type="submit" name="generate" id="start-button" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;">&nbsp;Nuova Simulazione&nbsp;<i class="fas fa-globe-americas"></i>&nbsp;</button>
-                                <button class="btn btn-success btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick="showInputForm()">&nbsp;Nascondi&nbsp;&nbsp;</button>
+                                <button class="btn btn-danger btn-lg" type="submit" style="margin-left: 5px;font-weight: bold;width: auto;height: auto;margin-right: 8px;">&nbsp;Reset&nbsp;</button>
+                                <button class="btn btn-success btn-lg" type="submit" name="generate" id="start-button" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;">&nbsp;Inizia Simulazione&nbsp;<i class="fas fa-globe-americas"></i>&nbsp;</button>
+                                <button class="btn btn-secondary btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick="showInputForm()">&nbsp;Nascondi&nbsp;&nbsp;</button>
                             </div>
                         </div>
                     </form>
