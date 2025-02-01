@@ -45,22 +45,14 @@ if __name__ == '__main__':
         name = polygons.iloc[i]['COMUNE']
         polygon_z = polygons.iloc[i]['geometry']
         polygon_2d = Polygon([(x, y) for x, y, z in polygon_z.exterior.coords])
-
-        # tolerance = 0.1  # Più alto è il valore, più semplice diventa la geometria
-        # polygon_2d = polygon_2d.simplify(tolerance, preserve_topology=True)
-
         cur = client_postgresql.cursor()
         query = sql.SQL("INSERT INTO comune (id, nome_comune, box) VALUES (%s, %s, ST_GeomFromText(%s, 4326))")
-
         reduced_wkt = dumps(polygon_2d, rounding_precision=5)
-
         cur.execute(query, [id, name, reduced_wkt])
         id+=1
         print("[*] Insert : {}".format(name), flush=True)
         cur.close()
         client_postgresql.commit()
-
-
 
     '''
     geodataframe_commons = polygons['COMUNE']
