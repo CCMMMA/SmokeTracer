@@ -5,18 +5,13 @@
 /env
 activate
 
-/ccmmma-database
 
-/static/img/avatars/
 /static/img/regione.png
 /static/js/adminuntils.js
 /static/js/interattivo.js
-/static/js/KML.js
 /static/js/profilo.js
 /static/js/storico.js
 /static/js/theme.js
-/static/KML
-/static/storage
 
 backup_script.sh
 docker-compose.yml

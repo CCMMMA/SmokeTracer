@@ -172,25 +172,22 @@ def login():
             if is_active:
            
                 session["user"] = username
-
                 session["jobinfo_queue"]= []
-                session["job_sim_singola"] = False
+                # session["job_sim_singola"] = False
 
                 # tiene traccia dei dati sottomessi per la simulazione singola 
-                session["info_single_job"] = []
+                # session["info_single_job"] = []
                 session["tot_jobs_queue"] = 0
 
                 # tiene traccia dei dati sottomessi per le simulazioni nella queue
                 session["info_jobs_queue"] = []
-                session['path_show_kml'] = ""
                 session['admin'] = False
-
+                # session['path_show_kml'] = ""
+                
                 # db.update_access(session["user"])
                 db.update_access(username)
-                # session["access"] = db.get_last_access(session["user"])
                 session["access"] = db.get_last_access(username)
                 
-
                 groups_user = db.get_groups_user(username)
 
                 if 'admin' in str(groups_user):
@@ -242,102 +239,6 @@ def dashboard():
    
     return render_template("dashboard.html", user=user, last_access=last_access)
 
-'''
-@app.route('/simulazione-singola', methods=['POST', 'GET'])
-def simulazione_singola():
-
-    if "user" not in session:
-        return redirect(url_for('login'))
-
-    db = DBProxy()
-    
-    if db.is_admin(session["user"]):
-        return redirect(url_for('adminpane'))
-
-    user = session["user"]
-    last_access= session["access"]
-
-    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(24)]
-
-    if request.method == "POST":
-        if "generate" in request.form:
-            
-            if session['job_sim_singola'] != False:
-                flash("Un'operazione è attualmente in atto. Aspettare che finisca o sottometterne di nuove nella dashboard per le code.") 
-                return redirect(url_for('interattivo'))
-            else:
-                session['job_sim_singola'] = True
-           
-            area = request.form.get("area")
-            if not validate_string(area, "[a-zA-Z]"):
-                flash("Area inserita non valida. Unici caratteri consentiti: Lettere [a-z e A-Z]. Riprovare!")
-                return redirect(url_for('simulazione_singola'))
-
-            data = request.form.get("data")
-            ora = request.form.get("hours")
-            durata = request.form.get("durata")
-            comune = request.form.get("comune")
-            longit = request.form.get("long")
-            latit = request.form.get("lat")
-            temp = request.form.get("temp")
-            codice_GISA = request.form.get("codice_gisa")
-
-            session['area'] = area
-            session['data'] = data
-            session['ora'] = ora
-            session['durata'] = durata
-            session['comune'] = comune
-            session['lon'] = longit
-            session['lat'] = latit
-            session['temp'] = temp
-            session['codice_GISA'] = codice_GISA
-            session['data2'] = "".join(data.split('-'))
-            session['ora_inizio'] = str(int(ora))
-            
-            job_info = ["./EmsSmoke.sh", area, "".join(data.split('-')), str(int(ora)), durata, comune, longit, latit, temp, codice_GISA]
-            job_info.append(str(user))
-            
-            id_workflow = sbatchmanager.run(user, job_info)
-
-            if id_workflow is not None:
-                job_info[0] = id_workflow
-                db.new_job(job_info)
-                session['workflow_id'] = id_workflow
-            else:
-                session['workflow_id'] = ""
-                flash("Non è stato possibile inserire l'operazione in coda. Riprovare!")
-                return redirect(url_for('interactive'))
-
-    
-        elif "dresetmap" in request.form:
-            session['user_dir_name'] = ""
-            session['workflow_id'] = ""
-            session['area'] = ""
-            session['data'] = ""
-            session['ora'] = ""
-            session['durata'] = ""
-            session['comune'] = ""
-            session['lon'] = ""
-            session['lat'] = ""
-            session['temp'] = ""
-            session['codice_GISA'] = ""
-            session['data2'] = ""
-            session['ora_inizio'] = ""
-            session['job_sim_singola'] = False
-    else: 
-        print("no post method")
-
-    return render_template('interactive.html',
-                            user=user, 
-                            last_access=last_access, 
-                            # update=update, 
-                            # info_str=info_str, 
-                            # state=session["jobstate_interactive"],
-                            # info=session["jobinfo_interactive"], 
-                            hours=hours)
-                            # kmlpath = session["kmlpath_dash"])
-'''
-
 @app.route('/simulazioni', methods=['POST', 'GET'])
 def coda():
     
@@ -367,8 +268,7 @@ def coda():
         print("- simulazioni - User non ha i permessi di scrittura in nessun gruppo", flush=True)
         return redirect(url_for('dashboard'))
 
-    # Sezione dedicata per assicurare che l'utente quando fa il logout con una simulazione ancora in corso
-    # al suo prossimo login ritroverà la simulazione in corso
+    # Sezione dedicata per assicurare che l'utente quando farà il logout con una simulazione ancora in corso al suo prossimo login ritroverà la simulazione in corso
 
     query = '''SELECT JOBINFO.JOBID, NAME_SIM, \"DATE\", \"TIME\", DURATION, LONG, LAT, TEMPERATURE, CODICE_GISA, COMMON, JOBINFO.COMPLETED
                 FROM JOBINFO 
@@ -383,26 +283,25 @@ def coda():
 
     if session["tot_jobs_queue"] == 0: 
         for i in range(0, len(all_jobs_user), 2):
-            if all_jobs_user[i][10] == 0:
+            if all_jobs_user[i][10] == 0 and all_jobs_user[i][0] not in str(session["info_jobs_queue"]): 
                 var_info = [all_jobs_user[i][0], all_jobs_user[i][1], all_jobs_user[i][2], all_jobs_user[i][3], all_jobs_user[i][4], all_jobs_user[i][5], all_jobs_user[i][6], all_jobs_user[i][7], all_jobs_user[i][8], all_jobs_user[i][9]]
                 session["info_jobs_queue"].append(var_info)
                 session["tot_jobs_queue"] += 1
             # print("job in progress", flush=True)
     # print(f"all_jobs_user : {all_jobs_user}", flush=True)
-    # ---------------------------------------------------------    
+  
 
-    # hours = [f"0{i}" if i < 10 else f"{i}" for i in range(0, 24)]
-    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(0, 24)]
+    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(1, 24)]
 
     if request.method == "POST":
         
         if "generate" in request.form:
             session["tot_jobs_queue"] += 1
+
             area = request.form.get("area")
             #if not validate_string(area, "[a-zA-Z]"):
             #    flash("Area inserita non valida. Unici caratteri consentiti: Lettere [a-z e A-Z]. Riprovare!")
             #    return redirect(url_for('coda'))
-
             data = request.form.get("data")
             ora = request.form.get("hours")
             durata = request.form.get("durata")
@@ -419,27 +318,36 @@ def coda():
 
             print("jobinfo : " + str(job_info), flush=True)
 
+            # Sezione per il controllo dei gruppi dell'utente a associare tale simulazione ( basandomi sui permessi di scrittura di ogni gruppo )
+            groups_write_ok = []
+
+            for group in user_groups:
+                permissions = db.get_permission_of_group(user, group[0])
+                for permission in permissions:
+                    if permission[0][1] == True:
+                        groups_write_ok.append(group)
+
             # id_workflow, path_out_user = sbatchmanager.run(user, data_to_run, job_info)
             id_workflow = sbatchmanager.run(user, data_to_run, job_info)
 
             if id_workflow is not None:
                 job_info[0] = id_workflow
-                db.new_job(job_info, user_groups, id_workflow)
+                # db.new_job(job_info, user_groups, id_workflow)
+                db.new_job(job_inserted, groups_write_ok, id_workflow)
                 var_info = [id_workflow, area, data, ora, durata, longit, latit, temp, codice_GISA, comune]
                 session["info_jobs_queue"].append(var_info)
                 # Create thread to check workflow status
-                # Once the Workflow finished, the thread update db            
+                # Once the Workflow finished, the thread updates the db            
                 t1 = threading.Thread(target=sbatchmanager.check_progress, args=(str(id_workflow), )) 
                 t1.start()
-
             else:
                 flash("Non è stato possibile inserire l'operazione in coda. Riprovare!")
                 return redirect(url_for('dashboard'))
 
-        elif "hshowbutton" in request.form:
-            id_job = request.form.get("idJOB")
+        # elif "hshowbutton" in request.form:
+            # id_job = request.form.get("idJOB")
             # print("- coda - show button - id_job : " + id_job, flush=True)
-            session["kml_info_show"] = db.get_all_groups()
+            # session["kml_info_show"] = db.get_all_groups()
             # print("coda - show button - session['kml_info_show] : " + str(session['kml_info_show']), flush=True)
             # da finire quando ottengo gli out del workflow
 
@@ -447,92 +355,7 @@ def coda():
             print("-coda - delete button", flush=True)
             id_job = request.form.get("idJOB")
             db.delete_row("JOBINFO", "JOBID", id_job)
-
-        ''' 
-        # Second case: the user want to cancel the job
-        elif "qcancel" in request.form:
-            
-            # We lock the thread for the entire request to avoid multiple elimination request
-            # at once, we may lost something
-            queue_lock.acquire()
-            if not session["queue_ops_in_act"]:
-                
-                # Operation in act 
-                session["queue_ops_in_act"] = True
-
-                # Unlock 
-                queue_lock.release()
-
-                # We get the index of the array in which the button has been pressed 
-                index = int(request.form['qcancel'])
-                print(index)
-                
-                # We fetch the jobid from the jobinfo array 
-                jobid = session["jobinfo_queue"][index][7]
-
-                # Before trying to eliminate the job, we check if the sbatch manager has finalized
-                # the routine for the starting of a new job: to do so, we just query the database 
-                # given the jobid of the selected job in the selected table row, and we got the 
-                # PATH: basically if none, the job hasn't finalized yet 
-                path = None
-                try:
-
-                    # We try to fetch the path from the given jobid
-                    path = db.specific_select("JOBIDENTIFIER", "PATH", "JOBID", jobid)
-
-                except: 
-                    
-                    # Flash an error and render again
-                    flash("Non è stato possibile trovare l'operazione in coda. Riprovare!")
-                    return redirect(url_for('coda'))
-
-                # If we returned something
-                if path is not None:
-
-                    # We try to submit the scancel [jobid] command
-                    try: 
-                        sbatchmanager.cancel_job(jobid)
-                    except:
-                        flash("Errore nella cancellazione dell'operazione. Riprovare!")
-
-                    # We update the session deleting the element
-                    del session["jobinfo_queue"][index]
-                    session.modified = True
-                
-                else:
-
-                    # We flash a message 
-                    flash("Operazione in finalizzazione. Riprovare tra qualche secondo.")
-
-                # No ops in act 
-                queue_lock.acquire()
-                session["queue_ops_in_act"] = False
-                queue_lock.release()
-            
-            else: 
-
-                # Unlock 
-                queue_lock.release()
-
-                # We flash a message 
-                flash("Operazione di eliminazione in finalizzazione. Riprovare tra qualche secondo.")
-        '''
-
-        # elif "qresetjob" in request.form:
-        #    pass
-
-            # If we reload the job, we do an integrity check to understand if 
-            # some job has been lost. We get the queue state by the parser
-            # We retry the dictionarized squeue job list 
-            # jobs = get_slurm_queue("g.hauber")
-            
-            # Fetch a local structure of jobinfo queue
-            # queue_lock.acquire()
-            # jobinfo_queue = session["jobinfo_queue"]
-            # queue_lock.release()
-
-            # Now we iterate the jobinfo queue
-            # print("RESET JOB")
+            #TODO: Far partire lo script per eleiminare i dati di tale simulazione dallo /storage
     
     page = int(request.args.get('page', 1))
     per_page = 10
@@ -540,11 +363,8 @@ def coda():
     pagination_data = session["jobinfo_queue"][offset: offset + per_page]
     
     if len(pagination_data) == 0 and len(session["jobinfo_queue"]) != 0: 
-        # We subtract a page then doing the offset calculation again
         page -= 1
         offset = (page - 1) * per_page
-        # We do assign the new pagination data belonging to the previous page, only if 
-        # the lenght of the jobinfo queue is diff than 0 (still job in queue)
         pagination_data = session["jobinfo_queue"][offset: offset + per_page]
    
     pagination = Pagination(page=page, per_page=per_page, total=len(session["jobinfo_queue"]), css_framework='bootstrap5')
@@ -615,26 +435,50 @@ def storico():
 
     user = session["user"]
     last_access=db.get_last_access(user)
+    
 
     user_groups = db.get_groups_user(user)
     count_false = 0
     for group in user_groups:
         permissions = db.get_permission_of_group(user, group[0])
+        print(f"-- Storico [RequestManager.py line 622] -- group : {group} -- permissions : {permissions[0]}\n\n", flush=True)
         for permission in permissions:
             if permission[0] == False:
                 count_false+=1
     if count_false == len(user_groups):
         # print("- simulazioni - User non ha i permessi di scrittura in nessun gruppo", flush=True)
-        flash("L'utente non ha i permessi di scrittura in nessun gruppo")
+        flash("Tale Utente non ha i permessi di lettura in nessun gruppo")
         return redirect(url_for('dashboard'))
+
+    
+    # se si arriva qui vuol dire che l'utente ha qualche permesso di lettura in qualche gruppo 
+    # ciò singifica .. far vedere tutte le simulazioni dei gruppi cui l'utente ne fa parte ( senza ripetizioni !!!!!)
 
     jobs = []
     string_search = ""
     
     for group in user_groups:
-        print("- requestmanager - group : " + str(group), flush=True)
+
+        permissions = db.get_permission_of_group(user, group[0])
+
+        # se l'utente ha il permesso di lettura di quel determinato gruppo 
+        if permissions[0][0] == True:
+
+            job_of_user_group = db.fetch_user_group(user, group[0])
+
+            # print(f"\n\n-- group : {group} -- sim : {job_of_user_group}\n\n", flush=True)
+            
+            for job_var in job_of_user_group:
+                # print(f"\n\n-- Storico -- id workflow : {job_var[9]} --\n\n", flush=True)
+
+                if job_var[9] not in str(jobs):
+                    jobs.append(job_var)
+        
+        # print(f"\n\n -- Jobs -- {jobs}\n\n", flush=True)
+
+        '''
         if str(group[0]) != str(user):
-            print("- requestmanager - group : " + str(group[0]) + " - user : " + str(user), flush=True)
+            print("\n\n- requestmanager - group : " + str(group[0]) + " - user : \n\n" + str(user), flush=True)
             permissions = db.get_permission_of_group(user, group[0])
             if permission[0] == True:
                 jobs_of_user_group = db.fetch_user_group(user, group[0])
@@ -643,14 +487,14 @@ def storico():
                 for jobs_var in jobs_of_user_group:
                     jobs.append(jobs_var)
         '''
+
+        '''
         for permission in permissions:
             if permission[0] == True:
                 jobs_of_user_group = db.fetch_user_group(user, group[0])
                 for jobs_var in jobs_of_user_group:
                     jobs.append(jobs_var)
         '''
-    
-
 
     if request.method=="POST":  
         if "hsearchbutton" in request.form:
@@ -1145,71 +989,54 @@ def logout():
 
     # Simple logout mechanism. We do pop the user from the session stack
     # and redirect to login.
+    
     session.pop("user", None)
-    session['admin'] = False
+    session.pop("admin", None)
+    session.pop("jobinfo_queue", None)
+    session.pop("tot_jobs_queue", None)
+
+    # session['admin'] = False
+    # session["jobinfo_queue"]= []
+    # session["tot_jobs_queue"] = 0
     
     return redirect(url_for('login'))
 
 @app.route('/download', methods=['POST', 'GET'])
 def download(): 
-    # Fourth and last case of the historic, the download button. When this button is pressed,
-    # We must organize an output zip file containing all the model output files for that given id.
-    # NOTE that, to avoid memory consumption we'll make all the object in memory!
     if request.method == "POST":
-
-        # Istanciate a db object to perform queries
         db = DBProxy()
 
-        # Fetch info in order to reconstruct the out path 
         date = request.form['datesim']
         user = request.form['user']
         name_com = request.form['name_com']
-
         # print(f"jobid : {jobid}", flush=True)
-
 
         gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
         # comune_name = params[5]
         cod_com = gdf.loc[gdf['COMUNE'] == name_com, 'COD_COM'].values
-    
+
         path = '/home/fumi2/FUMI2/static/smoketracer/' + user + '/' + date + '_' + cod_com[0] + '/'
         
-        print("path : " + str(path))
-        print(f"date : {date}")
-        print(f"user : {user}")
-        print(f"name_com : {name_com}")
+        #print("path : " + str(path))
+        #print(f"date : {date}")
+        #print(f"user : {user}")
+        #print(f"name_com : {name_com}")
 
-        # Get the output path based on the jobid 
-        # OUTPATH = db.get_output_path(jobid, "root")
-
-        # Init an IO object to store object in memory
         fileobj = io.BytesIO()
 
-        # Create a ZipFile Object
         with zipfile.ZipFile(fileobj, 'w') as zip_file:
-
-            # For the element of the output folder: 
-            # for file in os.listdir(OUTPATH):
             for file in os.listdir(path):
-
                 if file == 'out':
                     pass
 
-                # Safe join the file and the filepath 
                 file_path = safe_join(path, file)
-
-                # Add multiple files to the zip
                 zip_file.write(file_path, os.path.basename(file_path))
-
                 print(f"file : {file}", flush=True)
 
-
         print(f"{fileobj}", flush=True)
-
-        # Seek at 0th byte
+   
         fileobj.seek(0)
 
-        # Make a response to send back
         response = make_response(fileobj.read())
         response.headers.set('Content-Type', 'zip')
         filename_out = user + '_' + date + '_' + cod_com
