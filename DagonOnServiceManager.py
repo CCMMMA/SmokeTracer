@@ -31,10 +31,11 @@ class DagonOnServiceManager():
         status_workflow = {}
         if response.status_code == 200:
             data_json = response.json()
+            
             status_workflow = {}
             for i in self.workflow:
                 status_workflow[i] = data_json['tasks'][i]['status']
-                
+            
             return status_workflow
 
         return None

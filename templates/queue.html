@@ -14,8 +14,42 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/css/Login-Form-Basic-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/VentasPro-Login.css') }}">
 
-    <link rel="stylesheet" href="http://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
-    <script src="http://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
+    <link rel="stylesheet" href="http://unpkg.com/leaflet@1.4.0/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+    <style>
+        .input-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px; 
+        }
+
+        .input-item {
+            display: flex;
+            flex-direction: column;
+        }     
+
+        #map {
+            height: 400px;
+            width: 100%;
+            display: none; 
+            margin-top: 10px;
+        }
+        
+    </style>
+
+    <!--
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        }
+    </style>
+    -->
 
 </head>
 
@@ -89,16 +123,62 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card shadow border-start-primary py-2">
+                                        <div class="card shadow border-start-success py-2">
                                             <div class="card-body">
                                                 <div class="row align-items-center no-gutters">
                                                     <div class="col me-2">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Longitudine</span></div>
-                                                        <div class="text-dark fw-bold h5 mb-0"><span><input type="number" name="long" step="any" id="long_dash" style="width: 160px;" required></span></div>
+                                                        <!-- in input di latitude  -- step="any" -->
+                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>latitudine</span></div>
+
+                                                        <div class="input-group">
+                                                    
+                                                            <div class="input-item">
+                                                            <label for="lat_int">Gradi</label>
+                                                            <input type="number" step="any" name="lat_int" id="lat_int" min="-90" max="90" style="width: 80px;" required>
+                                                            </div>
+                                                        
+                                                        
+                                                            <div style="margin-top: 30px;"">
+                                                                <h2>.</h2>
+                                                            </div>
+                                                        
+                                                            
+                                                            <div class="input-item">
+                                                            <label for="lat_decimal">Decimali</label>
+                                                            <input type="number" step="any" name="lat_decimal" id="lat_decimal" min="0" style="width: 120px;" required>
+                                                            </div>
+                                                        
+                                                        
+                                                            <div class="input-item">
+                                                            <label for="c_directions_lat">Direzione</label>
+                                                            <input list="list_c_directions_lat" name="c_directions_lat" id="c_directions_lat" style="width: 80px;" required>
+                                                            <datalist id="list_c_directions_lat">
+                                                                <option>N</option>
+                                                                <option>S</option>
+                                                            </datalist>
+                                                            </div>
+                                                        </div>
+
+                                                        
+                                                        <!-- <input type="number" step="any" placeholder="dd.1/4 (40.8400)" name="lat" id="lat_dash" min="-90" max="90" style="width: 160px;" required> -->
+                                                        <!-- <div class="text-dark fw-bold h5 mb-0"><span></span></div> -->
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="card shadow border-start-primary py-2" style="margin-bottom: 10px;width: auto;height: auto;">
+                                            <div class="card-body">
+                                                <div class="row align-items-center no-gutters">
+                                                    <div class="col me-2">
+                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Scegli coordinate da mappa</span></div>
+                                                        <button id="button_show_map">Apri mappa</button>
+                                                        <div width="100%" style="height: 520px;" id="map"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -109,17 +189,49 @@
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
                                                 <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DATA</span></div>
-                                                <div class="text-dark fw-bold h5 mb-0"><span><input id="date_dash" type="date" name="data" style="width: 168px;" required></span></div>
+                                                <div class="text-dark fw-bold h5 mb-0"><span><input id="date_dash" type="date" name="data" style="width: 168px;" min="1" required></span></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card shadow border-start-success py-2">
+                                <div class="card shadow border-start-primary py-2">
                                     <div class="card-body">
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>latitudine</span></div><input type="number" step="any" name="lat" id="lat_dash" style="width: 160px;" required>
-                                                <div class="text-dark fw-bold h5 mb-0"><span></span></div>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Longitudine</span></div>
+                                                
+                                                
+                                                <div class="input-group">
+                                                    
+                                                    <div class="input-item">
+                                                      <label for="lon_int">Gradi</label>
+                                                      <input type="number" step="any" name="lon_int" id="lon_int" min="-180" max="180" style="width: 80px;" required>
+                                                    </div>
+                                                
+                                                   
+                                                    <div style="margin-top: 30px;">
+                                                        <h2>.</h2>
+                                                    </div>
+                                                
+                                                    
+                                                    <div class="input-item">
+                                                      <label for="lon_decimal">Decimali</label>
+                                                      <input type="number" step="any" name="lon_decimal" id="lon_decimal" min="0" style="width: 120px;" required>
+                                                    </div>
+                                                
+                                                   
+                                                    <div class="input-item">
+                                                      <label for="c_directions_lon">Direzione</label>
+                                                      <input list="list_c_directions_lon" name="c_directions_lon" id="c_directions_lon" style="width: 80px;" required>
+                                                      <datalist id="list_c_directions_lon">
+                                                        <option>E</option>
+                                                        <option>O</option>
+                                                      </datalist>
+                                                    </div>
+                                                  </div>
+
+                                                <!-- <input type="number" placeholder="dd.1/4 (14.2500)" step="any" name="long"  id="long_dash" style="width: 160px;" min="1" required> -->
+                                                <!-- <div class="text-dark fw-bold h5 mb-0"><span></span></div>-->
                                             </div>
                                         </div>
                                     </div>
@@ -171,7 +283,7 @@
                                         <div class="row align-items-center no-gutters">
                                             <div class="col me-2">
                                                 <!-- type="number" -->
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Temperatura (°C)</span></div><input list="list_std_tmp" name="temp" id="temp_dash" style="width: 160px;" required>
+                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Temperatura (°C)</span></div><input list="list_std_tmp" name="temp" id="temp_dash" min="100 °C" style="width: 160px;" required>
                                                 <datalist id="list_std_tmp">
                                                     <option>800 °C</option>
                                                     <option>900 °C</option>
@@ -272,6 +384,21 @@
                                                         <th>Temp</th>
                                                         <th>Codice GISA</th>
                                                         <th>Comune</th>
+                                                        <!--array_jobs = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'] -->
+                                                        
+                                                        <th>calmet</th>
+                                                        <th>calpost</th>
+                                                        <th>calpufff</th>
+                                                        <th>calwrff</th>
+                                                        <th>ctgproc</th>
+                                                        <th>dst</th>
+                                                        <th>lnd2</th>
+                                                        <th>makegeo</th>
+                                                        <th>terrel</th>
+                                                        <th>wrf2calwrf</th>
+                                                        <th>www</th>
+                                                        <th>Visualizza</th>
+                                                        <!--
                                                         <th>ctgproc</th>
                                                         <th>terrel</th>
                                                         <th>lnd2</th>
@@ -284,8 +411,10 @@
                                                         <th>dst</th>
                                                         <th>www</th>
                                                         <th>Visualizza
-                                                            <!-- <td><button class="btn btn-secondary btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;"></button></td> -->
                                                         </th>
+                                                        -->
+                                                        <!-- <td><button class="btn btn-secondary btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;"></button></td> -->
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -316,9 +445,23 @@
         let id_workflow_jobs_queue = [];
         let comuni = [];
         let comuniList = document.getElementById('comuni_list');
+
+
         document.getElementById('comune_label').addEventListener('click', populateDatalist);
         //window.addEventListener('load', cotrolJobsQueue);
-        setInterval(checkStatusJobsQueue, 5000);
+
+
+        setInterval(checkStatusJobsQueue, 10000);
+
+
+        fetch('static/centroidi_comuni/centroidi_comuni.geojson')
+        .then(response => response.json())
+        .then(data => {
+            for (let feature of data.features) {
+                comuni.push(feature.properties.COMUNE);
+            }
+        })
+        .catch(error => console.error('Errore durante il recupero del file:', error));
 
 
         // Funzione per popolare la datalist con i comuni
@@ -336,6 +479,7 @@
             let tot_jobs = parseInt("{{session['tot_jobs_queue']}}")
             let tbody = document.getElementById("info-table").getElementsByTagName("tbody")[0];
 
+            
             if( (parseInt(tot_jobs) > 0) ){  
                 if( parseInt(tot_jobs) > tbody.rows.length ) {
                     fetch('/getInfoJobsQueue')
@@ -349,13 +493,12 @@
                                 }
                             }
                         }
-                        //console.log("rows : " , tbody.rows.length);
-                        //console.log("tot_jobs : ", tot_jobs);
                     })
                     .catch(error => console.error('Errore durante il recupero del file:', error)); 
 
                 }
-            
+                
+                //TODO: invece di effetturare un'altra fetch , quando alla fetch precedente inserisco il Text , controllo il valore al momento ed aggiungo anche il colore.
                 fetch('/getStatusJobsQueue')
                 .then(response => response.json())
                 .then(data => {
@@ -372,10 +515,14 @@
                         console.log("---------------------------------------------------------------------------------");
                     }
                     */
+
+                    console.log("response status queue : ", data)
+
                     for(let i=0; i<tot_jobs; i++) {
                         let selected_row = tbody.rows[i];
-                        let workflow = ['ctgproc', 'terrel', 'lnd2', 'makegeo', 'wrf2calwrf', 'calwrff', 'calmet', 'calpufff', 'calpost', 'www', 'dst']
-                        
+                        //let workflow = ['ctgproc', 'terrel', 'lnd2', 'makegeo', 'wrf2calwrf', 'calwrff', 'calmet', 'calpufff', 'calpost', 'www', 'dst']
+                        let workflow = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www']
+
                         for(let j=10; j<21; j++) {
                             if(!selected_row.cells[j]){
                                 selected_row.insertCell(j).textContent = data[i][0][workflow[j-10]]
@@ -383,25 +530,22 @@
                                 selected_row.cells[j].textContent = data[i][0][workflow[j-10]];
                             }
 
-                            if(data[i][0][workflow[j-10]] == 'RUNNING') {
+                            if(selected_row.cells[j].textContent == "RUNNING") {
                                 selected_row.cells[j].style.color = 'blue';
-                            } else if(data[i][0][workflow[j-10]] == 'FINISHED') {
-                                selected_row.cells[j].style.color = 'green';
-                            } else if(data[i][0][workflow[j-10]] == 'WAITING') {
+
+                            } else if(selected_row.cells[j].textContent == "WAITING") {
                                 selected_row.cells[j].style.color = 'gray';
+
+                            } else if(selected_row.cells[j].textContent == "FINISHED") {
+                                selected_row.cells[j].style.color = 'green';
                             }
                         }
                         
-
                         if(!selected_row.cells[21]) {
                             selected_row.insertCell(21).innerHTML = "<button class='btn btn-secondary btn-small' style='margin-left: 8px; font-weight: bold;width: auto;height: auto;' onclick='link_to_storico()'>Vai</button>";
                         } else {
                             selected_row.cells(21).innerHTML = "<button class='btn btn-secondary btn-small' style='margin-left: 8px; font-weight: bold;width: auto;height: auto;' onclick='link_to_storico()'>Vai</button>";
                         }
-                        
-                        
-
-                        
                     }
                 })
                 .catch(error => console.error('Errore durante il recupero del file:', error));
@@ -421,21 +565,150 @@
             }
         }
         
-        fetch('static/centroidi_comuni/centroidi_comuni.geojson')
-        .then(response => response.json())
-        .then(data => {
-            for (let feature of data.features) {
-                comuni.push(feature.properties.COMUNE);
-            }
-        })
-        .catch(error => console.error('Errore durante il recupero del file:', error));
-
-
         function link_to_storico() {
-
             window.location.href = "storico"
+        }
+
+
+        setInterval(checkIntLon, 2000);
+
+        function checkIntLon() {
+
+            const lonInputInt = document.getElementById('lon_int');
+            let value = parseInt(lonInputInt.value);
+
+            if (!isNaN(value)) {
+                if (value < -180) {
+                    lonInputInt.value = -180;
+                    lonInputInt.textContent = -180;
+                } else if (value > 180) {
+                    lonInputInt.value = 180;
+                    lonInputInt.textContent = 180;
+                }
+            }
 
         }
+
+        setInterval(checkDecimalLon, 2000);
+
+        function checkDecimalLon() {
+
+            const lonInputDecimal = document.getElementById('lon_decimal');
+            let value = parseInt(lonInputDecimal.value);
+
+            if(!isNaN(value)) {
+                if(value<0) {
+                    lonInputDecimal.value = 0;
+                    lonInputDecimal.textContent = 0;
+                }
+            }
+        }
+
+       
+        setInterval(checkIntLat, 2000);
+
+        function checkIntLat() {
+            const latInputInt = document.getElementById('lat_int');
+
+            let value = parseInt(latInputInt.value);
+            if (!isNaN(value)) {
+                if (value < -90) {
+                    latInputInt.value = -90;
+                    latInputInt.textContent = -90;
+                } else if (value > 90) {
+                    latInputInt.value = 90;
+                    latInputInt.textContent = 90;
+                }
+            }
+
+        }
+
+        setInterval(checkDecimalLat, 2000);
+
+        function checkDecimalLat() {
+
+            const latInputDecimal = document.getElementById('lat_decimal');
+            let value = parseInt(latInputDecimal.value);
+
+            if(!isNaN(value)) {
+                if(value<0) {
+                    latInputDecimal.value = 0;
+                    latInputDecimal.textContent = 0;
+                }
+            }
+        }
+
+        let map, marker;
+
+        function initMap() {
+            // Visualizza il div della mappa
+            const mapDiv = document.getElementById('map');
+            mapDiv.style.display = 'block';
+
+            
+
+            // Crea la mappa centrata su Napoli (esempio)
+            map = new ol.Map({
+                target: 'map',
+                layers: [
+
+                    new ol.layer.Tile({
+                        source: new ol.source.XYZ({
+                            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+                            //url: 'https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}.png'
+                            //url: 'https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key=yNolbzVOYm8BH5d911a9' 
+                        }),
+                    }),
+
+                    /*
+                    new ol.layer.Vector({
+                        source: new ol.source.Vector({
+                        url: '/static/limits_comuni/limits_IT_municipalities.geojson',
+                        format: new ol.format.GeoJSON()
+                        })
+                    })
+                    */
+                ],
+                view: new ol.View({
+                    center: [0, 0],
+                    zoom: 0,
+                })
+            });
+
+           
+
+            // Aggiungi l'evento click sulla mappa
+            map.on('click', function(evt) {
+                const latlng = e.coordinate;
+                var lonLat = ol.proj.toLonLat(coordinate)
+
+                console.log("lonLat : ", lonLat)
+
+                // Se esiste già un marker, aggiornalo, altrimenti creane uno nuovo
+                if (marker) {
+                marker.setLatLng(lonLat);
+                } else {
+                marker = L.marker(lonLat).addTo(map);
+                }
+                
+             
+               
+            });
+        }
+
+    
+        document.getElementById('button_show_map').addEventListener('click', function() {
+            // Se la mappa non è stata inizializzata, la creiamo
+
+            if (!map) {
+                initMap();
+            } else {
+                // Se la mappa è già visibile, potresti scegliere di nasconderla o mantenerla visibile
+                const mapDiv = document.getElementById('map');
+                mapDiv.style.display = mapDiv.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+
 
     </script>
 </body>

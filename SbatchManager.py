@@ -128,6 +128,7 @@ class SbatchManager():
 
         while True:
             response_dagon = dagonManager.getStatusByID(id_workflow)
+            #print(f"\n\n-- SbatchManager -- response dagon : {response_dagon}\n\n")
             count_finish = 0
 
             for i in range(11):

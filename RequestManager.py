@@ -283,7 +283,7 @@ def coda():
 
     all_jobs_user = db.get_db().execute(query)
 
-    print(f"\n\n-- Coda --- all_jobs_user : {all_jobs_user}\n\n", flush=True)
+    # print(f"\n\n-- Coda --- all_jobs_user : {all_jobs_user}\n\n", flush=True)
 
     session["tot_jobs_queue"] = 0
     session["info_jobs_queue"] = []
@@ -291,17 +291,16 @@ def coda():
     # if session["tot_jobs_queue"] == 0: 
     #for i in range(0, len(all_jobs_user), 2):
     for i in range(0, len(all_jobs_user)):
-        # if all_jobs_user[i][10] == 0 and all_jobs_user[i][0] not in str(session["info_jobs_queue"]): 
-        if all_jobs_user[i][10] == 0:
+        if all_jobs_user[i][10] == 0 and all_jobs_user[i][0] not in str(session["info_jobs_queue"]): 
             var_info = [all_jobs_user[i][0], all_jobs_user[i][1], all_jobs_user[i][2], all_jobs_user[i][3], all_jobs_user[i][4], all_jobs_user[i][5], all_jobs_user[i][6], all_jobs_user[i][7], all_jobs_user[i][8], all_jobs_user[i][9]]
             session["info_jobs_queue"].append(var_info)
             session["tot_jobs_queue"] += 1
       
-    print(f"-- Coda -- tot_jobs_queue  : {session['tot_jobs_queue']}\n\n", flush=True)
-    print(f"-- Coda -- info_jobs_queue : {session['info_jobs_queue']}\n\n", flush=True)
+    # print(f"-- Coda -- tot_jobs_queue  : {session['tot_jobs_queue']}\n\n", flush=True)
+    # print(f"-- Coda -- info_jobs_queue : {session['info_jobs_queue']}\n\n", flush=True)
   
 
-    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(1, 24)]
+    hours = [f"0{i}" if i < 10 else f"{i}" for i in range(0, 24)]
 
 
     if request.method == "POST":
@@ -317,8 +316,21 @@ def coda():
             ora = request.form.get("hours")
             durata = request.form.get("durata")
             comune = request.form.get("comune")
-            longit = request.form.get("long")
-            latit = request.form.get("lat")
+
+            lon_int = request.form.get("lon_int")
+            lon_decimal = request.form.get("lon_decimal")
+            lat_int = request.form.get("lat_int")
+            lat_decimal = request.form.get("lat_decimal")
+
+            longit = lon_int + "." + lon_decimal
+            latit = lat_int + "." + lat_decimal
+
+            # longit = request.form.get("long")
+            # latit = request.form.get("lat")
+            #if "." not in longit or "." not in latit or len(longit) < 3 or len(latit) < 3:
+            #    flash("Formato inserito per latitudine o longitudine non valido")
+            #    return redirect(url_for('coda'))
+
             temp = request.form.get("temp")
             codice_GISA = request.form.get("codice_gisa")
 
