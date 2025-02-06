@@ -208,8 +208,10 @@
                                                 </td> -->
                                                 <td>
                                                     <form method="post">
-                                                        <input type="hidden" name="idJOB" value="{{ job[9] }}">
                                                         <button class="btn btn-danger" type="submit" name="hdeletebutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Elimina&nbsp;<i class="fas fa-eraser"></i>&nbsp;</button>
+                                                        <input type="hidden" name="idJOB" value="{{ job[9] }}">
+                                                        <input type="hidden" name="datesim" value="{{ job[1] }}">
+                                                        <input type="hidden" name="name_com" value="{{ job[4] }}">
                                                     </form>
                                                 </td>
                                                 <td style="display: none;">{{job[10]}}</td> 

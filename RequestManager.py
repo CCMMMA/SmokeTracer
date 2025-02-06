@@ -22,6 +22,7 @@ import json
 import threading
 import geopandas as gpd
 import io
+import subprocess
 # Custom Import
 from DBManager import DBProxy, DBManager
 from SbatchManager import SbatchManager
@@ -270,6 +271,7 @@ def coda():
 
     # Sezione dedicata per assicurare che l'utente quando farà il logout con una simulazione ancora in corso al suo prossimo login ritroverà la simulazione in corso
 
+    #TODO : modificare la query in maniera tale che ritorni solo quelle non ancora concluse se ci sono , ossia quelle con il flag a 0 , quindi si evita il for successivo
     query = '''SELECT JOBINFO.JOBID, NAME_SIM, \"DATE\", \"TIME\", DURATION, LONG, LAT, TEMPERATURE, CODICE_GISA, COMMON, JOBINFO.COMPLETED
                 FROM JOBINFO 
                 JOIN JOBS ON JOBINFO.JOBID=JOBS.JOBID 
@@ -281,17 +283,26 @@ def coda():
 
     all_jobs_user = db.get_db().execute(query)
 
-    if session["tot_jobs_queue"] == 0: 
-        for i in range(0, len(all_jobs_user), 2):
-            if all_jobs_user[i][10] == 0 and all_jobs_user[i][0] not in str(session["info_jobs_queue"]): 
-                var_info = [all_jobs_user[i][0], all_jobs_user[i][1], all_jobs_user[i][2], all_jobs_user[i][3], all_jobs_user[i][4], all_jobs_user[i][5], all_jobs_user[i][6], all_jobs_user[i][7], all_jobs_user[i][8], all_jobs_user[i][9]]
-                session["info_jobs_queue"].append(var_info)
-                session["tot_jobs_queue"] += 1
-            # print("job in progress", flush=True)
-    # print(f"all_jobs_user : {all_jobs_user}", flush=True)
+    print(f"\n\n-- Coda --- all_jobs_user : {all_jobs_user}\n\n", flush=True)
+
+    session["tot_jobs_queue"] = 0
+    session["info_jobs_queue"] = []
+
+    # if session["tot_jobs_queue"] == 0: 
+    #for i in range(0, len(all_jobs_user), 2):
+    for i in range(0, len(all_jobs_user)):
+        # if all_jobs_user[i][10] == 0 and all_jobs_user[i][0] not in str(session["info_jobs_queue"]): 
+        if all_jobs_user[i][10] == 0:
+            var_info = [all_jobs_user[i][0], all_jobs_user[i][1], all_jobs_user[i][2], all_jobs_user[i][3], all_jobs_user[i][4], all_jobs_user[i][5], all_jobs_user[i][6], all_jobs_user[i][7], all_jobs_user[i][8], all_jobs_user[i][9]]
+            session["info_jobs_queue"].append(var_info)
+            session["tot_jobs_queue"] += 1
+      
+    print(f"-- Coda -- tot_jobs_queue  : {session['tot_jobs_queue']}\n\n", flush=True)
+    print(f"-- Coda -- info_jobs_queue : {session['info_jobs_queue']}\n\n", flush=True)
   
 
     hours = [f"0{i}" if i < 10 else f"{i}" for i in range(1, 24)]
+
 
     if request.method == "POST":
         
@@ -324,7 +335,8 @@ def coda():
             for group in user_groups:
                 permissions = db.get_permission_of_group(user, group[0])
                 for permission in permissions:
-                    if permission[0][1] == True:
+                    print(f'permission : {permission}', flush=True)
+                    if permission[1] == True:
                         groups_write_ok.append(group)
 
             # id_workflow, path_out_user = sbatchmanager.run(user, data_to_run, job_info)
@@ -333,7 +345,7 @@ def coda():
             if id_workflow is not None:
                 job_info[0] = id_workflow
                 # db.new_job(job_info, user_groups, id_workflow)
-                db.new_job(job_inserted, groups_write_ok, id_workflow)
+                db.new_job(job_info, groups_write_ok, id_workflow)
                 var_info = [id_workflow, area, data, ora, durata, longit, latit, temp, codice_GISA, comune]
                 session["info_jobs_queue"].append(var_info)
                 # Create thread to check workflow status
@@ -354,8 +366,22 @@ def coda():
         elif "hdeletebutton" in request.form:
             print("-coda - delete button", flush=True)
             id_job = request.form.get("idJOB")
+            date_sim = request.form.get("datesim")
+            comune_name = request.form.get("name_com")
+
+            # elimina la simulazione dal db
             db.delete_row("JOBINFO", "JOBID", id_job)
-            #TODO: Far partire lo script per eleiminare i dati di tale simulazione dallo /storage
+
+
+            # elimina la cartella con gli out della simulazione dallo storage 
+            data = data.replace("-", "")
+            gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
+            cod_com = gdf.loc[gdf['COMUNE'] == comune_name, 'COD_COM'].values
+            if cod_com.size <= 0:
+                print(f"Comune {comune_name} non trovato nel file.", flush=True)
+            path_to_delete = f'static/{user}/{data}_{cod_com}'
+            subprocess.run(['rm', '-r', path_to_delete])
+
     
     page = int(request.args.get('page', 1))
     per_page = 10
@@ -441,7 +467,7 @@ def storico():
     count_false = 0
     for group in user_groups:
         permissions = db.get_permission_of_group(user, group[0])
-        print(f"-- Storico [RequestManager.py line 622] -- group : {group} -- permissions : {permissions[0]}\n\n", flush=True)
+        #print(f"-- Storico [RequestManager.py line 622] -- group : {group} -- permissions : {permissions[0]}\n\n", flush=True)
         for permission in permissions:
             if permission[0] == False:
                 count_false+=1
@@ -505,8 +531,22 @@ def storico():
        
         elif "hdeletebutton" in request.form:
             job_to_remove=request.form.get("idJOB")
+            date_sim_to_remove = request.form.get("datesim")
+            name_comune_to_remove = request.form.get("name_com")
+
+            # elimina la simulazione dal db
             db.delete_row('JOBINFO', 'JOBID', job_to_remove)
-            # print("[*] Delete Button - coda", flush=True)
+            
+            gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
+            cod_com = gdf.loc[gdf['COMUNE'] == name_comune_to_remove, 'COD_COM'].values
+            if cod_com.size <= 0:
+                print(f"Comune {cod_comune_to_remove} non trovato nel file.", flush=True)
+            path_to_delete = f'static/smoketracer/{user}/{date_sim_to_remove}_{cod_com[0]}'
+            print(f"path to remove  : {path_to_delete}", flush=True)
+            
+            # elimina i dati inerenti alla simulazione dallo storage
+            subprocess.run(['rm', '-r', path_to_delete])
+
             return redirect(url_for('storico'))
           
         elif "hresetmap" in request.form:

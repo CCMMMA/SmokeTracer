@@ -375,7 +375,7 @@
                     for(let i=0; i<tot_jobs; i++) {
                         let selected_row = tbody.rows[i];
                         let workflow = ['ctgproc', 'terrel', 'lnd2', 'makegeo', 'wrf2calwrf', 'calwrff', 'calmet', 'calpufff', 'calpost', 'www', 'dst']
-
+                        
                         for(let j=10; j<21; j++) {
                             if(!selected_row.cells[j]){
                                 selected_row.insertCell(j).textContent = data[i][0][workflow[j-10]]
