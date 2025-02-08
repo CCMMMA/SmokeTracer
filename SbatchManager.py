@@ -91,7 +91,8 @@ class SbatchManager():
                 stderr=f,
                 start_new_session=True
             )
-
+        # tempo necessario per accedere da remoto al frontend ( dove c'è SLURM ), lanciare la simulazione, ed aspettare la scrittura dell'id del workflow 
+        # (da parte di smoketracer ) sul file per poi ritrovarcelo su Blackjeans ( nel container ( nel volume ) )
         time.sleep(9)
 
         try:

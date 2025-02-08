@@ -266,7 +266,8 @@ def coda():
             if permission[1] == False:
                 count_false+=1
     if count_false == len(user_groups):
-        print("- simulazioni - User non ha i permessi di scrittura in nessun gruppo", flush=True)
+        flash("User non ha i permessi di scrittura in nessun gruppo")
+        #print("- simulazioni - User non ha i permessi di scrittura in nessun gruppo", flush=True)
         return redirect(url_for('dashboard'))
 
     # Sezione dedicata per assicurare che l'utente quando farà il logout con una simulazione ancora in corso al suo prossimo login ritroverà la simulazione in corso
@@ -347,7 +348,7 @@ def coda():
             for group in user_groups:
                 permissions = db.get_permission_of_group(user, group[0])
                 for permission in permissions:
-                    print(f'permission : {permission}', flush=True)
+                    # print(f'permission : {permission}', flush=True)
                     if permission[1] == True:
                         groups_write_ok.append(group)
 
@@ -1038,19 +1039,13 @@ def restoration(unique_id):
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
-
-    # Simple logout mechanism. We do pop the user from the session stack
-    # and redirect to login.
-    
     session.pop("user", None)
     session.pop("admin", None)
     session.pop("jobinfo_queue", None)
     session.pop("tot_jobs_queue", None)
-
     # session['admin'] = False
     # session["jobinfo_queue"]= []
     # session["tot_jobs_queue"] = 0
-    
     return redirect(url_for('login'))
 
 @app.route('/download', methods=['POST', 'GET'])
@@ -1061,10 +1056,8 @@ def download():
         date = request.form['datesim']
         user = request.form['user']
         name_com = request.form['name_com']
-        # print(f"jobid : {jobid}", flush=True)
 
         gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
-        # comune_name = params[5]
         cod_com = gdf.loc[gdf['COMUNE'] == name_com, 'COD_COM'].values
 
         path = '/home/fumi2/FUMI2/static/smoketracer/' + user + '/' + date + '_' + cod_com[0] + '/'
@@ -1075,23 +1068,27 @@ def download():
         #print(f"name_com : {name_com}")
 
         fileobj = io.BytesIO()
-
         with zipfile.ZipFile(fileobj, 'w') as zip_file:
             for file in os.listdir(path):
-                if file == 'out':
-                    pass
 
-                file_path = safe_join(path, file)
-                zip_file.write(file_path, os.path.basename(file_path))
                 print(f"file : {file}", flush=True)
-
-        print(f"{fileobj}", flush=True)
-   
+                
+                if str(file) != "out":
+                    file_path = safe_join(path, file)
+                    zip_file.write(file_path, os.path.basename(file_path))
+                
         fileobj.seek(0)
 
         response = make_response(fileobj.read())
         response.headers.set('Content-Type', 'zip')
-        filename_out = user + '_' + date + '_' + cod_com
+        # filename_out = user + '_' + date + '_' + cod_com
+        filename_out = user + '_' + date + '_' + name_com
+
+        filename_out = str(filename_out).replace("['", "")
+        filename_out = str(filename_out).replace("']", "")
+
+        print(f"filename_out : {filename_out}", flush=True)
+
         response.headers.set('Content-Disposition', 'attachment', filename="{}.zip".format(filename_out))
         return response
         

@@ -554,11 +554,12 @@
                 fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url_var)
                 .then(response => {
 
-                    if( response.status == 500 || response.status == 404 ) 
+                    if( response.status == 500 || response.status == 404 ) {
                         document.getElementById('myRange').style.backgroundColor = "red";
-                    else 
+                    } else { 
                         document.getElementById('myRange').style.backgroundColor = "#d3d3d3";
-                    
+                    }
+
                     return response.json();
                 }) 
                 .then(data => {
@@ -1196,7 +1197,6 @@
                 righe.forEach(function(row) {
                     row.classList.remove('evidenziato');
                 });
-                riga.classList.add('evidenziato');
 
                 // -------------------------FINE SEZIONE PULIZIA MAPPA --------------------------------------------
             
@@ -1233,9 +1233,17 @@
                             fetch(url)
                             .then(response =>{
                                 if(!response.ok) {
+
                                     riga.classList.add('evidenziato_error');
+
+                                    setTimeout(function() {
+                                        riga.classList.remove('evidenziato_error');
+                                    }, 10000);
+
                                     return;
-                                }
+
+                                } else 
+                                    riga.classList.add('evidenziato');
                             })
                             
                             
@@ -1361,8 +1369,6 @@
                     }
                 }  
             }
-        
-            
         
         </script>
 </body>
