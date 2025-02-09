@@ -107,7 +107,7 @@ class SbatchManager():
             id_match = re.search(r'id = (\w+)', line)
             if id_match:
                 id_value = id_match.group(1)
-                print(f'[*] ID estratto: {id_value}', flush=True)
+                print(f"-- id workflow lunched : {id_value}")
                 subprocess.run(['rm', 'tmp/{}/out_from_job_{}_runcmd_{}.txt'.format(user, user, var_millis)])
                 # path_out_user = 'static/smoketracer/' + user + '/' + date_str + '_' + cod_com[0]  
                 # return id_value, path_out_user

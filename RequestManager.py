@@ -549,6 +549,9 @@ def storico():
 
             # elimina la simulazione dal db
             db.delete_row('JOBINFO', 'JOBID', job_to_remove)
+            db.delete_row('SIMULATION_GROUP', 'JOBID', job_to_remove)
+            db.delete_row('JOBS', 'JOBID', job_to_remove)
+           
             
             gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
             cod_com = gdf.loc[gdf['COMUNE'] == name_comune_to_remove, 'COD_COM'].values
