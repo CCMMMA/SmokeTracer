@@ -800,6 +800,30 @@ def adminpane():
             db.create_group(new_group_name)
             return redirect(url_for('adminpane'))
 
+        elif "hdeletebutton" in request.form:
+            job_to_remove=request.form.get("idJOB")
+            date_sim_to_remove = request.form.get("datesim")
+            name_comune_to_remove = request.form.get("name_com")
+
+            # elimina la simulazione dal db
+            db.delete_row('JOBINFO', 'JOBID', job_to_remove)
+            db.delete_row('SIMULATION_GROUP', 'JOBID', job_to_remove)
+            db.delete_row('JOBS', 'JOBID', job_to_remove)
+           
+            
+            gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
+            cod_com = gdf.loc[gdf['COMUNE'] == name_comune_to_remove, 'COD_COM'].values
+            if cod_com.size <= 0:
+                print(f"Comune {cod_comune_to_remove} non trovato nel file.", flush=True)
+            path_to_delete = f'static/smoketracer/{user}/{date_sim_to_remove}_{cod_com[0]}'
+            print(f"path to remove  : {path_to_delete}", flush=True)
+            
+            # elimina i dati inerenti alla simulazione dallo storage
+            subprocess.run(['rm', '-r', path_to_delete])
+
+            flash("Simulazione eliminata correttamente !")
+            return redirect(url_for('adminpane'))
+        
         elif "deletebutton" in request.form:
             username = request.form['username_hidden']
             # print("--adminpane -- username : " + str(username), flush=True)
@@ -905,6 +929,10 @@ def adminpane():
 
         elif "aresetusers" in request.form:
             pass
+        
+        elif "hdownloadbutton" in request.form:
+            redirect(url_for('storico'))
+            return download()
 
     
         

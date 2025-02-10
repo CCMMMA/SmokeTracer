@@ -147,8 +147,9 @@
                                             <div class="card-body">
                                                 <div class="row align-items-center no-gutters">
                                                     <div class="col me-2" style="width: 100%;">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Scegli coordinate da mappa</span></div>
-                                                        <button id="button_show_map">Apri mappa</button>
+                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Selezione coordinate dalla mappa</span></div>
+                                                        <!-- <button id="button_show_map">Apri mappa</button> -->
+                                                        <span class="btn btn-secondary" id="button_show_map">Apri MAPPA</span>
                                                         <div id="map"></div>
                                                     </div>
                                                 </div>
@@ -505,10 +506,22 @@
         document.getElementById('button_show_map').addEventListener('click', function() {
             if (!map) {
                 initMap();
+                document.getElementById('button_show_map').textContent = "Chiudi MAPPA";
+
             } else {
                 const mapDiv = document.getElementById('map');
-                mapDiv.style.display = mapDiv.style.display === 'none' ? 'block' : 'none';
+
+                if(mapDiv.style.display === 'none') {
+                    mapDiv.style.display = 'block';
+                    document.getElementById('button_show_map').textContent = "Chiudi MAPPA";
+                } else {
+                    mapDiv.style.display = 'none';
+                    document.getElementById('button_show_map').textContent = "Apri MAPPA";
+                }
+
                 map = " "
+                //mapDiv.style.display = mapDiv.style.display === 'none' ? 'block' : 'none';
+                //map = " "
             }
         });
         
@@ -555,7 +568,7 @@
             });
         }
        
-
+ 
         function checkStatusJobsQueue() {
             
             let tot_jobs = parseInt("{{session['tot_jobs_queue']}}")
@@ -773,6 +786,17 @@
 
                 document.getElementById("lat_int").value = lat_int;
                 document.getElementById("lat_decimal").value = lat_decimal.slice(0, 5);
+
+                if(lat_int>0)
+                    document.getElementById("c_directions_lat").value = "N";
+                else
+                    documen.getElementById("c_directions_lat").value = "S";
+
+                if(lon_int>0)
+                    document.getElementById("c_directions_lon").value = "E";
+                else
+                    document.getElementById("c_directions_lon").value = "O";
+
 
             });
         }
