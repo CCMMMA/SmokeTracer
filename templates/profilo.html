@@ -27,8 +27,8 @@
                     <li class="nav-item"><a class="nav-link" href="dashboard"><i class="fas fa-terminal"></i><span style="color: var(--bs-accordion-bg);">Dashboard</span></a></li>
                     <!-- <li class="nav-item"><a class="nav-link" href="simulazione-singola"><i class="fas fa-eye"></i><span style="color: var(--bs-accordion-bg);">Simulazione singola</span></a></li> -->
                     <li class="nav-item"><a class="nav-link" href="simulazioni"><i class="fas fa-list"></i><span style="color: var(--bs-accordion-bg);">Simulazioni</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo Utente</span></a></li>
                     <li class="nav-item"></li>
                 </ul>
                 <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
@@ -47,9 +47,12 @@
                     </div>
                 </nav>
                 <div class="container-fluid">
+
                     <h3 class="text-dark mb-4">Profilo</h3>
+                    
                     <div class="row mb-3">
-                        <div class="col-lg-8">
+                        <!-- <div class="col-lg-8"> -->
+                        <div class="col">
                             <div class="row">
                                 <div class="col">
                                     <div class="card shadow mb-3">
@@ -61,11 +64,10 @@
 
                                                 <div class="row">
                                                     <div class="col">
-                                                        <div class="mb-3" style="margin-bottom: 0px;">
+                                                        <div class="mb-3">
                                                             <label class="form-label" for="username"><strong>Username</strong></label>
+                                                            <small style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small>
                                                         </div>
-                                                        <!-- <small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small> -->
-                                                        <small class="form-text"><h4><b>{{ user }}</b></h4></small>
                                                     </div>
 
                                                     
@@ -75,6 +77,7 @@
                                                             <input class="form-control" type="text" id="firstname_profile" placeholder="{{ profile[0] }}" name="firstname">
                                                         </div>
                                                     </div>
+
                                                 </div>
 
 
@@ -88,35 +91,12 @@
                                                     </div>
                                                     
                                                     <div class="col">
-                                                        <div class="mb-3">
+                                                        <div class="mb3">
                                                             <label class="form-label" for="lastname"><strong>Cognome</strong></label>
                                                             <input class="form-control" type="text" id="lastname_profile" placeholder="{{ profile[1] }}" name="lastname">
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <!--
-                                                <div class="row">
-                                                    
-                                                    <div class="col">
-                                                        <div class="mb-3" style="margin-bottom: 0px;">
-                                                            <label class="form-label" for=""><strong>Gruppi Utente</strong></label>
-                                                        </div>
-                                                        <small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>Gruppo 1</b></h4></small>
-                                                        <small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>Gruppo 2</b></h4></small>
-                                                        <small class="form-text" style="margin-left: 0px;width: 250.1641px;"><h4><b>Gruppo 3</b></h4></small>
-                                                    </div>
-                                                    
-
-                                                    
-                                                    <div class="col">
-                                                        <div class="mb-3">
-                                                            <label class="form-label" for=""><strong>Nome</strong></label>
-                                                            <input class="form-control" type="text" id="" placeholder="{{ profile[0] }}" name="">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                -->
 
 
                                                 <div class="row">
@@ -126,9 +106,25 @@
                                                             <input id="password_profile-1" class="form-control" type="text" name="telephone" placeholder="{{ profile[2] }}" name="password" />
                                                         </div>
                                                     </div>
-                                                    <div class="col">
-                                                        <div class="mb-3"></div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col" style="margin-bottom: 40px;">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for=""><strong>Gruppi</strong></label>
+                                                            {% for group in user_groups %}
+                                                            <small class="form-text"><h5><b>{{ group[0] }}</b></h5></small>
+                                                            {% endfor %}
+                                                        </div>
                                                     </div>
+
+                                                    <div class="col">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for=""><strong>Struttura</strong></label>
+                                                            <small class="form-text"><h5><b>{{ user_structure }}</b></h5></small>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                                 
                                                 <div class="mb-3">
@@ -160,7 +156,10 @@
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/profilo.js') }}"></script>
-    
+    <script>
+        let user_groups = '{{user_groups}}'
+        console.log("user_groups : ", user_groups[0]);
+    </script>
 </body>
 
 </html>

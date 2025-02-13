@@ -216,6 +216,7 @@ class DBProxy():
         query = "SELECT firstname, lastname, username, telephone, email, struttura, ruolotec, active, search_field FROM \"USER\" ;"
         return self.__db.execute(query)
 
+
     def add_user(self, username, firstname, lastname, email, cellulare, struttura, ruolo):
         values = [username, firstname, lastname, email, cellulare, struttura, ruolo, 0]
 

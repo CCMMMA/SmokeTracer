@@ -430,13 +430,17 @@ def profilo(alert_category=""):
 
     user = session["user"]
     # session["searchval"] = ""
-    
     last_access=db.get_last_access(user)
     profile=db.get_profile(user)
-
-    # We init the alert category to the input 
+    user_groups = db.get_groups_user(user)
     category = alert_category
+    all_users = db.fetch_users();
+    user_structure = ""
 
+    for user_var in all_users:
+        if user_var[2] == user:
+            user_structure = user_var[5]
+            break
   
     if request.method == "POST":
 
@@ -462,7 +466,7 @@ def profilo(alert_category=""):
                 lastname if lastname!="" else profile[1], 
                 telephone if telephone!="" else profile[2]]
 
-    return render_template('profilo.html', user=user, last_access=last_access, profile=profile, category=category)
+    return render_template('profilo.html', user=user, last_access=last_access, profile=profile, category=category, user_groups=user_groups, user_structure=user_structure)
 
 @app.route('/storico', methods=['POST', 'GET'])
 def storico():
@@ -513,7 +517,7 @@ def storico():
                 if job_var[9] not in str(jobs):
                     jobs.append(job_var)
         
-        # print(f"\n\n -- Jobs -- {jobs}\n\n", flush=True)
+        print(f"\n\n -- Jobs -- {jobs}\n\n", flush=True)
 
         '''
         if str(group[0]) != str(user):
@@ -1084,10 +1088,10 @@ def download():
     if request.method == "POST":
         db = DBProxy()
 
+        codice_gisa = request.form['codiceGisa']
         date = request.form['datesim']
         user = request.form['user']
         name_com = request.form['name_com']
-
         gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
         cod_com = gdf.loc[gdf['COMUNE'] == name_com, 'COD_COM'].values
 
@@ -1106,14 +1110,21 @@ def download():
                 
                 if str(file) != "out":
                     file_path = safe_join(path, file)
-                    zip_file.write(file_path, os.path.basename(file_path))
+                    
+                    new_name_file = name_com + '_' + codice_gisa + '_' + str(file).replace("['", "").replace("']", "")
+
+                    #zip_file.write(file_path, os.path.basename(file_path))
+
+                    zip_file.write(file_path, str(new_name_file).replace("['", "").replace("']", ""))
+
                 
         fileobj.seek(0)
 
         response = make_response(fileobj.read())
         response.headers.set('Content-Type', 'zip')
         # filename_out = user + '_' + date + '_' + cod_com
-        filename_out = user + '_' + date + '_' + name_com
+        # filename_out = user + '_' + date + '_' + name_com
+        filename_out = name_com + '_' + codice_gisa + '_' + date
 
         filename_out = str(filename_out).replace("['", "")
         filename_out = str(filename_out).replace("']", "")

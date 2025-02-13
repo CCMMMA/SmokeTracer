@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
     <link rel="stylesheet" href="http://unpkg.com/leaflet@1.4.0/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    
 
     <style>
         .evidenziato {
@@ -99,6 +100,24 @@
         margin-right: 5px;
         }
 
+        /* Stile per il contenitore del checkbox */
+        .checkbox-container {
+            display: inline-block;
+            width: 3em;
+            height: 3em;
+        }
+
+        /* Stile per il div che simula il checkbox */
+        .custom-checkbox {
+            width: 2.5em;
+            height: 2.5em;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s, border 0.3s;
+        }
+
     </style>
 </head>
 
@@ -115,11 +134,8 @@
                 <ul class="navbar-nav text-light" id="accordionSidebar">
                     <li class="nav-item"><a class="nav-link" href="dashboard"><i class="fas fa-terminal"></i><span style="color: var(--bs-accordion-bg);">Dashboard</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="simulazioni"><i class="fas fa-list"></i><span style="color: var(--bs-accordion-bg);">Simulazioni</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="profilo">
-                        <i class="far fa-user-circle"></i>
-                        <span style="color: var(--bs-accordion-bg);">Profilo</span></a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo Utente</span></a></li>
                     <li class="nav-item"></li>
                 </ul>
                 <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
@@ -162,8 +178,8 @@
                                         <thead>
                                             <tr>
                                                 <th>Descrizione</th>
-                                                <th>Data</th>
-                                                <th>Ora</th>
+                                                <th>Data inizio</th>
+                                                <th>Ora inizio</th>
                                                 <th>Durata</th>
                                                 <th>Comune</th>
                                                 <th>Longitudine</th>
@@ -172,7 +188,10 @@
                                                 <th>Codice GISA</th>
                                                 <th>ID</th>
                                                 <th>Gruppo</th>
-                                                <th>Azioni</th>
+                                                <th>Stato</th>
+                                                <th>Scarica</th>
+                                                <th>Elimina</th>
+                                                
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -189,6 +208,9 @@
                                                 <td>{{ job[8] }}</td>
                                                 <td>{{ job[9] }}</td>
                                                 <td>{{ job[12] }}</td>
+
+                                                <!-- <td><input type="checkbox" class="form-check-input" style="width: 2.5em; height: 2.5em;" disabled></td> -->
+                                                <td><div id="custom-checkbox" class="custom-checkbox"></div></td>
                                                 
                                                 <!-- <form action="{{ url_for('download') }}" method="post"> -->
                                                 <td>
@@ -198,6 +220,7 @@
                                                         <input type="hidden" name="datesim" value="{{ job[1] }}">
                                                         <input type="hidden" name="user" value="{{ user }}">
                                                         <input type="hidden" name="name_com" value="{{ job[4] }}">
+                                                        <input type="hidden" name="codiceGisa" value="{{ job[8] }}">
                                                     </form>
                                                 </td>
                                                 <!-- <td>
@@ -219,10 +242,12 @@
                                             </tr>
                                             {% endfor %}
                                         </tbody>
-                                       
+                                        
+                                        <!--
                                         <tfoot>
                                             <tr></tr>
                                         </tfoot>
+                                        -->
                                     </table>
                                     <div class="pagination">
                                         {{ pagination.links }}
@@ -263,7 +288,7 @@
                                 </div>
         
                                 <div class="card-body">
-                                    <button class="btn btn-primary btn-sm" id="bottoneSovrapposizione" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="sovraCheck()">Sovrapposizione</button>
+                                    <button class="btn btn-primary btn-sm" id="bottoneSovrapposizione" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="sovraCheck()">Evoluzione</button>
                                     <button class="btn btn-primary btn-sm" id="buffer500mt" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="bufferCheck500mt()">Buffer 500MT</button>
                                     <button class="btn btn-primary btn-sm" id="buffer3km" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="bufferCheck3km()">Buffer 3KM</button>
                                     <button class="btn btn-primary btn-sm" id="buttonHighlightCommons" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="highlightsCommon()">Evidenzia comuni</button>
@@ -305,10 +330,13 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.6.0/tinycolor.min.js"></script> <!-- libreria utile per la generazione di un colore randomico in esadecimale -->
     
         <script>
+
             document.getElementById('myRange').addEventListener("input", changeInput);
 
-            var output = document.getElementById("demo");
             var slider = document.getElementById("myRange");
+            var output = document.getElementById("demo");
+            //var isLock = false;
+            output.innerHTML = slider.value;
 
             // Variabili per gestire la logica dei bottoni 
             var attivoBuffer3km = true;
@@ -342,23 +370,11 @@
             var map = new ol.Map({
                 target: 'map',
                 layers: [
-
                     new ol.layer.Tile({
                         source: new ol.source.XYZ({
                             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-                            //url: 'https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}.png'
-                            //url: 'https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key=yNolbzVOYm8BH5d911a9' 
                         }),
                     }),
-
-                    /*
-                    new ol.layer.Vector({
-                        source: new ol.source.Vector({
-                        url: '/static/limits_comuni/limits_IT_municipalities.geojson',
-                        format: new ol.format.GeoJSON()
-                        })
-                    })
-                    */
                 ],
                 view: new ol.View({
                     center: [0, 0],
@@ -372,25 +388,90 @@
             var rotateMap = new ol.interaction.DragRotateAndZoom();
             map.addInteraction(rotateMap);
 
-            output.innerHTML = slider.value;
-            slider.oninput = function() {
-                    output.innerHTML = this.value / 5;
-            }
             
-            // sezione per evidenziare le simulazioni ancora non terminate o per eliminare l'evidenziazione delle simulazioni terminate 
+            /*
+            slider.oninput = function() {
+                output.innerHTML = this.value / 5;
+            }
+            */
+            
+            // sezione per evidenziare le simulazioni ancora non terminate
             let table_body = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
 
             if( table_body.rows.length > 0 ) {
-                for( let i=0; i<table_body.rows.length; i++ ) {
-                    if( table_body.rows[i].cells[14].textContent == '0' )
-                        table_body.rows[i].classList.add("evidenziato_coda");
-                }
 
                 for( let i=0; i<table_body.rows.length; i++ ) {
-                    if( table_body.rows[i].contains("evidenziato_coda") && (table_body.rows[i].cells[14].textContent == '1') )
-                        table_body.rows[i].classList.remove("evidenziato_coda");
+
+                    if( table_body.rows[i].cells[14].textContent == '0' ) {
+                        console.log("sim ancora in coda");
+                        table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "gray";
+                        // table_body.rows[i].classList.add("evidenziato_coda");
+                    }
                 }
+
+                /*
+                for( let i=0; i<table_body.rows.length; i++ ) {
+                    if( table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor == "gray" && (table_body.rows[i].cells[14].textContent == '1') )
+                        table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor= "white";
+                        //table_body.rows[i].classList.remove("evidenziato_coda");
+                }
+                */
+
+                
             }
+
+
+
+            for(let i=0; i<table_body.rows.length; i++) {
+                
+                let name_user= "{{session['user']}}";
+                let date_label = table_body.rows[i].cells[1].textContent;
+
+                fetch('static/centroidi_comuni/centroidi_comuni.geojson')
+                .then(response => response.json())
+                .then(data => {
+
+                    for (let feature of data.features) {
+                        
+                        if (feature.properties.COMUNE == table_body.rows[i].cells[4].textContent){
+
+                            var municipality_code = feature.properties.COD_COM;
+                            let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(table_body.rows[i].cells[2].textContent)).toString().padStart(2, '0') + ".kml";
+                            // let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "_" + id_workflow + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
+
+                            // check if file exists 
+                            fetch(url)
+                            .then(response =>{
+                                if(!response.ok) {
+                                    
+                                    if(table_body.rows[i].cells[15].textContent == '0') {
+                                    
+                                        table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "gray";
+                                        console.log("simulazione ancora in corso.")
+                                    } else {
+                                        table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "red";
+                                        console.log("simulazione non andata a buon fine.")
+                                    }
+                                } else {
+                                    table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "green";
+                                    console.log("simulazione trovata.");
+                                }
+                                
+                            })
+
+                        }
+                    }
+                })
+                .catch()
+            
+
+
+
+
+            }
+
+           
+            
 
 
             function search() {
@@ -408,7 +489,7 @@
                         if( field_search_of_row.includes(text_input_search) ){
 
                             rows_match.push(tbody.rows[i]);
-                            console.log("occorrenza trovata");
+                            // console.log("occorrenza trovata");
 
                         }
                     }
@@ -418,62 +499,29 @@
                         riga.classList.add('evidenziato');
                         setTimeout(function() {
                             riga.classList.remove('evidenziato');
-                        }, 10000);
+                        }, 5000);
                     });      
                 }
-
-                /*
-                if (matches) {
-                    const nomeCampo = matches[1];
-                    const valore = matches[2];
-                    let tbody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
-
-                    if(tbody.rows.length > 0) {
-
-                        var thead = document.querySelector('#dataTable thead');
-                        var cells_th = thead.querySelectorAll('th');        
-                        var valori = [];
-
-                        cells_th.forEach(function(cella) {
-                            valori.push(cella.textContent);
-                        });
-
-                        let index_thead = -1;
-                        let rows_match = []
-
-                        for(var i=0; i<valori.length; i++) {
-                            if(valori[i] == nomeCampo) {
-                                index_thead = i;
-                                break;
-                            }
-                        }
-                        
-                        if(index_thead!=-1) {
-                            for(let j=0; j<tbody.rows.length; j++) {
-                                if(tbody.rows[j].cells[index_thead].textContent == valore) {
-                                    rows_match.push(tbody.rows[j]);
-                                }
-                            }
-                        }
-
-                        rows_match.reverse().forEach(function(riga) {
-                            tbody.insertBefore(riga, tbody.firstChild);
-
-                            riga.classList.add('evidenziato');
-                            
-                            setTimeout(function() {
-                                riga.classList.remove('evidenziato');
-                            }, 10000);
-                         });
-                    }
-                } else {
-                    console.log("La stringa non è nel formato previsto.");
-                }
-                */
             }
 
 
             function changeInput() {
+
+                /*
+                if(isLock)
+                    return;
+                
+                isLock = true;
+                slider.disabled = true;
+
+                setTimeout(() => {
+                    isLock = false;
+                    slider.disabled = false;
+                }, 1000);
+                */
+
+                output.innerHTML = this.value / 5;
+
 
                 // Sezione pulizia mappa dai precedenti layer 
                 map.removeLayer(vectorLayer_buffer3000);
@@ -685,42 +733,11 @@
                 // aggiorno l'ora precedente in base a quella selezionata 
                 previous_hour = parseInt(hourToLegend)-1;
 
-
-                /*
-                // aggiunge i confini dei comuni sulla mappa
-                let borders = new ol.layer.Vector({
-                    source: new ol.source.Vector({
-                    url: '/static/limits_comuni/limits_IT_municipalities.geojson',
-                    format: new ol.format.GeoJSON()
-                    })
-                })
-                map.addLayer(borders);
-                */
-
-
-
-                /*
-                console.log("flagEvidenziaComuni : ", flagEvidenziaComuni);
-                console.log("flag_buffer3km : ", flag_buffer3km);
-                console.log("flag_buffer500mt : ", flag_buffer500mt);
-                console.log("flag_sovrapposizione : ", flag_sovrapposizione);
-
-                console.log("--------------------------------------------")
-
-                console.log("attivoEvidenziaComuni : ", attivoEvidenziaComuni);
-                console.log("attivoBuffer3km : ", attivoBuffer3km);
-                console.log("attivoBuffer500mt : ", attivoBuffer500mt);
-                console.log("attivo : ", attivo);
-                */
-
-
                 // Sezione controllo dei layer aggiunti sulla mappa 
                 if(flag_buffer3km)
                     map.addLayer(vectorLayer_buffer3000);
                 if(flag_buffer500mt)
                     map.addLayer(vectorLayer_buffer500);
-
-             
             }
 
 
@@ -732,6 +749,7 @@
                 if (attivo) {
 
                     bottone.classList.remove("evidenziato");
+                    bottone.style.color = "white";
                     // console.log("SOVRAPPOSIZIONE : disattivato");
                     flag_sovrapposizione = false;
                     map.removeControl(legendControl);
@@ -739,6 +757,7 @@
                 } else {
 
                     bottone.classList.add("evidenziato");
+                    bottone.style.color = "black";
                     // console.log("SOVRAPPOSIZIONE : attivato");
                     flag_sovrapposizione = true;
 
@@ -760,251 +779,6 @@
                 }
             }
             
-
-            /*
-            function nextKML(){
-                
-                if( i > parseInt("{{session['durata']}}")) {
-                    console.log("Max ora durata simulazione");
-                    return;
-                }
-
-                if( ((i+1)%24) == 0 && i!=0) {
-                    let data_var = moment(data);
-                    let new_data = data_var.add(1, 'day');
-                    let format_data = new_data.format('YYYY-MM-DD');
-                    data = format_data.replace(/-/g, "");
-                    // normalizzazione dell'indice ( che rappresenta l'ora )
-                    i = i - 23;
-                    document.getElementById("data_data").innerText = format_data.toString();
-                }
-
-                i+=1;
-
-                if(flag_sovrapposizione==false){
-
-                    // pulisce il layers kml precedente
-                    var layers = map.getLayers().getArray();
-                    layers.forEach(function(layer) {
-                    if (layer instanceof ol.layer.Vector) {
-                            layer.getSource().clear();
-                        }
-                    });
-                }
-
-                // crea lo stile ( cambio colore ) per le linee del .kml
-                function changeKMLColor(feature, color) {
-                    feature.setStyle(new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: color,
-                            width: 1
-                        })
-                    }));
-                }
-
-                // carica il file kml in un vector-layer
-                var targetVectorLayer = new ol.layer.Vector({
-                    source: new ol.source.Vector({
-                        url : '/static/KML/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + i ).toString().padStart(2, '0') + ".kml",
-                        // url : '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + i ).toString().padStart(2, '0') + ".kml",
-                        format: new ol.format.KML(),
-                    })
-                });
-
-                // cambia effettivamente colore alle vector features nel kml
-                targetVectorLayer.getSource().once('change', function(event) {
-                    if (targetVectorLayer.getSource().getState() === 'ready') {
-                            var features = targetVectorLayer.getSource().getFeatures();
-                            color = tinycolor.random().toHexString();
-                            features.forEach(function(feature) {
-                                changeKMLColor(feature, color);
-                            });
-                        }
-                    });
-
-
-                // Controllo del buffer da 500m
-                if( flag_buffer500mt == true) {
-                    let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")];
-                    let radius = 500;
-                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
-                    let circleFeature = new ol.Feature(circle);
-                    let circleStyle = new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: 'red',
-                            width: 1
-                        }),
-                    });
-
-                    circleFeature.setStyle(circleStyle);
-
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
-                    let vectorSource = new ol.source.Vector({
-                        features: [circleFeature]
-                        });
-
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
-                    var vectorLayer = new ol.layer.Vector({
-                        source: vectorSource
-                        });
-
-                    map.addLayer(vectorLayer);
-                    console.log("flag_buffer section completed")
-                }
-
-                // Controllo del buffer da 3km
-                if( flag_buffer3km == true ) {
-                    let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")];
-                    let radius = 3000;
-                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
-                    let circleFeature = new ol.Feature(circle);
-                    let circleStyle = new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: 'red',
-                            width: 1
-                        }),
-                    });
-
-                    circleFeature.setStyle(circleStyle);
-
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
-                    let vectorSource = new ol.source.Vector({
-                        features: [circleFeature]
-                        });
-
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
-                    var vectorLayer = new ol.layer.Vector({
-                        source: vectorSource
-                        });
-
-                    map.addLayer(vectorLayer);
-                    console.log("BUFFER [3km] : Added to map")
-                }
-
-                map.addLayer(targetVectorLayer);  
-                document.getElementById("data_ora").innerText = i.toString();
-                console.log("Ora successiva - load kml path : ", '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + i ).toString().padStart(2, '0') + ".kml");
-            }
-
-            function previousKML(){
-
-                if( ((i-1)%24) == 0 && i!=0) { 
-                    let data_var = moment(data);
-                    let new_data = data_var.subtract(1, 'day');
-                    let format_data = new_data.format('YYYY-MM-DD');
-                    data = format_data.replace(/-/g, "");
-                    i = i + 23;
-
-                    document.getElementById("data_data").innerText = format_data.toString();
-                }
-
-                i-=1;
-
-
-                if(flag_sovrapposizione==false) {
-                    var layers = map.getLayers().getArray();
-                    layers.forEach(function(layer) {
-                        if (layer instanceof ol.layer.Vector) {
-                            layer.getSource().clear();
-                        }
-                    });
-                }
-
-                function changeKMLColor(feature, color) {
-                    feature.setStyle(new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: color,
-                            width: 1
-                        })
-                    }));
-                }
-
-                var targetVectorLayer = new ol.layer.Vector({
-                    source: new ol.source.Vector({
-                        url: '/static/KML/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + (i-1) ).toString().padStart(2, '0') + ".kml",
-                        // url: '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + i ).toString().padStart(2, '0') + ".kml",
-                        format: new ol.format.KML(),
-                    })
-                });
-
-                targetVectorLayer.getSource().once('change', function(event) {
-                    if (targetVectorLayer.getSource().getState() === 'ready') {
-                            var features = targetVectorLayer.getSource().getFeatures();
-                            color = tinycolor.random().toHexString();
-                            features.forEach(function(feature) {
-                                changeKMLColor(feature, color);
-                            });
-                        }
-                    });
-
-
-                // Controllo del buffer da 500m
-                if( flag_buffer500mt == true) {
-                    let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")];
-                    let radius = 500;
-                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
-                    let circleFeature = new ol.Feature(circle);
-                    let circleStyle = new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: 'red',
-                            width: 1
-                        }),
-                    });
-
-                    circleFeature.setStyle(circleStyle);
-
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
-                    let vectorSource = new ol.source.Vector({
-                        features: [circleFeature]
-                        });
-
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
-                    var vectorLayer = new ol.layer.Vector({
-                        source: vectorSource
-                        });
-
-                    map.addLayer(vectorLayer);
-                    console.log("flag_buffer section completed")
-                }
-
-                // Controllo del buffer da 3km
-                if( flag_buffer3km == true ) {
-                    let center = [parseFloat("{{session['lon']}}"), parseFloat("{{session['lat']}}")];
-                    let radius = 3000;
-                    let circle = new ol.geom.Circle(ol.proj.fromLonLat(center), radius);
-                    let circleFeature = new ol.Feature(circle);
-                    let circleStyle = new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: 'red',
-                            width: 1
-                        }),
-                    });
-
-                    circleFeature.setStyle(circleStyle);
-
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
-                    let vectorSource = new ol.source.Vector({
-                        features: [circleFeature]
-                        });
-
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
-                    var vectorLayer = new ol.layer.Vector({
-                        source: vectorSource
-                        });
-
-                    map.addLayer(vectorLayer);
-                    console.log("BUFFER [3km] : Added to map")
-                }
-
-                // Aggiunta kml della simulazione alla mappa
-                map.addLayer(targetVectorLayer);
-                document.getElementById("data_ora").innerText = i.toString();
-                console.log("Ora successiva - load kml path : ", '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + data + "Z" + (parseInt("{{ session['ora_inizio'] }}") + i ).toString().padStart(2, '0') + ".kml");
-
-            }
-            */
-        
-
             function bufferCheck3km() {
 
                 attivoBuffer3km = !attivoBuffer3km;
@@ -1012,12 +786,14 @@
                 
                 if (attivoBuffer3km) {
                     bottone.classList.remove("evidenziato");
+                    bottone.style.color = "white";
                     console.log("BUFFER [3km] : disattivato");
                     flag_buffer3km = false;
                     map.removeLayer(vectorLayer_buffer3000);
 
                 } else {
                     bottone.classList.add("evidenziato");
+                    bottone.style.color = "black";
                     console.log("BUFFER [3km] : attivato");
                     flag_buffer3km = true;
 
@@ -1061,6 +837,7 @@
                 if (attivoBuffer500mt) {
 
                     bottone.classList.remove("evidenziato");
+                    bottone.style.color = "white";
                     console.log("BUFFER [500mt] : disattivato");
                     flag_buffer500mt = false;
                     map.removeLayer(vectorLayer_buffer500);
@@ -1068,6 +845,7 @@
                 } else {
 
                     bottone.classList.add("evidenziato");
+                    bottone.style.color = "black";
                     // console.log("BUFFER [500mt]: attivato");
                     flag_buffer500mt = true;
 
@@ -1111,6 +889,7 @@
                 if(attivoEvidenziaComuni) {
 
                     buttonHighlightsCommons.classList.remove("evidenziato");
+                    buttonHighlightsCommons.style.color = "white";
                     //console.log("Highlights Commons : disattivato");
                     flagEvidenziaComuni = false;
 
@@ -1120,17 +899,10 @@
                     // pulisce la mappa dai precedenti .kml
                     var layers = map.getLayers().getArray();
 
-                    /* 
-                    layers.forEach(function(layer) {
-                    if ( layer instanceof ol.layer.Vector ) {
-                            layer.getSource().clear();
-                        }
-                    });
-                    */
-
                 } else {
                 
                     buttonHighlightsCommons.classList.add("evidenziato");
+                    buttonHighlightsCommons.style.color = "black";
                     //console.log("Highlights Commons : attivato");
                     flagEvidenziaComuni = true;
 
@@ -1170,10 +942,8 @@
                 attivoEvidenziaComuni = true;
                 document.getElementById('buttonHighlightCommons').classList.remove('evidenziato');
 
-
                 // pulisce la leggenda 
                 map.removeControl(legendControl);
-
 
                 // pulisce la mappa dai layers della simulazione precednete  
                 var layers = map.getLayers(); 
@@ -1182,7 +952,6 @@
                         layer.getSource().clear();
                     }
                 });
-                
 
                 // pulisce il campo del nome dei comuni estratti dalla precedente simulazione
                 var ul_common_list = document.getElementById('commons_list')
@@ -1197,7 +966,7 @@
                 righe.forEach(function(row) {
                     row.classList.remove('evidenziato');
                 });
-
+                
                 // -------------------------FINE SEZIONE PULIZIA MAPPA --------------------------------------------
             
 
@@ -1210,10 +979,8 @@
                 map.getView().setZoom(11);
 
 
-                // let name_user = document.getElementById('name_user_label').textContent
                 let name_user = "{{session['user']}}";
                 let date_label = riga.cells[1].textContent;
-                
                 
                 //let id_workflow = riga.cells[9].textContent;
 
@@ -1229,22 +996,27 @@
                             let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
                             // let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "_" + id_workflow + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
 
+                            
                             // check if file exists 
                             fetch(url)
                             .then(response =>{
                                 if(!response.ok) {
 
-                                    riga.classList.add('evidenziato_error');
+                                    //riga.cells[11].querySelector('#custom-checkbox').style.backgroundColor = "red";
+                                    //return;
+                                    
+                                    //riga.classList.add('evidenziato_error');
+                                    //setTimeout(function() {
+                                    //    riga.classList.remove('evidenziato_error');
+                                    //}, 10000);
 
-                                    setTimeout(function() {
-                                        riga.classList.remove('evidenziato_error');
-                                    }, 10000);
-
-                                    return;
-
-                                } else 
+                                } else {
+                                    //riga.cells[11].querySelector('#custom-checkbox').style.backgroundColor = "green";
                                     riga.classList.add('evidenziato');
+                                }
+                                
                             })
+                            
                             
                             
                             base_global_path = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/"
@@ -1304,10 +1076,10 @@
                                         source: vectorSource,
                                         style: new ol.style.Style({
                                             fill: new ol.style.Fill({
-                                                color: 'rgba(255, 0, 0, 0.2)' // colore rosso con trasparenza
+                                                color: 'rgba(255, 0, 0, 0.2)' 
                                             }),
                                             stroke: new ol.style.Stroke({
-                                                color: 'red', // bordi rossi
+                                                color: 'red', 
                                                 width: 0.5
                                             })
                                         })
@@ -1324,19 +1096,6 @@
                             
                         }                        
                     }
-                    
-
-                    /*
-
-                    console.log("----------------------------------------------------------");
-                    console.log("before to end the fetch");
-                    console.log("length vectorLayersCommons : ", vectorLayersCommons.length);
-                    for( let layer of vectorLayersCommons ) {
-                        console.log("layer : ", layer);
-                    }
-                    console.log("----------------------------------------------------------");
-                    */
-
                 })
                 .catch(error => console.error('Errore durante il recupero del file:', error));
                 
