@@ -10,9 +10,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/css/Login-Form-Basic-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/VentasPro-Login.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 
     <style>
-
         .left-half {
             background-color: #3498db;
             height: 100vh;
@@ -48,17 +49,21 @@
             opacity: 0.3;
         }
         
+        
+        
         .logo-izsdm {
             max-height: 150px;
-            min-height: 100px;
+            min-height: 50px;
         }
 
         .logo-regione {
             max-width: 150px;
-            min-width: 150px;
+            min-width: 50px;
             max-height: 150px;
-            min-height: 150px;
+            min-height: 50px;
         }
+
+        
         
     </style>
 
@@ -70,28 +75,50 @@
         <div class="row no-gutters">
 
             <!-- Left column -->
-            <div class="col-12 col-md-6 left-half d-flex flex-wrap align-items-center justify-content-center" id="left_contents">
-                <div class="d-flex">
-                    <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" class="img-fluid logo-regione" alt="Logo Regione Campania">
-                </div>
+            <div class="col-12 col-md-6 left-half d-flex flex-column align-items-center justify-content-center" id="left_contents">
+               
+                <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" class="img-fluid logo-regione" alt="Logo Regione Campania">
+                   
+                
             </div>
 
             <!-- Right column -->
-            <div class="col-12 col-md-6 right-half d-flex flex-wrap align-items-center justify-content-center" id="right_contents">
+            <div class="col-12 col-md-6 right-half d-flex flex-column align-items-center justify-content-center justify-content-between justify-content-around" id="right_contents">
 
-                <div class="row mt-5 d-flex flex-row justify-content-center">
-
-                    <div class="col d-flex justify-content-center">
-                      <img src="{{ url_for('static', filename='img/logo_IZSDM.png') }}" class="img-fluid logo-izsdm" alt="Logo IZSDM">
-                    </div>
-                    <div class="col d-flex justify-content-center">
-                      <img src="{{ url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png') }}" class="img-fluid logo-regione" alt="Logo Regione Campania">
-                    </div>
-
+                
+                <div class="row">
+                    <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
+                        <img src="{{ url_for('static', filename='img/logo_IZSDM.png') }}" class="img-fluid logo-izsdm" alt="Logo IZSDM">
+                      </div>
+  
+                      <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
+                        <img src="{{ url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png') }}" class="img-fluid logo-regione" alt="Logo Regione Campania">
+                      </div>
                 </div>
-            
-                <div class="card mb-5"  style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-top: 10%;">
-                    <div class="card-body d-flex flex-column align-items-center" style="backdrop-filter: opacity(0);-webkit-backdrop-filter: opacity(0);"> 
+
+
+                <div class="row">
+                    <div class="card">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-between">
+                            <h5 class="card-title"> <i class="bi bi-fire"></i> &nbsp;&nbsp;LOGIN SMOKETRACER &nbsp;&nbsp;<i class="bi bi-fire"></i></h5>
+                            <p>
+                                {% for mesg in get_flashed_messages() %}
+                                <div class="alert alert-danger text-center">Errore: {{ mesg }}</div>
+                                {% endfor %}
+                            </p>
+                            <form class="text-center" method="post">
+                                <div class="mb-3"><input class="form-control form-control" type="username" id="user_login" name="username" placeholder="Username"></div>
+                                <div class="mb-3"><input class="form-control form-control" type="password" id="password_login" name="password" placeholder="Password"></div>
+                                <div class="mb-3"><button class="btn btn-primary d-block w-100" id="loginbutton_login" type="submit">Login</button></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+         
+                <!--
+                <div class="card d-flex flex-column justify-content-center align-items-center">
+                    <div class="card-body align-items-center" style="backdrop-filter: opacity(0);-webkit-backdrop-filter: opacity(0);"> 
                         <h6>LOGIN SISTEMA SMOKETRACER</h6>
                         <p>{% for mesg in get_flashed_messages() %}
                         <div class="alert alert-danger text-center">Errore: {{ mesg }}</div>
@@ -99,28 +126,32 @@
                         <form class="text-center" method="post">
                             <div class="mb-3"><input class="form-control form-control" type="username" id="user_login" name="username" placeholder="Username"></div>
                             <div class="mb-3"><input class="form-control form-control" type="password" id="password_login" name="password" placeholder="Password"></div>
-                            <div class="mb-3"><button class="btn btn-primary d-block w-100" id="loginbutton_login" type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1);">Login</button></div>
+                            <div class="mb-3"><button class="btn btn-primary d-block w-100" id="loginbutton_login" type="submit">Login</button></div>
                         </form>
                     </div>
                 </div>
-             
-                <div class="mt-auto text-center w-100" style="margin-bottom: 40px;">
-                    <span>I dati numerici e le rappresentazioni cartografiche generate sono frutto di elaborazioni di modelli matematici che operano in modo automatico senza intervento umano. I prodotti sono forniti così come sono. L'interpretazione deve essere svolta da personale esperto a proprio rischio e sotto la propria responsabilità. Le informazioni riportate non possono essere considerate sostitutive dei documenti ufficiali. L'orario indicato è in ora UTC. In nessun caso lo staff di meteo@uniparthenope, il CMMMA, il Dipartimento di Scienze e Tecnologie, l'Università degli Studi di Napoli "Parthenope" e tutte le persone coinvolte nelle relative attività di ricerca e produzione sono responsabili per danni a persone, animali o cose.</span>
+                -->
+                
+                <div class="row d-flex flex-column align-items-center">
+                    <div class="col-12">
+                    <div class="text-center">
+                        <span>I dati numerici e le rappresentazioni cartografiche generate sono frutto di elaborazioni di modelli matematici che operano in modo automatico senza intervento umano. I prodotti sono forniti così come sono. L'interpretazione deve essere svolta da personale esperto a proprio rischio e sotto la propria responsabilità. Le informazioni riportate non possono essere considerate sostitutive dei documenti ufficiali. L'orario indicato è in ora UTC. In nessun caso lo staff di meteo@uniparthenope, il CMMMA, il Dipartimento di Scienze e Tecnologie, l'Università degli Studi di Napoli "Parthenope" e tutte le persone coinvolte nelle relative attività di ricerca e produzione sono responsabili per danni a persone, animali o cose.</span>
+                    </div>
+                    </div>
                 </div>
-
             </div>
-
+            
         </div>
     </div>
 
     <div class="overlay" style="display: none;" id="overlay_contents">
         <div class="overlay-content">
-            <div class="card-body d-flex flex-column align-items-center" style="backdrop-filter: opacity(0);-webkit-backdrop-filter: opacity(0);">
+            <div class="card-body d-flex flex-column align-items-center">
                 <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" style="width: 80px;min-width: 80px;height: 80px;margin-bottom: 10px;">      
                 <form method="POST">
-                    <button class="btn btn-primary d-block w-100" name="button_admin_panel" type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-bottom: 10px;">Admin Panel</button>
-                    <button class="btn btn-primary d-block w-100" name="button_user_panel" type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-bottom: 10px;">User Panel</button>
-                    <button class="btn btn-primary d-block w-100"  type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-bottom: 10px;" onclick="closeOverlay()">Chiudi</button>
+                    <button class="btn btn-primary d-block w-100" name="button_admin_panel" type="submit" style="margin-bottom: 10px;">Admin Panel</button>
+                    <button class="btn btn-primary d-block w-100" name="button_user_panel" type="submit" style="margin-bottom: 10px;">User Panel</button>
+                    <button class="btn btn-primary d-block w-100"  type="submit" style=" margin-bottom: 10px;" onclick="closeOverlay()">Chiudi</button>
                 </form>
             </div>
         </div>

@@ -16,32 +16,68 @@
 
 <body id="page-top">
     <div id="wrapper">
+
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
 
-            <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#"><img style="width: 32px;height: 33px;" src="{{ url_for('static', filename='/img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png') }}">
-                    <div class="sidebar-brand-icon rotate-n-15"></div>
-                    <div class="sidebar-brand-text mx-3"><span>SMOKETRACER</span></div>
+            <div class="container-fluid d-flex flex-column p-0">
+
+                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <img style="width: 32px;height: 33px;" src="{{ url_for('static', filename='/img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png') }}">
+                    <!-- <div class="sidebar-brand-icon rotate-n-15"></div> -->
+                    <div class="sidebar-brand-text mx-3">
+                        <span>SMOKETRACER</span>
+                    </div>
                 </a>
-                <hr class="sidebar-divider my-0">
+
+                <!-- <hr class="sidebar-divider my-0"> -->
                 <ul class="navbar-nav text-light" id="accordionSidebar">
-                    <li class="nav-item"><a class="nav-link" href="dashboard"><i class="fas fa-terminal"></i><span style="color: var(--bs-accordion-bg);">Dashboard</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="simulazioni"><i class="fas fa-list"></i><span style="color: var(--bs-accordion-bg);">Simulazioni</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo Utente</span></a></li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard">
+                            <i class="fas fa-terminal"></i>
+                            <span style="color: var(--bs-accordion-bg);">Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="simulazioni">
+                            <i class="fas fa-list"></i>
+                            <span style="color: var(--bs-accordion-bg);">Simulazioni</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="storico">
+                            <i class="fas fa-table"></i>
+                            <span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="profilo">
+                            <i class="far fa-user-circle"></i>
+                            <span style="color: var(--bs-accordion-bg);">Profilo Utente</span>
+                        </a>
+                    </li>
                     
                 </ul>
-                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+                <!-- <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div> -->
             </div>
 
         </nav>
+
+
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
-                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                <!-- <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top"> -->
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar">
 
-                    <div class="container-fluid">
+                    <!-- <div class="container-fluid"> -->
                         <!-- <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button> -->
 
-                        <div class="d-flex flex-column flex-md-row">
+                        <!-- <div class="d-flex flex-column flex-md-row"> -->
+
+                        <div class="d-flex flex-column flex-wrap"
                             <small class="form-text fs-4 fw-semibold">&nbsp;Ultimo accesso : {{ last_access }}&nbsp;</small>
                         </div>
 
@@ -51,16 +87,23 @@
                         </form>
                         <ul class="navbar-nav flex-nowrap ms-auto"></ul>
                         
-                        <div class="d-flex flex-column flex-md-row align-items-center ms-auto">
+                        <!-- <div class="d-flex flex-column flex-md-row align-items-center ms-auto"> -->
+                        <div class="d-flex flex-md-row flex-wrap align-items-center">
+
                             <div class="d-none d-sm-block topbar-divider"></div>
+
                             <div class="mb-2 mb-md-0 me-md-2">
                                 <h4 class="m-0 fw-bold">&nbsp;&nbsp;{{ user }}&nbsp;&nbsp;</h4>
                             </div>
+
                             <div class="d-none d-sm-block topbar-divider"></div>
+
                             <a href="{{ url_for('logout') }}" class="btn btn-primary">&nbsp;Log Out</a>
+
+
                         </div>
 
-                    </div>
+                    <!-- </div> -->
 
                 </nav>
                 <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
