@@ -17,6 +17,7 @@
 <body id="page-top">
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
+
             <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#"><img style="width: 32px;height: 33px;" src="{{ url_for('static', filename='/img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png') }}">
                     <div class="sidebar-brand-icon rotate-n-15"></div>
                     <div class="sidebar-brand-text mx-3"><span>SMOKETRACER</span></div>
@@ -24,49 +25,48 @@
                 <hr class="sidebar-divider my-0">
                 <ul class="navbar-nav text-light" id="accordionSidebar">
                     <li class="nav-item"><a class="nav-link" href="dashboard"><i class="fas fa-terminal"></i><span style="color: var(--bs-accordion-bg);">Dashboard</span></a></li>
-                    <!-- <li class="nav-item"><a class="nav-link" href="simulazione-singola"><i class="fas fa-eye"></i><span style="color: var(--bs-accordion-bg);">Simulazione singola</span></a></li> -->
                     <li class="nav-item"><a class="nav-link" href="simulazioni"><i class="fas fa-list"></i><span style="color: var(--bs-accordion-bg);">Simulazioni</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo Utente</span></a></li>
-                    <!-- <li class="nav-item"></li> -->
+                    
                 </ul>
                 <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
+
         </nav>
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
                 <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
-                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><small class="form-text fs-4 fw-semibold" style="width: auto;height: auto;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
+
+                    <div class="container-fluid">
+                        <!-- <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button> -->
+
+                        <div class="d-flex flex-column flex-md-row">
+                            <small class="form-text fs-4 fw-semibold">&nbsp;Ultimo accesso : {{ last_access }}&nbsp;</small>
+                        </div>
+
+                        
                         <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group"></div>
                         </form>
-                        <ul class="navbar-nav flex-nowrap ms-auto">
+                        <ul class="navbar-nav flex-nowrap ms-auto"></ul>
+                        
+                        <div class="d-flex flex-column flex-md-row align-items-center ms-auto">
                             <div class="d-none d-sm-block topbar-divider"></div>
-                        </ul><small class="form-text" style="margin-left: 0px;width: 250.1641px;font-weight: bold;"><h4><b>{{ user }}</b></h4></small><a href="{{ url_for('logout') }}" class="btn btn-primary">Log Out</a>
+                            <div class="mb-2 mb-md-0 me-md-2">
+                                <h4 class="m-0 fw-bold">&nbsp;&nbsp;{{ user }}&nbsp;&nbsp;</h4>
+                            </div>
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <a href="{{ url_for('logout') }}" class="btn btn-primary">&nbsp;Log Out</a>
+                        </div>
+
                     </div>
+
                 </nav>
                 <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
-                    <div class="container">
+                    <div class="container-fluid" style="margin-left: 5%; margin-right: 5%;">
                         <div class="container text-center"><small class="form-text fs-4 fw-semibold " style="width: auto;height: auto; ">Benvenuto al sistema Smoketracer!</small></div>
                         <div class="row" style="padding-bottom: 25px; padding-top: 25px;">
-                            <!-- 
-                            <div class="col">
-                                <a href="simulazione-singola" style="text-decoration:none;">
-                                    <div class="card">
-                                        <div class="card-body" style="margin: auto;">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <h4>Simulazione Singola</h4>
-                                                </div>
-                                                <div class="col text-end"><i class="fas fa-eye fa-2x text-gray-300"></i></div>
-                                            </div>
-                                            <h6 class="text-muted card-subtitle mb-2" style="color: rgba(128, 128, 128, 0.767);">Simulazione singola e visualizzazione</h6>
-                                            <p class="card-text" style="color: Gray;">In questa sezione potrai sottomettere singole simulazioni e vederne il risultato.</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            -->
                             <div class="col">
                                 <a href="simulazioni" style="text-decoration:none;">                            
                                     <div class="card">
@@ -77,8 +77,6 @@
                                                 </div>
                                                 <div class="col text-end"><i class="fas fa-list-ol fa-2x text-gray-300"></i></div>
                                             </div>
-                                            <!-- <h6 class="text-muted card-subtitle mb-2" style="color: rgba(128, 128, 128, 0.767);">Simulazioni parallele </h6> -->
-                                            <!-- <p class="card-text" style="color: Gray;">In questa sezione potrai sottomettere più simulazioni contemporaneamente e vederne lo stato associato nella coda.</p> -->
                                             <p class="card-text" style="color: Gray;">In questa sezione potrai sottomettere una o più simulazioni e vederne lo stato ed i risultati.</p>
                                         </div>
                                     </div>
@@ -96,8 +94,6 @@
                                                 </div>
                                                 <div class="col text-end"><i class="fas fa-table fa-2x text-gray-300"></i></div>
                                             </div>
-                                            <!-- <h6 class="text-muted card-subtitle mb-2" style="color: rgba(128, 128, 128, 0.767);">Lista delle simulazioni effettuate</h6> --> 
-                                            <!-- <p class="card-text" style="color: Gray;">In questa sezione potrai vedere tutte le simulazioni sottomesse in passato. Inoltre potrai mostrare, scaricare ed eliminare i dati ad esse associati.</p> -->
                                             <p class="card-text" style="color: Gray;">In questa sezione potrai vedere lo storico delle simulazioni ed i risultati associati.</p>
                                         </div>
                                     </div>
@@ -113,8 +109,6 @@
                                                 </div>
                                                 <div class="col text-end"><i class="far fa-user-circle fa-2x text-gray-300"></i></div>
                                             </div>
-                                            <!-- <h6 class="text-muted card-subtitle mb-2" style="color: rgba(128, 128, 128, 0.767);">Informazioni Personali</h6> -->
-                                            <!-- <p class="card-text" style="color: Gray;">In questa sezione potrai accedere al tuo profilo e mostrare, modificare e salvare le tue informazioni personali.</p> -->
                                             <p class="card-text" style="color: Gray;">In questa sezione potrai accedere al tuo profilo e modificare le tue info personali.</p>
                                         </div>
                                     </div>
@@ -136,5 +130,4 @@
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </body>
-
 </html>

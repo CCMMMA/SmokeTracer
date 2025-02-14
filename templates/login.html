@@ -13,9 +13,8 @@
 
     <style>
 
-        /* style for right and left sections */
         .left-half {
-            background-color: #3498db; 
+            background-color: #3498db;
             height: 100vh;
         }
         .right-half {
@@ -23,7 +22,6 @@
             height: 100vh;
         }
 
-        /* style for dynamic change */
         .overlay {
             display: none;
             position: fixed;
@@ -45,42 +43,56 @@
             width: 100%;
             text-align: center;
         }
-        /* Darken columns when overlay is active */
+
         .dimmed {
             opacity: 0.3;
         }
+        
+        .logo-izsdm {
+            max-height: 150px;
+            min-height: 100px;
+        }
+
+        .logo-regione {
+            max-width: 150px;
+            min-width: 150px;
+            max-height: 150px;
+            min-height: 150px;
+        }
+        
     </style>
 
 </head>
 
-<!-- <body class="bg-gradient-primary" style="background: url(&quot;static/img/regione.png&quot;) center / cover repeat-x;"> -->
+
 <body>
     <div class="container-fluid">
         <div class="row no-gutters">
-            <!-- Colonna sinistra -->
-            <div class="col-md-6 left-half d-flex align-items-center justify-content-center" id="left_contents">
-                <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" style="width: 200px; min-width: 200px; height: 200px; margin-bottom: 10px;">
-            </div>
-            <!-- Colonna destra -->
-            <div class="col-md-6 right-half d-flex flex-column align-items-center justify-content-center" id="right_contents">
 
-                <div class="row" style="margin-top: 250px; display: flex; align-items: center;">
-                    <div class="col">
-                        <img src="{{url_for('static', filename='img/logo_IZSDM.png')}}" style="height: 200px; width: auto;">
-                    </div>
-                    <div class="col">
-                        <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" style="width: 200px; height: 200px;">
-                    </div>
+            <!-- Left column -->
+            <div class="col-12 col-md-6 left-half d-flex flex-wrap align-items-center justify-content-center" id="left_contents">
+                <div class="d-flex">
+                    <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" class="img-fluid logo-regione" alt="Logo Regione Campania">
                 </div>
-                
+            </div>
 
-                <div class="card mb-5" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-top: 50px;">
+            <!-- Right column -->
+            <div class="col-12 col-md-6 right-half d-flex flex-wrap align-items-center justify-content-center" id="right_contents">
+
+                <div class="row mt-5 d-flex flex-row justify-content-center">
+
+                    <div class="col d-flex justify-content-center">
+                      <img src="{{ url_for('static', filename='img/logo_IZSDM.png') }}" class="img-fluid logo-izsdm" alt="Logo IZSDM">
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                      <img src="{{ url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png') }}" class="img-fluid logo-regione" alt="Logo Regione Campania">
+                    </div>
+
+                </div>
+            
+                <div class="card mb-5"  style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-top: 10%;">
                     <div class="card-body d-flex flex-column align-items-center" style="backdrop-filter: opacity(0);-webkit-backdrop-filter: opacity(0);"> 
                         <h6>LOGIN SISTEMA SMOKETRACER</h6>
-                        <!-- 
-                        <img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" style="width: 80px;min-width: 80px;height: 80px;margin-bottom: 10px;">
-                        <p>Inserisci le credenziali per accedere al sistema FUMI</p> 
-                        -->
                         <p>{% for mesg in get_flashed_messages() %}
                         <div class="alert alert-danger text-center">Errore: {{ mesg }}</div>
                         {% endfor %}</p>
@@ -91,10 +103,13 @@
                         </form>
                     </div>
                 </div>
+             
                 <div class="mt-auto text-center w-100" style="margin-bottom: 40px;">
                     <span>I dati numerici e le rappresentazioni cartografiche generate sono frutto di elaborazioni di modelli matematici che operano in modo automatico senza intervento umano. I prodotti sono forniti così come sono. L'interpretazione deve essere svolta da personale esperto a proprio rischio e sotto la propria responsabilità. Le informazioni riportate non possono essere considerate sostitutive dei documenti ufficiali. L'orario indicato è in ora UTC. In nessun caso lo staff di meteo@uniparthenope, il CMMMA, il Dipartimento di Scienze e Tecnologie, l'Università degli Studi di Napoli "Parthenope" e tutte le persone coinvolte nelle relative attività di ricerca e produzione sono responsabili per danni a persone, animali o cose.</span>
                 </div>
+
             </div>
+
         </div>
     </div>
 
@@ -107,45 +122,10 @@
                     <button class="btn btn-primary d-block w-100" name="button_user_panel" type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-bottom: 10px;">User Panel</button>
                     <button class="btn btn-primary d-block w-100"  type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1); margin-bottom: 10px;" onclick="closeOverlay()">Chiudi</button>
                 </form>
-                <!-- <button class="btn btn-primary d-block w-100" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1);  margin-bottom: 10px;" onclick="closeOverlay()">Chiudi</button> -->
             </div>
         </div>
     </div>
 
-
-    
-<!-- 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-9 col-lg-12 col-xl-10">
-                <div class="card shadow-lg o-hidden border-0 my-5">
-                    <div class="card-body p-0"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <section class="py-4 py-xl-5">
-        <div class="container">
-            <div class="row d-flex justify-content-center">
-                <div class="col-md-8 col-lg-6 col-xl-5 col-xxl-4">
-                    <div class="card mb-5" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1);">
-                        <div class="card-body d-flex flex-column align-items-center" style="backdrop-filter: opacity(0);-webkit-backdrop-filter: opacity(0);"><img src="{{url_for('static', filename='img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png')}}" style="width: 80px;min-width: 80px;height: 80px;margin-bottom: 10px;">
-                            <p>Inserisci le credenziali per accedere al sistema FUMI</p>
-                            <p>{% for mesg in get_flashed_messages() %}
-                            <div class="alert alert-danger text-center">Errore: {{ mesg }}</div>
-                            {% endfor %}</p>
-                            <form class="text-center" method="post">
-                                <div class="mb-3"><input class="form-control form-control" type="username" id="user_login" name="username" placeholder="Username"></div>
-                                <div class="mb-3"><input class="form-control form-control" type="password" id="password_login" name="password" placeholder="Password"></div>
-                                <div class="mb-3"><button class="btn btn-primary d-block w-100" id="loginbutton_login" type="submit" style="backdrop-filter: opacity(1);-webkit-backdrop-filter: opacity(1);">Login</button></div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
--->
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
@@ -157,7 +137,6 @@
             document.getElementById('left_contents').classList.add("dimmed")
             document.getElementById('right_contents').classList.add("dimmed")
             document.getElementById('overlay_contents').style.display = 'flex';
-            console.log(flag_admin);
         } else {
             console.log("False");
         }
