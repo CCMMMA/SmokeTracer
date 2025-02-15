@@ -4,8 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <!-- <title>Coda Operazioni</title> -->
-    <title>Simulazione Multipla</title>
+    <title>Simulazioni Multiple</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fontawesome-all.min.css') }}">
@@ -61,443 +60,368 @@
         
     </style>
 
-    <!--
-    <style>
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-        }
-    </style>
-    -->
-
 </head>
 
 <body id="page-top">
     <div id="wrapper">
+
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
             <div class="container-fluid d-flex flex-column p-0">
-                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#"><img style="width: 32px;height: 33px;" src="{{ url_for('static', filename='/img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png') }}">
+
+                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <img style="width: 32px;height: 33px;" src="{{ url_for('static', filename='/img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png') }}">
                     <div class="sidebar-brand-icon rotate-n-15"></div>
-                    <div class="sidebar-brand-text mx-3"><span>SMOKETRACER</span></div>
+                    <div class="sidebar-brand-text mx-3">
+                        <span>SMOKETRACER</span>
+                    </div>
                 </a>
+
                 <hr class="sidebar-divider my-0">
+
                 <ul class="navbar-nav text-light" id="accordionSidebar">
-                    <li class="nav-item"><a class="nav-link" href="dashboard"><i class="fas fa-terminal"></i><span style="color: var(--bs-accordion-bg);">Dashboard</span></a></li>
-                    <!--<li class="nav-item"><a class="nav-link" href="simulazione-singola"><i class="fas fa-eye"></i><span style="color: var(--bs-accordion-bg);">Simulazione singola</span></a></li>-->
-                    <li class="nav-item"><a class="nav-link" href="simulazioni"><i class="fas fa-list"></i><span style="color: var(--bs-accordion-bg);">Simulazioni</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo Utente</span></a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard"><i class="fas fa-terminal"></i><span style="color: var(--bs-accordion-bg);">Dashboard</span></a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="simulazioni"><i class="fas fa-list"></i><span style="color: var(--bs-accordion-bg);">Simulazioni</span></a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span></a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo Utente</span></a>
+                    </li>
+
                     <li class="nav-item"></li>
                 </ul>
+
                 <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
         </nav>
 
+
         <div class="d-flex flex-column" id="content-wrapper">
-            <div id="content">
-                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
-                    <div class="container-fluid">
-                        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button">
-                            <i class="fas fa-bars"></i>
-                        </button>
-                        <small class="form-text fs-4 fw-semibold" style="width: auto;height: auto;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
-                        <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
-                            <div class="input-group"></div>
-                        </form>
-                        <ul class="navbar-nav flex-nowrap ms-auto">
-                            <div class="d-none d-sm-block topbar-divider"></div>
-                        </ul>
-                        <small class="form-text" style="margin-left: 0px;width: 250.1641px; font-weight:bold">
-                            <h2><b>{{ user }}</b></h2>
-                        </small>
-                        <a href="{{ url_for('logout') }}" class="btn btn-primary">Log Out</a>
+            <!-- <div id="content"> -->
 
-                    </div>
-                </nav>
+            <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4">
+                <div class="d-flex justify-content-center ml-3">
+                    <h4 class="m-0 fw-bold">&nbsp;Ultimo accesso : {{ last_access }}&nbsp;</h4>
+                </div>
+                
+                <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group"></div>
+                </form>
+                
+                <div class="d-flex flex-row justify-content-center align-items-center">
+                    <div class="d-none d-sm-block topbar-divider"></div>
 
-
-                <div class="container-fluid" style="width: auto;height: auto;">
-                    <!-- style="margin-bottom: 25px;" --> 
-                    <div class="row" id="button-show" style="display: block;">
-                        <div class="col" style="width: auto;margin-left: auto;margin-right: auto;text-align: center;">
-                            <button class="btn btn-success btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick='showInputForm()'>&nbsp;Nuova Simulazione&nbsp;<i class="fas fa-edit"></i>&nbsp;</button>
-                        </div>
+                    <div class="mb-2 mb-md-0 me-md-2">
+                        <h4 class="m-0 fw-bold">&nbsp;&nbsp;{{ user }}&nbsp;&nbsp;</h4>
                     </div>
 
-                    <form method="POST" id="row-input" style="display: none;">
-                        <div class="d-sm-flex justify-content-between align-items-center mb-4" style="border-style: none;">
-                            <h3 class="text-dark mb-0">Simulazioni</h3>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="row">
-                                    <div class="col" style="margin-bottom: 20px;">
-                                        <div class="card shadow border-start-primary py-2" style="margin-bottom: 10px;width: auto;height: auto;">
-                                            <div class="card-body">
-                                                <div class="row align-items-center no-gutters">
-                                                    <div class="col me-2">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DESCRIZIONE</span></div><input type="text" name="area" id="area_dash" style="width: 162px;" required>
-                                                        <div class="text-dark fw-bold h5 mb-0"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                    <div class="d-none d-sm-block topbar-divider"></div>
 
-                                        <div class="card shadow border-start-success py-2" style="margin-bottom: 20px;">
-                                            <div class="card-body">
-                                                <div class="row align-items-center no-gutters">
-                                                    <div class="col me-2">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1">
-                                                            <span>COMUNE</span>
-                                                        </div>
-                                                        <input type="text" name="comune" id="comune_label" style="width: 160px;" list="comuni_list" required>
-                                                        <datalist id="comuni_list">
-                                                        </datalist>
-                                                        <div class="text-dark fw-bold h5 mb-0"><span></span></div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                    <a href="{{ url_for('logout') }}" class="btn btn-primary mr-3">&nbsp;Log Out</a>
+                </div>
+            </nav>
 
+            <div clas="row d-flex flex-column justify-content-center justify-content-around justify-content-between mt-3" style="margin-left: 2%; margin-right: 2%; margin-bottom: 20%;">
 
-                                            <div class="card-body">
-                                                <div class="row align-items-center no-gutters">
-                                                    <div class="col me-2">
-                                                        <!-- in input di latitude  -- step="any" -->
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>latitudine</span></div>
-        
-                                                        <div class="input-group">
-                                                    
-                                                            <div class="input-item">
-                                                            <label for="lat_int">Gradi</label>
-                                                            <input type="number" step="any" name="lat_int" id="lat_int" min="-90" max="90" style="width: 80px;" required>
-                                                            </div>
-                                                        
-                                                        
-                                                            <div style="margin-top: 30px;"">
-                                                                <h2>.</h2>
-                                                            </div>
-                                                        
-                                                            
-                                                            <div class="input-item">
-                                                            <label for="lat_decimal">Decimali</label>
-                                                            <input type="number" step="any" name="lat_decimal" id="lat_decimal" min="0" style="width: 120px;" required>
-                                                            </div>
-                                                        
-                                                        
-                                                            <div class="input-item">
-                                                            <label for="c_directions_lat">Direzione</label>
-                                                            <input list="list_c_directions_lat" name="c_directions_lat" id="c_directions_lat" style="width: 80px;" required>
-                                                            <datalist id="list_c_directions_lat">
-                                                                <option>N</option>
-                                                                <option>S</option>
-                                                            </datalist>
-                                                            </div>
-                                                        </div>
-                                                        <!-- <input type="number" step="any" placeholder="dd.1/4 (40.8400)" name="lat" id="lat_dash" min="-90" max="90" style="width: 160px;" required> -->
-                                                        <!-- <div class="text-dark fw-bold h5 mb-0"><span></span></div> -->
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="card-body">
-                                                <div class="row align-items-center no-gutters">
-                                                    <div class="col me-2">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Longitudine</span></div>
-                                                        
-                                                        
-                                                        <div class="input-group">
-                                                            
-                                                            <div class="input-item">
-                                                              <label for="lon_int">Gradi</label>
-                                                              <input type="number" step="any" name="lon_int" id="lon_int" min="-180" max="180" style="width: 80px;" required>
-                                                            </div>
-                                                        
-                                                           
-                                                            <div style="margin-top: 30px;">
-                                                                <h2>.</h2>
-                                                            </div>
-                                                        
-                                                            
-                                                            <div class="input-item">
-                                                              <label for="lon_decimal">Decimali</label>
-                                                              <input type="number" step="any" name="lon_decimal" id="lon_decimal" min="0" style="width: 120px;" required>
-                                                            </div>
-                                                        
-                                                           
-                                                            <div class="input-item">
-                                                              <label for="c_directions_lon">Direzione</label>
-                                                              <input list="list_c_directions_lon" name="c_directions_lon" id="c_directions_lon" style="width: 80px;" required>
-                                                              <datalist id="list_c_directions_lon">
-                                                                <option>E</option>
-                                                                <option>O</option>
-                                                              </datalist>
-                                                            </div>
-                                                          </div>
-        
-                                                        <!-- <input type="number" placeholder="dd.1/4 (14.2500)" step="any" name="long"  id="long_dash" style="width: 160px;" min="1" required> -->
-                                                        <!-- <div class="text-dark fw-bold h5 mb-0"><span></span></div>-->
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                            <div class="card-body">
-                                                <div class="row align-items-center no-gutters">
-                                                    <div class="col me-2" style="width: 100%;">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>MAPPA &nbsp;&nbsp;<i id="button_show_map" class="bi bi-globe fs-2"></i> </span></div>
-                                                        <!-- <span class="btn btn-secondary small" id="button_show_map">Apri MAPPA</span> -->
-                                                        <div id="map"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-        
-                                        </div>
-                                        
-                                        <!--
-                                        <div class="card shadow border-start-primary py-2" style="margin-bottom: 10px;width auto;height: auto;">
-                                            <div class="card-body">
-                                                <div class="row align-items-center no-gutters">
-                                                    <div class="col me-2" style="width: 100%;">
-                                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Selezione coordinate dalla mappa</span></div>
-                                                        <span class="btn btn-secondary small" id="button_show_map">Apri MAPPA</span>
-                                                        <div id="map"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        -->
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="card shadow border-start-success py-2" style="margin-bottom: 10px;height: 100.8047px;">
-                                    <div class="card-body">
-                                        <div class="row align-items-center no-gutters">
-                                            <div class="col me-2">
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DATA INIZIO</span></div>
-                                                <div class="text-dark fw-bold h5 mb-0"><span><input id="date_dash" type="date" name="data" style="width: 168px;" min="1" required></span></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="card shadow border-start-info py-2">
-                                    <div class="card-body">
-                                        <div class="row align-items-center no-gutters">
-                                            <div class="col me-2">
-                                                <!-- type="number" -->
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Temperatura (°C)</span></div><input list="list_std_tmp" name="temp" id="temp_dash" min="100 °C" style="width: 160px;" required>
-                                                <datalist id="list_std_tmp">
-                                                    <option>800 °C</option>
-                                                    <option>900 °C</option>
-                                                    <option>1200 °C</option>
-                                                </datalist>
-                                                <div class="row g-0 align-items-center">
-                                                    <div class="col-auto">
-                                                        <div class="text-dark fw-bold h5 mb-0 me-3"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                            </div>
-
-                            <div class="col">
-                                <!--
-                                <div class="card shadow border-start-info py-2" style="margin-bottom: 10px;height: 100.805px;">
-                                    <div class="card-body">
-                                        <div class="row align-items-center no-gutters">
-                                            <div class="col me-2">
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>ora</span></div>
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>:00:00 UTC</span></div>
-                                                <div class="text-dark fw-bold h5 mb-0">
-                                                    <select name="hours" class="Input">
-                                                        {% for hour in hours %}
-                                                        <option value="{{ hour }}">{{ hour }}</option>
-                                                        {% endfor %}
-                                                    </select><br><br>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                -->
-                                <div class="card shadow border-start-info py-2" style="margin-bottom: 10px;height: 100.805px;">
-                                    <div class="card-body">
-                                        <div class="row align-items-center no-gutters">
-                                            <div class="col me-2">
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>ora inizio(UTC)</span></div>
-                                                <div class="text-dark fw-bold h5 mb-0">
-                                                    <div class="d-flex align-items-center">
-                                                        <select name="hours" class="Input me-2">
-                                                            {% for hour in hours %}
-                                                                <option value="{{ hour }}">{{ hour }}</option>
-                                                            {% endfor %}
-                                                        </select>
-                                                        <span style="font-size: 0.75rem; font-weight: normal;">:00:00</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                     
-                                <div class="card shadow border-start-info py-2">
-                                    <div class="card-body">
-                                        <div class="row align-items-center no-gutters">
-                                            <div class="col me-2">
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Codice GISA</span></div><input type="text" name="codice_gisa" id="codice_gisa" style="width: 160px;" placeholder="2025_NN">
-                                                <div class="row g-0 align-items-center">
-                                                    <div class="col-auto">
-                                                        <div class="text-dark fw-bold h5 mb-0 me-3"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                               
-                            </div>
-
-                            <div class="col">
-                                <div class="card shadow border-start-warning py-2" style="margin-bottom: 10px;">
-                                    <div class="card-body">
-                                        <div class="row align-items-center no-gutters">
-                                            <div class="col me-2">
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DURATA (ore)</span></div><input type="number" name="durata" id="duration_dash" style="width: 160px;" required min="1">
-                                                <div class="text-dark fw-bold h5 mb-0"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                               
-                            </div>
-
-                            <!--
-                            <div class="col">
-                                <div class="card shadow border-start-warning py-2" style="margin-bottom: 10px; height: 100.805px;">
-                                    <div class="card-body">
-                                        <div class="row align-items-center no-gutters">
-                                            <div class="col me-2">
-                                                <div class="text-uppercase text-primary fw-bold text-xs mb-1">
-                                                    <span>COMUNE</span>
-                                                </div>
-                                                <input type="text" name="comune" id="comune_label" style="width: 160px;" list="comuni_list" required>
-                                                <datalist id="comuni_list">
-                                                </datalist>
-                                                <div class="text-dark fw-bold h5 mb-0"><span></span></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                            -->
-                        </div>
-                        <div class="row" style="margin-bottom: 25px;">
-                            <div class="col" style="width: auto;margin-left: auto;margin-right: auto;text-align: center;">
-                                <button class="btn btn-danger btn-lg" type="submit" style="margin-left: 5px;font-weight: bold;width: auto;height: auto;margin-right: 8px;">&nbsp;Reset&nbsp;</button>
-                                <button class="btn btn-success btn-lg" type="submit" name="generate" id="start-button" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick="spinner_logic()">&nbsp;Inizia Simulazione&nbsp;<i class="fas fa-globe-americas"></i>&nbsp;</button>
-                                <button class="btn btn-secondary btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick="showInputForm()">&nbsp;Nascondi&nbsp;&nbsp;</button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <div class="row">
-                        <p>{% for mesg in get_flashed_messages() %}
-                            <div class="alert alert-danger text-center"><b>{{ mesg }}</b></div>
-                            {% endfor %}</p>
-                    </div>
-
-                    <div class="row">
-
-                        <!-- <div class="col"></div> --> 
-
-                            <div class="col-lg-12 col-xl-12" style="color: var(--bs-card-bg);background: var(--bs-card-cap-bg);" id="options_simulation">
-                                <div class="card shadow mb-4">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h6 class="text-primary fw-bold m-0">Coda Simulazioni</h6>
-                                    </div>
-                                    <div class="card-body" style="height: 100%; margin-bottom: 0px;">
-                                        <div class="table-responsive">
-                                            <table class="table", id="info-table" onload="spinner_logic()">
-                                                <thead>
-                                                    <tr>
-                                                        <th>ID</th>
-                                                        <th>Descrizione</th>
-                                                        <th>Data inizio</th>
-                                                        <th>Ora inizio</th>
-                                                        <th>Durata</th>
-                                                        <th>Lon</th>
-                                                        <th>Lat</th>
-                                                        <th>Temp</th>
-                                                        <th>Codice GISA</th>
-                                                        <th>Comune</th>
-                                                        <!--array_jobs = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'] -->
-                                                        
-                                                        <th>calmet</th>
-                                                        <th>calpost</th>
-                                                        <th>calpufff</th>
-                                                        <th>calwrff</th>
-                                                        <th>ctgproc</th>
-                                                        <th>dst</th>
-                                                        <th>lnd2</th>
-                                                        <th>makegeo</th>
-                                                        <th>terrel</th>
-                                                        <th>wrf2calwrf</th>
-                                                        <th>www</th>
-                                                        <th>Visualizza</th>
-                                                        <!--
-                                                        <th>ctgproc</th>
-                                                        <th>terrel</th>
-                                                        <th>lnd2</th>
-                                                        <th>makegeo</th>
-                                                        <th>calmet</th>
-                                                        <th>calpuff</th>
-                                                        <th>calpost</th>
-                                                        <th>wrf2calwrf</th>
-                                                        <th>calwrff</th>
-                                                        <th>dst</th>
-                                                        <th>www</th>
-                                                        <th>Visualizza
-                                                        </th>
-                                                        -->
-                                                        <!-- <td><button class="btn btn-secondary btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;"></button></td> -->
-
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            
-                        <!-- </div> -->
-
-                        <div class="row">
-                            <div class="col-12 offset-6">
-                                <div id="spinner" class="spinner"></div>
-                            </div>
-                        </div>
-
-                        
-                        
-                        <div class="col"></div>
+                <div class="row" id="button-show" style="display: block;">
+                    <div class="col" style="width: auto;margin-left: auto;margin-right: auto;text-align: center;">
+                        <button class="btn btn-success btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick='showInputForm()'>&nbsp;Nuova Simulazione&nbsp;<i class="fas fa-edit"></i>&nbsp;</button>
                     </div>
                 </div>
+
+                <div class="card" id="row-input" style="display: none;">
+                    <div class="card-body">
+                        <div class="card-title">
+                            <div class="d-sm-flex justify-content-between align-items-center mb-4" style="border-style: none;">
+                                <h3 class="text-dark mb-0">Inserisci dati Simulazione</h3>
+                            </div>
+                        </div>
+                        <form method="POST">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col" style="margin-bottom: 20px;">
+                                            <div class="card shadow border-start-primary py-2" style="margin-bottom: 10px;width: auto;height: auto;">
+                                                <div class="card-body">
+                                                    <div class="row align-items-center no-gutters">
+                                                        <div class="col me-2">
+                                                            <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DESCRIZIONE</span></div><input type="text" name="area" id="area_dash" style="width: 162px;" required>
+                                                            <div class="text-dark fw-bold h5 mb-0"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="card shadow border-start-success py-2" style="margin-bottom: 20px;">
+                                                <div class="card-body">
+                                                    <div class="row align-items-center no-gutters">
+                                                        <div class="col me-2">
+                                                            <div class="text-uppercase text-primary fw-bold text-xs mb-1">
+                                                                <span>COMUNE</span>
+                                                            </div>
+                                                            <input type="text" name="comune" id="comune_label" style="width: 160px;" list="comuni_list" required>
+                                                            <datalist id="comuni_list">
+                                                            </datalist>
+                                                            <div class="text-dark fw-bold h5 mb-0"><span></span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="card-body">
+                                                    <div class="row align-items-center no-gutters">
+                                                        <div class="col me-2">
+                                                            <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>latitudine</span></div>
+            
+                                                            <div class="input-group">
+                                                        
+                                                                <div class="input-item">
+                                                                <label for="lat_int">Gradi</label>
+                                                                <input type="number" step="any" name="lat_int" id="lat_int" min="-90" max="90" style="width: 80px;" required>
+                                                                </div>
+                                                            
+                                                            
+                                                                <div style="margin-top: 30px;"">
+                                                                    <h2>.</h2>
+                                                                </div>
+                                                            
+                                                                
+                                                                <div class="input-item">
+                                                                <label for="lat_decimal">Decimali</label>
+                                                                <input type="number" step="any" name="lat_decimal" id="lat_decimal" min="0" style="width: 120px;" required>
+                                                                </div>
+                                                            
+                                                            
+                                                                <div class="input-item">
+                                                                <label for="c_directions_lat">Direzione</label>
+                                                                <input list="list_c_directions_lat" name="c_directions_lat" id="c_directions_lat" style="width: 80px;" required>
+                                                                <datalist id="list_c_directions_lat">
+                                                                    <option>N</option>
+                                                                    <option>S</option>
+                                                                </datalist>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="card-body">
+                                                    <div class="row align-items-center no-gutters">
+                                                        <div class="col me-2">
+                                                            <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Longitudine</span></div>
+                                                            
+                                                            
+                                                            <div class="input-group">
+                                                                
+                                                                <div class="input-item">
+                                                                    <label for="lon_int">Gradi</label>
+                                                                    <input type="number" step="any" name="lon_int" id="lon_int" min="-180" max="180" style="width: 80px;" required>
+                                                                </div>
+                                                            
+                                                                
+                                                                <div style="margin-top: 30px;">
+                                                                    <h2>.</h2>
+                                                                </div>
+                                                            
+                                                                
+                                                                <div class="input-item">
+                                                                    <label for="lon_decimal">Decimali</label>
+                                                                    <input type="number" step="any" name="lon_decimal" id="lon_decimal" min="0" style="width: 120px;" required>
+                                                                </div>
+                                                            
+                                                                
+                                                                <div class="input-item">
+                                                                    <label for="c_directions_lon">Direzione</label>
+                                                                    <input list="list_c_directions_lon" name="c_directions_lon" id="c_directions_lon" style="width: 80px;" required>
+                                                                    <datalist id="list_c_directions_lon">
+                                                                    <option>E</option>
+                                                                    <option>O</option>
+                                                                    </datalist>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+            
+                                                <div class="card-body">
+                                                    <div class="row align-items-center no-gutters">
+                                                        <div class="col me-2" style="width: 100%;">
+                                                            <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>MAPPA &nbsp;&nbsp;<i id="button_show_map" class="bi bi-globe fs-2"></i> </span></div>
+                                                            <div id="map"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="card shadow border-start-success py-2" style="margin-bottom: 10px;height: 100.8047px;">
+                                        <div class="card-body">
+                                            <div class="row align-items-center no-gutters">
+                                                <div class="col me-2">
+                                                    <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DATA INIZIO</span></div>
+                                                    <div class="text-dark fw-bold h5 mb-0"><span><input id="date_dash" type="date" name="data" style="width: 168px;" min="1" required></span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card shadow border-start-info py-2">
+                                        <div class="card-body">
+                                            <div class="row align-items-center no-gutters">
+                                                <div class="col me-2">
+                                                    <!-- type="number" -->
+                                                    <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Temperatura (°C)</span></div><input list="list_std_tmp" name="temp" id="temp_dash" min="100 °C" style="width: 160px;" required>
+                                                    <datalist id="list_std_tmp">
+                                                        <option>800 °C</option>
+                                                        <option>900 °C</option>
+                                                        <option>1200 °C</option>
+                                                    </datalist>
+                                                    <div class="row g-0 align-items-center">
+                                                        <div class="col-auto">
+                                                            <div class="text-dark fw-bold h5 mb-0 me-3"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <div class="col">
+                                    <div class="card shadow border-start-info py-2" style="margin-bottom: 10px;height: 100.805px;">
+                                        <div class="card-body">
+                                            <div class="row align-items-center no-gutters">
+                                                <div class="col me-2">
+                                                    <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>ora inizio(UTC)</span></div>
+                                                    <div class="text-dark fw-bold h5 mb-0">
+                                                        <div class="d-flex align-items-center">
+                                                            <select name="hours" class="Input me-2">
+                                                                {% for hour in hours %}
+                                                                    <option value="{{ hour }}">{{ hour }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <span style="font-size: 0.75rem; font-weight: normal;">:00:00</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                            
+                                    <div class="card shadow border-start-info py-2">
+                                        <div class="card-body">
+                                            <div class="row align-items-center no-gutters">
+                                                <div class="col me-2">
+                                                    <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Codice GISA</span></div><input type="text" name="codice_gisa" id="codice_gisa" style="width: 160px;" placeholder="2025_NN">
+                                                    <div class="row g-0 align-items-center">
+                                                        <div class="col-auto">
+                                                            <div class="text-dark fw-bold h5 mb-0 me-3"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                <div class="col">
+                                    <div class="card shadow border-start-warning py-2" style="margin-bottom: 10px;">
+                                        <div class="card-body">
+                                            <div class="row align-items-center no-gutters">
+                                                <div class="col me-2">
+                                                    <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>DURATA (ore)</span></div><input type="number" name="durata" id="duration_dash" style="width: 160px;" required min="1">
+                                                    <div class="text-dark fw-bold h5 mb-0"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-bottom: 25px;">
+                                <div class="col" style="width: auto;margin-left: auto;margin-right: auto;text-align: center;">
+                                    <button class="btn btn-danger btn-lg" type="submit" style="margin-left: 5px;font-weight: bold;width: auto;height: auto;margin-right: 8px;">&nbsp;Reset&nbsp;</button>
+                                    <button class="btn btn-success btn-lg" type="submit" name="generate" id="start-button" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick="spinner_logic()">&nbsp;Inizia Simulazione&nbsp;<i class="fas fa-globe-americas"></i>&nbsp;</button>
+                                    <button class="btn btn-secondary btn-lg" style="margin-left: 8px; font-weight: bold;width: auto;height: auto;" onclick="showInputForm()">&nbsp;Nascondi&nbsp;&nbsp;</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <p>{% for mesg in get_flashed_messages() %}
+                        <div class="alert alert-danger text-center"><b>{{ mesg }}</b></div>
+                        {% endfor %}</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12 col-xl-12" style="color: var(--bs-card-bg);background: var(--bs-card-cap-bg);" id="options_simulation">
+                        <div class="card shadow mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="text-primary fw-bold m-0">Coda Simulazioni</h6>
+                            </div>
+                            <div class="card-body" style="height: 100%; margin-bottom: 0px;">
+                                <div class="table-responsive">
+                                    <table class="table", id="info-table" onload="spinner_logic()">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Descrizione</th>
+                                                <th>Data inizio</th>
+                                                <th>Ora inizio</th>
+                                                <th>Durata</th>
+                                                <th>Lon</th>
+                                                <th>Lat</th>
+                                                <th>Temp</th>
+                                                <th>Codice GISA</th>
+                                                <th>Comune</th>
+                                           
+                                                
+                                                <th>calmet</th>
+                                                <th>calpost</th>
+                                                <th>calpufff</th>
+                                                <th>calwrff</th>
+                                                <th>ctgproc</th>
+                                                <th>dst</th>
+                                                <th>lnd2</th>
+                                                <th>makegeo</th>
+                                                <th>terrel</th>
+                                                <th>wrf2calwrf</th>
+                                                <th>www</th>
+                                                <th>Visualizza</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 offset-6">
+                            <div id="spinner" class="spinner"></div>
+                        </div>
+                    </div>
+                    <div class="col"></div>
+                </div>
             </div>
-            <footer class="bg-white sticky-footer">
+            <footer class="bg-white sticky-footer mt-auto">
                 <div class="container my-auto">
-                    <div class="text-center my-auto copyright"><span>Copyright © Uniparthenope 2023</span></div>
+                    <div class="text-center my-auto copyright"><span>Copyright © Uniparthenope 2025</span></div>
                 </div>
             </footer>
         </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
@@ -508,76 +432,37 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
-        /*
-        window.addEventListener("load", function() {
-
-            let tbody = document.getElementById("info-table").getElementsByTagName("tbody")[0];
-            let tot_jobs = parseInt("{{session['tot_jobs_queue']}}");
-
-            console.log("load -- tot_jobs : ", tot_jobs);
-
-            console.log("load -- tbody.rows : ", tbody.rows.length);
-
-            if(tot_jobs>0 && tbody.rows.length<=0) {
-                spinner_logic();
-            }
-
-        });
-        */
-
         window.addEventListener("load", spinner_logic);        
 
-        // let id_workflow_jobs_queue = [];
-        let comuni = [];
-        let comuniList = document.getElementById('comuni_list');
-        let map, marker;
-
-
         document.getElementById('comune_label').addEventListener('click', populateDatalist);
-        //window.addEventListener('load', cotrolJobsQueue);
 
         document.getElementById('button_show_map').addEventListener('click', function() {
             if (!map) {
                 initMap();
-                //document.getElementById('button_show_map').textContent = "Chiudi MAPPA";
-
             } else {
                 const mapDiv = document.getElementById('map');
 
                 if(mapDiv.style.display === 'none') {
                     mapDiv.style.display = 'block';
-                    //document.getElementById('button_show_map').textContent = "Chiudi MAPPA";
+
                 } else {
                     mapDiv.style.display = 'none';
-                    //document.getElementById('button_show_map').textContent = "Apri MAPPA";
                 }
 
                 map = " "
-                //mapDiv.style.display = mapDiv.style.display === 'none' ? 'block' : 'none';
-                //map = " "
             }
         });
         
-        /*
-        document.getElementById('start-button').addEventListener("click", function() {
-            // Simula un caricamento di 3 secondi
-            showSpinner();
-            setTimeout(function() {
-            hideSpinner();
-            }, 10000);
-        });
-        */
-
 
         setInterval(checkStatusJobsQueue, 10000);
-
         setInterval(checkIntLon, 2000);
         setInterval(checkDecimalLon, 2000);
         setInterval(checkIntLat, 2000);
         setInterval(checkDecimalLat, 2000);
 
-        //setInterval(checkComuneLabel, 2000);
-
+        let comuni = [];
+        let comuniList = document.getElementById('comuni_list');
+        let map, marker;
 
         fetch('static/centroidi_comuni/centroidi_comuni.geojson')
         .then(response => response.json())
@@ -591,7 +476,6 @@
 
         // Funzione per popolare la datalist con i comuni
         function populateDatalist() {
-
             comuni.sort();
             comuniList.innerHTML = '';  // Pulisce eventuali opzioni esistenti
             comuni.forEach(comune => {
@@ -626,29 +510,15 @@
 
                 }
                 
-                //TODO: invece di effetturare un'altra fetch , quando alla fetch precedente inserisco il Text , controllo il valore al momento ed aggiungo anche il colore.
                 fetch('/getStatusJobsQueue')
                 .then(response => response.json())
                 .then(data => {
-                    /*
-                    console.log("data completo : ", data);
-                    let workflow = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www'];
-                    for(let i=0; i<tot_jobs; i++) {
-                        console.log("----------------------" + " JOB : " + i + "-----------------------------");                            
-                        let job = data[i]
-                        console.log("job :", job);
-                        for(let j=0; j<11; j++){
-                            console.log("value data[i][j]["+ workflow[j] +"] : ", job[0][workflow[j]]);
-                        }
-                        console.log("---------------------------------------------------------------------------------");
-                    }
-                    */
+                    
 
                     console.log("response status queue : ", data)
 
                     for(let i=0; i<tot_jobs; i++) {
                         let selected_row = tbody.rows[i];
-                        //let workflow = ['ctgproc', 'terrel', 'lnd2', 'makegeo', 'wrf2calwrf', 'calwrff', 'calmet', 'calpufff', 'calpost', 'www', 'dst']
                         let workflow = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www']
 
                         for(let j=10; j<21; j++) {
@@ -697,22 +567,15 @@
         function link_to_storico() {
             window.location.href = "storico";
 
-            let storico_page = window.location.href = "storico";
-
-            let table_body = storico_page.getElementById("dataTable").getElementsByTagName("tbody")[0];
-
-            table_body.rows[0].click();
-
             /*
-            if( table_body.rows.length > 0 ) 
-                for( let i=0; i<table_body.rows.length; i++ ) 
-                    console.log("id_workflow : ", table_body.rows[i].cells[0].textContent);
+            let storico_page = window.location.href = "storico";
+            let table_body = storico_page.getElementById("dataTable").getElementsByTagName("tbody")[0];
+            table_body.rows[0].click();
             */
         }
         
 
         function checkIntLon() {
-
             const lonInputInt = document.getElementById('lon_int');
             let value = parseInt(lonInputInt.value);
 
@@ -729,7 +592,6 @@
         }
 
         function checkDecimalLon() {
-
             const lonInputDecimal = document.getElementById('lon_decimal');
             let value = parseInt(lonInputDecimal.value);
 
@@ -758,7 +620,6 @@
         }
 
         function checkDecimalLat() {
-
             const latInputDecimal = document.getElementById('lat_decimal');
             let value = parseInt(latInputDecimal.value);
 
@@ -771,7 +632,6 @@
         }
 
         function initMap() {
-      
             const mapDiv = document.getElementById('map');
             mapDiv.style.display = 'block';
 
@@ -830,12 +690,7 @@
                 else
                     document.getElementById("c_directions_lon").value = "O";
         
-                
-                
-
                 let point = turf.point([parseFloat(lonLat[0]), parseFloat(lonLat[1])]);
-
-
 
                 fetch('static/limits_comuni/limits_IT_municipalities.geojson')
                 .then(response => {
@@ -860,17 +715,6 @@
                     }
                 })
                 .catch()
-
-                /*
-                //console.log("lat : ", lat, " -- latFeature : ", latRounded, " -- lon : ", lon, " -- lonFeature : ", lonRounded);
-                
-                if(lat.toString() === latRounded.toString() && lon.toString() == lonRounded.toString()) {
-                    //console.log("--Comune trovato : ", props.COMUNE); 
-                    document.getElementById("comune_label").value = props.COMUNE;
-                    break;
-                }
-                */
-                    
             });
         }
 
@@ -889,10 +733,7 @@
 
                 let lat = parseFloat(lat_int + "." + lat_decimal).toFixed(2);
                 let lon = parseFloat(lon_int + "." + lon_decimal).toFixed(2);
-
-
                 
-
 
                 fetch('static/centroidi_comuni/centroidi_comuni.geojson')
                 .then(response => {
@@ -935,16 +776,6 @@
                             }
                         })
                         .catch()
-
-                        /*
-                        //console.log("lat : ", lat, " -- latFeature : ", latRounded, " -- lon : ", lon, " -- lonFeature : ", lonRounded);
-                        
-                        if(lat.toString() === latRounded.toString() && lon.toString() == lonRounded.toString()) {
-                            //console.log("--Comune trovato : ", props.COMUNE); 
-                            document.getElementById("comune_label").value = props.COMUNE;
-                            break;
-                        }
-                        */
                     }
                 })
             }
@@ -987,7 +818,7 @@
                     return feature.properties.name; 
                 }
             }
-            return null; // Se il punto non è dentro nessun poligono
+            return null;
         }
 
 
