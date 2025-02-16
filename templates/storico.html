@@ -18,6 +18,7 @@
     
 
     <style>
+
         .evidenziato {
             background-color: yellow !important;
         }
@@ -38,7 +39,7 @@
             background: #d3d3d3;
             outline: none;
             opacity: 0.7;
-            -webkit-transition: .2s;
+            -webkit-transition: .2s; 
             transition: opacity .2s;
         }
 
@@ -47,7 +48,7 @@
         }
 
         .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
+            -webkit-appearance: none; 
             appearance: none;
             width: 25px;
             height: 25px;
@@ -68,46 +69,44 @@
             display: inline;
         }
 
-        /* Stile per la legenda */
+        
         .ol-legend {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        background: #ffffff;  /* Sfondo bianco */
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        font-family: Arial, sans-serif;
-        z-index: 1000;
-        width: 150px;  /* Imposta la larghezza della legenda */
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-family: Arial, sans-serif;
+            z-index: 1000;
+            width: 150px;  
         }
 
         .ol-legend h4 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 8px;
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
         }
 
         .ol-legend div {
-        margin-bottom: 5px;
+            margin-bottom: 5px;
         }
 
         .ol-legend span {
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        margin-right: 5px;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            margin-right: 5px;
         }
 
-        /* Stile per il contenitore del checkbox */
         .checkbox-container {
             display: inline-block;
             width: 3em;
             height: 3em;
         }
 
-        /* Stile per il div che simula il checkbox */
         .custom-checkbox {
             width: 2.5em;
             height: 2.5em;
@@ -124,210 +123,227 @@
 <!-- onload="controlKmlOnLoad()" -->
 <body id="page-top">
     <div id="wrapper">
+
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
             <div class="container-fluid d-flex flex-column p-0">
-                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#"><img style="width: 32px;height: 33px;" src="static/img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png">
+                <a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <img style="width: 32px;height: 33px;" src="static/img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png">
                     <div class="sidebar-brand-icon rotate-n-15"></div>
                     <div class="sidebar-brand-text mx-3"><span>SMOKETRACER</span></div>
                 </a>
                 <hr class="sidebar-divider my-0">
                 <ul class="navbar-nav text-light" id="accordionSidebar">
-                    <li class="nav-item"><a class="nav-link" href="dashboard"><i class="fas fa-terminal"></i><span style="color: var(--bs-accordion-bg);">Dashboard</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="simulazioni"><i class="fas fa-list"></i><span style="color: var(--bs-accordion-bg);">Simulazioni</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo Utente</span></a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard"><i class="fas fa-terminal"></i><span style="color: var(--bs-accordion-bg);">Dashboard</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="simulazioni"><i class="fas fa-list"></i><span style="color: var(--bs-accordion-bg);">Simulazioni</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="storico"><i class="fas fa-table"></i><span style="color: var(--bs-accordion-bg);">Storico Simulazioni</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profilo"><i class="far fa-user-circle"></i><span style="color: var(--bs-accordion-bg);">Profilo Utente</span></a>
+                    </li>
                     <li class="nav-item"></li>
                 </ul>
                 <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
         </nav>
+
         <div class="d-flex flex-column" id="content-wrapper">
-            <div id="content">
-                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
-                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><small class="form-text fs-4 fw-semibold" style="width: 2348.234px;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
-                        <ul class="navbar-nav flex-nowrap ms-auto">
-                            <div class="d-none d-sm-block topbar-divider"></div>
-                        </ul><small class="form-text" style="margin-left: 0px;width: 450.1641px; font-weight:bold"><h4><b id="name_user_label">{{ user }}</b></h4></small><a href="{{ url_for('logout') }}" class="btn btn-primary" style="white-space: nowrap; text-align: center;">Log Out</a>
+            <!-- <div id="content"> -->
+
+            <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><small class="form-text fs-4 fw-semibold" style="width: 2348.234px;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
+                    <ul class="navbar-nav flex-nowrap ms-auto">
+                        <div class="d-none d-sm-block topbar-divider"></div>
+                    </ul><small class="form-text" style="margin-left: 0px;width: 450.1641px; font-weight:bold"><h4><b id="name_user_label">{{ user }}</b></h4></small><a href="{{ url_for('logout') }}" class="btn btn-primary" style="white-space: nowrap; text-align: center;">Log Out</a>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                <h3 class="text-dark mb-4">Storico Simulazioni</h3>
+                <div class="card shadow" style="margin-right: auto;margin-left: 0px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="text-primary fw-bold m-0">Simulazioni Sottomesse</h6>
+                        <form method="POST">
+                            <button class="btn btn-danger" type="submit" name="hresetjob" style="margin-left: 2px;font-weight: bold;width: auto;height: auto;color: var(--bs-gray);background: var(--bs-card-cap-bg);border-color: var(--bs-card-cap-bg);"><i class="fas fa-undo"></i></button>
+                        </form>
                     </div>
-                </nav>
-                <div class="container-fluid">
-                    <h3 class="text-dark mb-4">Storico Simulazioni</h3>
-                    <div class="card shadow" style="margin-right: auto;margin-left: 0px;">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h6 class="text-primary fw-bold m-0">Simulazioni Sottomesse</h6>
-                            <form method="POST">
-                                <button class="btn btn-danger" type="submit" name="hresetjob" style="margin-left: 2px;font-weight: bold;width: auto;height: auto;color: var(--bs-gray);background: var(--bs-card-cap-bg);border-color: var(--bs-card-cap-bg);"><i class="fas fa-undo"></i></button>
-                            </form>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <!-- <form method="POST" id="searchform" class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search"> -->
-                                    <div class="input-group">
-                                        <div class="col-sm-3">
-                                            <input class="bg-light form-control border-0 large" type="text" name="hsearchvalue" id="searchnamebar" placeholder="Cerca parola chiave">
-                                        </div>
-                                        <!-- sotto stava in button anche : type="submit" form="searchform" -->
-                                        <button class="btn btn-primary py-0" id="searchnamebutton" name="hsearchbutton" onclick="search()"><i class="fas fa-search"></i></button>
-
-                                <!-- </form> -->
-                                <label class="form-label"></label>
-                                </div>
-                                <!-- <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info"> -->
-                                <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
-                                    <table class="table my-0" id="dataTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Descrizione</th>
-                                                <th>Data inizio</th>
-                                                <th>Ora inizio</th>
-                                                <th>Durata</th>
-                                                <th>Comune</th>
-                                                <th>Longitudine</th>
-                                                <th>Latitudine</th>
-                                                <th>Temperatura</th>
-                                                <th>Codice GISA</th>
-                                                <th>ID</th>
-                                                <th>Gruppo</th>
-                                                <th>Stato</th>
-                                                <th>Scarica</th>
-                                                <th>Elimina</th>
-                                                
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for job in jobs %}
-                                            <tr onclick="evidenziaRiga(this)">
-                                                <td>{{ job[0] }}</td>
-                                                <td>{{ job[1] }}</td>
-                                                <td>{{ job[2] }}</td>
-                                                <td>{{ job[3] }}</td>
-                                                <td>{{ job[4] }}</td>
-                                                <td>{{ job[5] }}</td>
-                                                <td>{{ job[6] }}</td>
-                                                <td>{{ job[7] }}</td>
-                                                <td>{{ job[8] }}</td>
-                                                <td>{{ job[9] }}</td>
-                                                <td>{{ job[12] }}</td>
-
-                                                <!-- <td><input type="checkbox" class="form-check-input" style="width: 2.5em; height: 2.5em;" disabled></td> -->
-                                                <td><div id="custom-checkbox" class="custom-checkbox"></div></td>
-                                                
-                                                <!-- <form action="{{ url_for('download') }}" method="post"> -->
-                                                <td>
-                                                    <form method="post">
-                                                        <button class="btn btn-success" type="submit" name="hdownloadbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Scarica&nbsp;&nbsp;<i class="fas fa-file-download"></i>&nbsp;</button>
-                                                        <!-- <input type="hidden" name="idJOB" value="{{ job[9] }}"> -->
-                                                        <input type="hidden" name="datesim" value="{{ job[1] }}">
-                                                        <input type="hidden" name="user" value="{{ user }}">
-                                                        <input type="hidden" name="name_com" value="{{ job[4] }}">
-                                                        <input type="hidden" name="codiceGisa" value="{{ job[8] }}">
-                                                    </form>
-                                                </td>
-                                                <!-- <td>
-                                                    <form method="post">
-                                                        <input type="hidden" name="idJOB" value="{{ job[9] }}">
-                                                        <button class="btn btn-warning" type="submit" name="hshowbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Mostra&nbsp;<i class="fas fa-chalkboard-teacher"></i>&nbsp;</button>
-                                                    </form> 
-                                                </td> -->
-                                                <td>
-                                                    <form method="post">
-                                                        <button class="btn btn-danger" type="submit" name="hdeletebutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Elimina&nbsp;<i class="fas fa-eraser"></i>&nbsp;</button>
-                                                        <input type="hidden" name="idJOB" value="{{ job[9] }}">
-                                                        <input type="hidden" name="datesim" value="{{ job[1] }}">
-                                                        <input type="hidden" name="name_com" value="{{ job[4] }}">
-                                                    </form>
-                                                </td>
-                                                <td style="display: none;">{{job[10]}}</td> 
-                                                <td style="display: none;">{{job[11]}}</td>                           
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                        
-                                        <!--
-                                        <tfoot>
-                                            <tr></tr>
-                                        </tfoot>
-                                        -->
-                                    </table>
-                                    <div class="pagination">
-                                        {{ pagination.links }}
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- <form method="POST" id="searchform" class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search"> -->
+                                <div class="input-group">
+                                    <div class="col-sm-3">
+                                        <input class="bg-light form-control border-0 large" type="text" name="hsearchvalue" id="searchnamebar" placeholder="Cerca parola chiave">
                                     </div>
+                                    <!-- sotto stava in button anche : type="submit" form="searchform" -->
+                                    <button class="btn btn-primary py-0" id="searchnamebutton" name="hsearchbutton" onclick="search()"><i class="fas fa-search"></i></button>
+
+                            <!-- </form> -->
+                            <label class="form-label"></label>
+                            </div>
+                            <!-- <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info"> -->
+                            <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
+                                <table class="table my-0" id="dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Descrizione</th>
+                                            <th>Data inizio</th>
+                                            <th>Ora inizio</th>
+                                            <th>Durata</th>
+                                            <th>Comune</th>
+                                            <th>Longitudine</th>
+                                            <th>Latitudine</th>
+                                            <th>Temperatura</th>
+                                            <th>Codice GISA</th>
+                                            <th>ID</th>
+                                            <th>Gruppo</th>
+                                            <th>Stato</th>
+                                            <th>Scarica</th>
+                                            <th>Elimina</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for job in jobs %}
+                                        <tr onclick="evidenziaRiga(this)">
+                                            <td>{{ job[0] }}</td>
+                                            <td>{{ job[1] }}</td>
+                                            <td>{{ job[2] }}</td>
+                                            <td>{{ job[3] }}</td>
+                                            <td>{{ job[4] }}</td>
+                                            <td>{{ job[5] }}</td>
+                                            <td>{{ job[6] }}</td>
+                                            <td>{{ job[7] }}</td>
+                                            <td>{{ job[8] }}</td>
+                                            <td>{{ job[9] }}</td>
+                                            <td>{{ job[12] }}</td>
+
+                                            <!-- <td><input type="checkbox" class="form-check-input" style="width: 2.5em; height: 2.5em;" disabled></td> -->
+                                            <td><div id="custom-checkbox" class="custom-checkbox"></div></td>
+                                            
+                                            <!-- <form action="{{ url_for('download') }}" method="post"> -->
+                                            <td>
+                                                <form method="post">
+                                                    <button class="btn btn-success" type="submit" name="hdownloadbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Scarica&nbsp;&nbsp;<i class="fas fa-file-download"></i>&nbsp;</button>
+                                                    <!-- <input type="hidden" name="idJOB" value="{{ job[9] }}"> -->
+                                                    <input type="hidden" name="datesim" value="{{ job[1] }}">
+                                                    <input type="hidden" name="user" value="{{ user }}">
+                                                    <input type="hidden" name="name_com" value="{{ job[4] }}">
+                                                    <input type="hidden" name="codiceGisa" value="{{ job[8] }}">
+                                                </form>
+                                            </td>
+                                            <!-- <td>
+                                                <form method="post">
+                                                    <input type="hidden" name="idJOB" value="{{ job[9] }}">
+                                                    <button class="btn btn-warning" type="submit" name="hshowbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Mostra&nbsp;<i class="fas fa-chalkboard-teacher"></i>&nbsp;</button>
+                                                </form> 
+                                            </td> -->
+                                            <td>
+                                                <form method="post">
+                                                    <button class="btn btn-danger" type="submit" name="hdeletebutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Elimina&nbsp;<i class="fas fa-eraser"></i>&nbsp;</button>
+                                                    <input type="hidden" name="idJOB" value="{{ job[9] }}">
+                                                    <input type="hidden" name="datesim" value="{{ job[1] }}">
+                                                    <input type="hidden" name="name_com" value="{{ job[4] }}">
+                                                </form>
+                                            </td>
+                                            <td style="display: none;">{{job[10]}}</td> 
+                                            <td style="display: none;">{{job[11]}}</td>                           
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    
+                                    <!--
+                                    <tfoot>
+                                        <tr></tr>
+                                    </tfoot>
+                                    -->
+                                </table>
+                                <div class="pagination">
+                                    {{ pagination.links }}
                                 </div>
-                                <div class="row"> 
-                                    <div class="col-md-6 align-self-center">
-                                        <p id="dataTable_info" class="dataTables_info" role="status" aria-live="polite">{{ datainfo[0] }} - {{ datainfo[1] }} elementi di {{ datainfo[2] }} totali.</p>
-                                    </div>
+                            </div>
+                            <div class="row"> 
+                                <div class="col-md-6 align-self-center">
+                                    <p id="dataTable_info" class="dataTables_info" role="status" aria-live="polite">{{ datainfo[0] }} - {{ datainfo[1] }} elementi di {{ datainfo[2] }} totali.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-12 col-xl-12">
-                         <div class="card shadow mb-4" style="margin-left: 12px; margin-top: 20px; margin-right: 12px;">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary fw-bold m-0">Mappa interattiva</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div width="100%" style="height: 520px;" id="map"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-xl-12" style="color: var(--bs-card-bg);background: var(--bs-card-cap-bg);" id="options_map">
-                            <div class="card shadow mb-4" style="margin-left: 12px; margin-top: 9px; margin-right: 12px;">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h6 class="text-primary fw-bold m-0">Gestione simulazione e visualizzazione</h6>
-                                </div>
-                                <div class="card-body" style="height: 50%; margin-bottom: 0px;">
-                                    <input type="range" min="0" max="120" value="0" step="5" class="slider" id="myRange" list="list_values">
-                                    <p>Ora : <span id="demo"></span></p>
-                                    <p>Data : 
-                                        <select id="days_list">
-                                        </select>
-                                    </p>
-                                </div>
-        
-                                <div class="card-body">
-                                    <button class="btn btn-primary btn-sm" id="bottoneSovrapposizione" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="sovraCheck()">Evoluzione</button>
-                                    <button class="btn btn-primary btn-sm" id="buffer500mt" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="bufferCheck500mt()">Buffer 500MT</button>
-                                    <button class="btn btn-primary btn-sm" id="buffer3km" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="bufferCheck3km()">Buffer 3KM</button>
-                                    <button class="btn btn-primary btn-sm" id="buttonHighlightCommons" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="highlightsCommon()">Evidenzia comuni</button>
-                                </div> 
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-12 col-xl-12" style="color: var(--bs-card-bg);background: var(--bs-card-cap-bg);" id="options_map">
-                        <div class="card shadow mb-4" style="margin-left: 12px; margin-top: 9px; margin-right: 12px;">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="text-primary fw-bold m-0">Comuni Coinvolti</h6>
-                            </div>
-                            <div class="card-body" style="height: 50%; margin-bottom: 0px;">
-                                <ul id="commons_list">
-                                    
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <footer class="bg-white sticky-footer">
-                        <div class="container my-auto">
-                            <div class="text-center my-auto copyright"><span>Copyright © Uniparthenope 2023</span></div>
-                        </div>
-                    </footer>
-                </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
             </div>
+
+            <div class="row">
+                <div class="col-lg-12 col-xl-12">
+                        <div class="card shadow mb-4" style="margin-left: 12px; margin-top: 20px; margin-right: 12px;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="text-primary fw-bold m-0">Mappa interattiva</h6>
+                        </div>
+                        <div class="card-body">
+                            <div width="100%" style="height: 520px;" id="map"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-xl-12" style="color: var(--bs-card-bg);background: var(--bs-card-cap-bg);" id="options_map">
+                    <div class="card shadow mb-4" style="margin-left: 12px; margin-top: 9px; margin-right: 12px;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="text-primary fw-bold m-0">Gestione simulazione e visualizzazione</h6>
+                        </div>
+                        <div class="card-body" style="height: 50%; margin-bottom: 0px;">
+                            <input type="range" min="0" max="120" value="0" step="5" class="slider" id="myRange" list="list_values">
+                            <p>Ora : <span id="demo"></span></p>
+                            <p>Data : 
+                                <select id="days_list">
+                                </select>
+                            </p>
+                        </div>
+
+                        <div class="card-body">
+                            <button class="btn btn-primary btn-sm" id="bottoneSovrapposizione" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="sovraCheck()">Evoluzione</button>
+                            <button class="btn btn-primary btn-sm" id="buffer500mt" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="bufferCheck500mt()">Buffer 500MT</button>
+                            <button class="btn btn-primary btn-sm" id="buffer3km" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="bufferCheck3km()">Buffer 3KM</button>
+                            <button class="btn btn-primary btn-sm" id="buttonHighlightCommons" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;" onclick="highlightsCommon()">Evidenzia comuni</button>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+                    
+            <div class="col-lg-12 col-xl-12" style="color: var(--bs-card-bg);background: var(--bs-card-cap-bg);" id="options_map">
+                <div class="card shadow mb-4" style="margin-left: 12px; margin-top: 9px; margin-right: 12px;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="text-primary fw-bold m-0">Comuni Coinvolti</h6>
+                    </div>
+                    <div class="card-body" style="height: 50%; margin-bottom: 0px;">
+                        <ul id="commons_list">
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Uniparthenope 2025</span></div>
+                </div>
+            </footer>
+
+        </div>
+                
+        <a class="border rounded d-inline scroll-to-top" href="#page-top">
+            <i class="fas fa-angle-up"></i>
+        </a>
+                
         <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/KML.js') }}"></script>
-        <!--
-        <script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/dist/ol.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/ol@v8.2.0/source/TileWMS.js"></script>
-        <script src="http://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
-        -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> <!-- utile per la gestione della data per i file kml -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.6.0/tinycolor.min.js"></script> <!-- libreria utile per la generazione di un colore randomico in esadecimale -->
+   
+        <!-- Useful for date management for kml files. -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <!-- Useful library for generating a random color in hexadecimal. -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.6.0/tinycolor.min.js"></script> 
     
         <script>
 
@@ -335,10 +351,9 @@
 
             var slider = document.getElementById("myRange");
             var output = document.getElementById("demo");
-            //var isLock = false;
             output.innerHTML = slider.value;
 
-            // Variabili per gestire la logica dei bottoni 
+            // Variables to manage button logic.
             var attivoBuffer3km = true;
             var flag_buffer3km = false;
 
@@ -351,18 +366,18 @@
             var attivoEvidenziaComuni = true;
             var flagEvidenziaComuni = false;
 
-            // variabili per tenere traccia della lon e lat dell'attuale simulazione 
+            // Variables to keep track of the lon and lat of the current simulation.
             var var_lon, var_lat;
 
-            // Variabili per la leggenda dinamica della mappa ( sovrapposizione .kml )
+            // Variables for dynamic map legend (.kml overlay).
             var legendElement, legendControl;
             var hourToLegend, colorToLegend;
             var previous_hour = 0;
 
-            // Variabili per gestire il vector Layer dei buffer sulla mappa 
+            // Variables to manage the vector layer of buffers on the map.
             var vectorLayer_buffer500, vectorLayer_buffer3000;
 
-            // Vettore per gestire i VectorLayer dei polygon dei comuni 
+            // Vector to manage the VectorLayers of the common polygons.
             var vectorLayersCommons = [];
 
             var base_global_path = "";
@@ -388,14 +403,7 @@
             var rotateMap = new ol.interaction.DragRotateAndZoom();
             map.addInteraction(rotateMap);
 
-            
-            /*
-            slider.oninput = function() {
-                output.innerHTML = this.value / 5;
-            }
-            */
-            
-            // sezione per evidenziare le simulazioni ancora non terminate
+            // Section to highlight simulations that have not yet been completed.
             let table_body = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
 
             if( table_body.rows.length > 0 ) {
@@ -405,22 +413,9 @@
                     if( table_body.rows[i].cells[14].textContent == '0' ) {
                         console.log("sim ancora in coda");
                         table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "gray";
-                        // table_body.rows[i].classList.add("evidenziato_coda");
                     }
-                }
-
-                /*
-                for( let i=0; i<table_body.rows.length; i++ ) {
-                    if( table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor == "gray" && (table_body.rows[i].cells[14].textContent == '1') )
-                        table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor= "white";
-                        //table_body.rows[i].classList.remove("evidenziato_coda");
-                }
-                */
-
-                
+                } 
             }
-
-
 
             for(let i=0; i<table_body.rows.length; i++) {
                 
@@ -437,15 +432,14 @@
 
                             var municipality_code = feature.properties.COD_COM;
                             let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(table_body.rows[i].cells[2].textContent)).toString().padStart(2, '0') + ".kml";
-                            // let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "_" + id_workflow + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
 
-                            // check if file exists 
+                            // Check if file exists.
                             fetch(url)
                             .then(response =>{
                                 if(!response.ok) {
-                                    
+
                                     if(table_body.rows[i].cells[15].textContent == '0') {
-                                    
+        
                                         table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "gray";
                                         console.log("simulazione ancora in corso.")
                                     } else {
@@ -463,16 +457,7 @@
                     }
                 })
                 .catch()
-            
-
-
-
-
             }
-
-           
-            
-
 
             function search() {
 
@@ -507,31 +492,17 @@
 
             function changeInput() {
 
-                /*
-                if(isLock)
-                    return;
-                
-                isLock = true;
-                slider.disabled = true;
-
-                setTimeout(() => {
-                    isLock = false;
-                    slider.disabled = false;
-                }, 1000);
-                */
-
                 output.innerHTML = this.value / 5;
 
-
-                // Sezione pulizia mappa dai precedenti layer 
+                // Map cleaning section from previous layers.
                 map.removeLayer(vectorLayer_buffer3000);
                 map.removeLayer(vectorLayer_buffer500);
                 
-                // Rimuove tutti i Layer ( inerenti ai poligoni dei comuni ) dalla mappa 
+                // Removes all layers (relating to the municipality polygons) from the map.
                 for( let layer of vectorLayersCommons )
                     map.removeLayer(layer);
                 
-                // Pulizia del vettore che tiene traccia dei Layer inerenti ai poligoni dei comuni 
+                // Vector cleaning that tracks the layers related to the polygons of the municipalities.
                 vectorLayersCommons = [];
                 
                 let selected_choice = document.getElementById('days_list');
@@ -547,7 +518,7 @@
 
                 hourToLegend = parseInt(selected_hour_str);
             
-                // Crea lo stile ( cambio colore ) per le linee del .kml
+                // Create the style (color change) for the lines of the .kml
                 function changeKMLColor(feature, color) {
                     feature.setStyle(new ol.style.Style({
                         stroke: new ol.style.Stroke({
@@ -557,14 +528,11 @@
                     }));
                 }
                 
-                // let url_var =  '/static/KML/' + "{{session['user_dir_name']}}" + '-out/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
-                // let url_var = '/static/KML/out_job/' + value_without_char + 'Z' + selected_hour_str + '.kml';
-
-                // Creazione dinamica path del file kml in base ai parametri impostati dall'utente
+                // Dynamically create kml file path based on user-set parameters.
                 let url_var = base_global_path + value_without_char + "Z" + selected_hour_str + ".kml"; 
 
 
-                // Caricamento file kml in un vector-layer
+                // Loading kml file into a vector-layer.
                 let targetVectorLayer = new ol.layer.Vector({
                     source: new ol.source.Vector({
                         url: url_var,
@@ -572,19 +540,16 @@
                     })
                 });
 
-                // Aggiornamento della variabile del colore per la leggenda 
+                // Updated color variable for legend.
                 let new_color = tinycolor.random().toHexString();
                 colorToLegend = new_color;
           
 
-                // Cambio effettivo del colore alle vector features nel kml
+                // Effective color change to vector features in kml.
                 targetVectorLayer.getSource().once('change', function(event) {
                     if (targetVectorLayer.getSource().getState() === 'ready') {
                             var features = targetVectorLayer.getSource().getFeatures();
-                            // color = tinycolor.random().toHexString();
-                            // colorToLegend = color;
                             color = new_color;
-
                             // console.log("colorToLegend : ", colorToLegend);
 
                             features.forEach(function(feature) {
@@ -594,7 +559,7 @@
                     });
                     
                                 
-                // Sezione che implemente l'estrazione dei comuni basato sul .kml dell'ora selezionata 
+                // Section that implements the extraction of municipalities based on the .kml of the selected time.
                 let var_commons_list = document.getElementById('commons_list')
                 var_commons_list.textContent = '';
     
@@ -625,39 +590,39 @@
 
                     }
  
-                    // Sezione manipolazione della stringa wkt delle coordinate del box
+                    // Box coordinates wkt string manipulation section.
                     for( let elem of wkt_strings_box_extracted_commons ) {
 
                         let wktFormat = new ol.format.WKT();
                         let polygonGeometry = wktFormat.readGeometry(elem);
                         let polygonFeature = new ol.Feature(polygonGeometry);
 
-                        //  Le coordinate sono memorizzate in EPSG:4326 ( causa natura dei place di mongodb ), converto in EPSG:3857 
+                        //  The coordinates are stored in EPSG:4326 (due to the nature of mongodb places), I convert to EPSG:3857
                         polygonGeometry = polygonGeometry.transform('EPSG:4326', 'EPSG:3857');
 
                         let vectorSource = new ol.source.Vector({
                             features: [polygonFeature]
                         });
 
-                        // Crea il layer del vettore con un colore di riempimento
+                        // Create the vector layer with a fill color
                         let vectorLayer = new ol.layer.Vector({
                             source: vectorSource,
                             style: new ol.style.Style({
                                 fill: new ol.style.Fill({
-                                    color: 'rgba(255, 0, 0, 0.2)' // colore rosso con trasparenza
+                                    color: 'rgba(255, 0, 0, 0.2)'
                                 }),
                                 stroke: new ol.style.Stroke({
-                                    color: 'red', // bordi rossi
+                                    color: 'red',
                                     width: 0.5
                                 })
                             })
                         });                        
                     
                         if( flagEvidenziaComuni ) 
-                            // aggiunge i vectorLayer alla mappa
+                            // Adds vectorLayers to the map.
                             map.addLayer(vectorLayer);
                         else 
-                            // aggiunge i vectorLayer dei  polygon estratti nell'array che tiene traccia di tali layer per l'utente 
+                            // Adds the extracted polygons' vectorLayers to the array that keeps track of those layers for the user.
                             vectorLayersCommons.push(vectorLayer);
                     }
                 })
@@ -667,7 +632,7 @@
                                  
                 if(flag_sovrapposizione==false){
 
-                    // pulisce la mappa dai precedenti .kml
+                    // Cleans the map from previous .kml.
                     var layers = map.getLayers().getArray();
                     layers.forEach(function(layer) {
                     if (layer instanceof ol.layer.Vector) {
@@ -675,26 +640,25 @@
                         }
                     });
 
-                    // pulisce la leggenda dalla mappa nel caso in cui prima era 'True' la sovrapposizione
+                    // Clears the legend from the map in case the overlap was previously 'True'.
                     map.removeControl(legendControl);
 
-                    // aggiungo alla mappa il .kml ( layer ) della simulazione
+                    // Adds the simulation .kml (layer) to the map.
                     map.addLayer(targetVectorLayer); 
 
                     
 
                 } else { 
 
-                    // caso in cui l'utente torna indietro con le ora
-                    // bisogna eliminare l'ultimo layer inserito sulla mappa e nella legenda 
+                    // In case the user goes back with the time, the last layer inserted on the map and in the legend must be deleted. 
 
                     if ( (parseInt(selected_hour_str)) <= previous_hour ) {
 
-                        // rimuovo l'ultimo layer inserito 
+                        // remove the last inserted layer
                         let layers_map = map.getLayers().getArray();
                         map.removeLayer(layers_map[layers_map.length-1]);
 
-                         // rimuovo l'ultima voce della legenda 
+                        // remove the last entry in the legend 
                         let array_lines_html_string = (legendElement.innerHTML).split('\n');
                         let new_string_html = " ";
 
@@ -707,13 +671,14 @@
                         legendControl = new ol.control.Control({
                             element: legendElement
                         });
-                        // Aggiungo la legenda aggiornata alla mappa 
+
+                        // Add updated legend to map 
                         map.addControl(legendControl);
             
                         
                     } else {
                     
-                        // Aggiungo alla leggenda il campo dell'attuale ora della simulazione.
+                        // Add the current simulation time field to the legend.
                         let hour_legend = (hourToLegend.toString()).padStart(2, '0') + ':00 UTC';
                         legendElement.innerHTML = legendElement.innerHTML + ` <div><span style="background-color: ` + new_color.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend  + ` </div> \n`;
 
@@ -721,19 +686,19 @@
                             element: legendElement
                         });
 
-                        // Aggiungo la legenda aggiornata alla mappa 
+                        // Add updated legend to map. 
                         map.addControl(legendControl);
 
-                        // Aggiungo alla mappa il .kml ( layer )
+                        // Add the .kml (layer) to the map.
                         map.addLayer(targetVectorLayer);  
                         
                     }
                 }
 
-                // aggiorno l'ora precedente in base a quella selezionata 
+                // Update the previous time based on the selected time.
                 previous_hour = parseInt(hourToLegend)-1;
 
-                // Sezione controllo dei layer aggiunti sulla mappa 
+                // Control section of layers added to the map
                 if(flag_buffer3km)
                     map.addLayer(vectorLayer_buffer3000);
                 if(flag_buffer500mt)
@@ -768,12 +733,12 @@
                         <h4>Legenda</h4>
                         <div><span style="background-color: ` + colorToLegend.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend.toString() + ` </div> \n`;
 
-                    // crea un controllo personalizzato per la legenda
+                    // Create a custom control for the legend.
                     legendControl = new ol.control.Control({
                         element: legendElement
                     });
 
-                    // cggiungi il controllo della legenda alla mappa
+                    // Add map legend control.
                     map.addControl(legendControl);
 
                 }
@@ -812,12 +777,12 @@
                     });
                     circleFeature.setStyle(circleStyle);
 
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
+                    // Create an instance of ol.source.Vector to contain the circle.
                     let vectorSource = new ol.source.Vector({
                         features: [circleFeature]
                         });
 
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
+                    // Create an instance of ol.layer.Vector to display the circle on the map.
                     vectorLayer_buffer3000 = new ol.layer.Vector({
                         source: vectorSource
                         });
@@ -864,12 +829,12 @@
                     });
                     circleFeature.setStyle(circleStyle);
 
-                    // Crea un'istanza di ol.source.Vector per contenere la circonferenza
+                    // Create an instance of ol.source.Vector to contain the circle.
                     let vectorSource = new ol.source.Vector({
                         features: [circleFeature]
                         });
 
-                    // Crea un'istanza di ol.layer.Vector per visualizzare la circonferenza sulla mappa
+                    // Create an instance of ol.layer.Vector to display the circle on the map.
                     vectorLayer_buffer500 = new ol.layer.Vector({
                         source: vectorSource
                         });
@@ -896,7 +861,7 @@
                     for( let layer of vectorLayersCommons ) 
                         map.removeLayer(layer);
 
-                    // pulisce la mappa dai precedenti .kml
+                    // Cleans the map from previous .kml.
                     var layers = map.getLayers().getArray();
 
                 } else {
@@ -919,13 +884,13 @@
                 if( riga.classList.contains('evidenziato') )
                     return;
 
-                // ---------------- INIZIO SEZIONE PULIZIA MAPPA ---------------------------
+                // ---------------- START MAP CLEANING SECTION ---------------------------
 
-                // pulisce l'array dei layers ( poligoni dei places ) della simulazione precedente 
+                // Cleans the array of layers (places polygons) from the previous simulation.
                 vectorLayersCommons = [];
                 console.log("vectorLayersCommons pulito !");
 
-                // inizializza i flag per la loggica dei bottoni 
+                // Initialize flags for button logic.
                 flag_buffer3km = false;
                 attivoBuffer3km = true;
                 document.getElementById("buffer3km").classList.remove('evidenziato');
@@ -942,10 +907,10 @@
                 attivoEvidenziaComuni = true;
                 document.getElementById('buttonHighlightCommons').classList.remove('evidenziato');
 
-                // pulisce la leggenda 
+                // Cleans the legend. 
                 map.removeControl(legendControl);
 
-                // pulisce la mappa dai layers della simulazione precednete  
+                // Clears the layers map of the previous simulation.  
                 var layers = map.getLayers(); 
                 layers.forEach(function(layer) {
                 if (layer instanceof ol.layer.Vector) {
@@ -953,7 +918,7 @@
                     }
                 });
 
-                // pulisce il campo del nome dei comuni estratti dalla precedente simulazione
+                // Clears the name field of the municipalities extracted from the previous simulation.
                 var ul_common_list = document.getElementById('commons_list')
                 if( ul_common_list.children.length > 0 ) {
                     for( let i=0; i<ul_common_list.children.length; i++) {
@@ -961,28 +926,26 @@
                     }
                 }
 
-                // elimina l'evidenziato della riga da tutte le righe presenti nella tabella trannel quella corrispondente lla simulazione attuale 
+                // Removes the highlight from the row from all rows in the table except the one corresponding to the current simulation.
                 var righe = document.querySelectorAll('tr');
                 righe.forEach(function(row) {
                     row.classList.remove('evidenziato');
                 });
                 
-                // -------------------------FINE SEZIONE PULIZIA MAPPA --------------------------------------------
+                // -------------------------END OF MAP CLEANING SECTION --------------------------------------------
             
 
                 var_lon = parseFloat(riga.cells[5].textContent);
                 var_lat = parseFloat(riga.cells[6].textContent); 
                 var coordinate = ol.proj.fromLonLat([var_lon, var_lat]);
 
-                // Imposto la lon e lat del centro della simulazione 
+                // Set the lon and lat of the simulation center 
                 map.getView().setCenter(coordinate);
                 map.getView().setZoom(11);
 
 
                 let name_user = "{{session['user']}}";
                 let date_label = riga.cells[1].textContent;
-                
-                //let id_workflow = riga.cells[9].textContent;
 
                 fetch('static/centroidi_comuni/centroidi_comuni.geojson')
                 .then(response => response.json())
@@ -994,29 +957,13 @@
 
                             var municipality_code = feature.properties.COD_COM;
                             let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
-                            // let url = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "_" + id_workflow + "/" + date_label + "Z" + (parseInt(riga.cells[2].textContent)).toString().padStart(2, '0') + ".kml";
-
                             
-                            // check if file exists 
+                            // Check if file exists.
                             fetch(url)
                             .then(response =>{
-                                if(!response.ok) {
-
-                                    //riga.cells[11].querySelector('#custom-checkbox').style.backgroundColor = "red";
-                                    //return;
-                                    
-                                    //riga.classList.add('evidenziato_error');
-                                    //setTimeout(function() {
-                                    //    riga.classList.remove('evidenziato_error');
-                                    //}, 10000);
-
-                                } else {
-                                    //riga.cells[11].querySelector('#custom-checkbox').style.backgroundColor = "green";
+                                if(response.ok) 
                                     riga.classList.add('evidenziato');
-                                }
-                                
                             })
-                            
                             
                             
                             base_global_path = "/static/smoketracer/" + name_user + "/" + date_label + "_" + municipality_code + "/"
@@ -1033,7 +980,7 @@
 
                             map.addLayer(targetVectorLayer);
 
-                            // il primo plot di isolinee sarà sempre rosso 
+                            // The first plot of isolines will always be red.
                             colorToLegend = "red"
 
                             let var_commons_list = document.getElementById('commons_list')
@@ -1047,7 +994,6 @@
                                 for (let elem of data) {
                                     // console.log("Common : ", elem[1]);
                                     let newCommon = document.createElement('li');
-                                    // newCommon.textContent = elem[1].toString();
                                     newCommon.textContent = elem[1].toString();
                                     var_commons_list.appendChild(newCommon);
 
@@ -1055,23 +1001,23 @@
                                 }
 
                                
-                                // sezione  manipolazione della stringa wkt delle coordinate del box 
+                                // WKT string manipulation section of box coordinates.
                                 for( let elem of wkt_strings_box_extracted_commons) {
 
                                     let wktFormat = new ol.format.WKT();
                                     let polygonGeometry = wktFormat.readGeometry(elem);
 
-                                    // Crea una feature che rappresenta il poligono
+                                    // Creates a feature that represents the polygon.
                                     let polygonFeature = new ol.Feature(polygonGeometry);
-                                    // Le Coordinate sono memorizzate in EPSG:4326 ( causa natura dei place di mongodb ), converto in EPSG:3857 
+                                    // The coordinates are stored in EPSG:4326 (due to the nature of mongodb places), I convert to EPSG:3857. 
                                     polygonGeometry = polygonGeometry.transform('EPSG:4326', 'EPSG:3857');
 
-                                    // Crea il source per il vector layer
+                                    // Create the source for the vector layer.
                                     let vectorSource = new ol.source.Vector({
                                         features: [polygonFeature]
                                     });
 
-                                    // Crea il layer del vettore con un colore di riempimento
+                                    // Create the vector layer with a fill color
                                     let vectorLayer = new ol.layer.Vector({
                                         source: vectorSource,
                                         style: new ol.style.Style({
@@ -1085,8 +1031,7 @@
                                         })
                                     });
 
-                                    // map.addLayer(vectorLayer);
-                                    // aggiunge i vectorLayer dei  polygon estratti nell'array che tiene traccia di tali layer per l'utente 
+                                    // Adds the vector Layers of the extracted polygons to the array that keeps track of those layers for the user.
                                     vectorLayersCommons.push(vectorLayer);
                                 }
                             
