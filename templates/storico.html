@@ -11,10 +11,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/css/Login-Form-Basic-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/VentasPro-Login.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.2.4/ol.css">
     <link rel="stylesheet" href="http://unpkg.com/leaflet@1.4.0/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    
     
 
     <style>
@@ -120,7 +119,6 @@
     </style>
 </head>
 
-<!-- onload="controlKmlOnLoad()" -->
 <body id="page-top">
     <div id="wrapper">
 
@@ -152,8 +150,6 @@
         </nav>
 
         <div class="d-flex flex-column" id="content-wrapper">
-            <!-- <div id="content"> -->
-
             <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
                 <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><small class="form-text fs-4 fw-semibold" style="width: 2348.234px;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
                     <ul class="navbar-nav flex-nowrap ms-auto">
@@ -173,18 +169,15 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <!-- <form method="POST" id="searchform" class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search"> -->
-                                <div class="input-group">
-                                    <div class="col-sm-3">
-                                        <input class="bg-light form-control border-0 large" type="text" name="hsearchvalue" id="searchnamebar" placeholder="Cerca parola chiave">
-                                    </div>
-                                    <!-- sotto stava in button anche : type="submit" form="searchform" -->
-                                    <button class="btn btn-primary py-0" id="searchnamebutton" name="hsearchbutton" onclick="search()"><i class="fas fa-search"></i></button>
+                            <div class="input-group">
+                                <div class="col-sm-3">
+                                    <input class="bg-light form-control border-0 large" type="text" name="hsearchvalue" id="searchnamebar" placeholder="Cerca parola chiave">
+                                </div>
 
-                            <!-- </form> -->
-                            <label class="form-label"></label>
+                                <button class="btn btn-primary py-0" id="searchnamebutton" name="hsearchbutton" onclick="search()"><i class="fas fa-search"></i></button>
+                                <label class="form-label"></label>
                             </div>
-                            <!-- <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info"> -->
+
                             <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
                                 <table class="table my-0" id="dataTable">
                                     <thead>
@@ -208,7 +201,7 @@
                                     </thead>
                                     <tbody>
                                         {% for job in jobs %}
-                                        <tr onclick="evidenziaRiga(this)">
+                                        <tr onclick="highlightLine(this)">
                                             <td>{{ job[0] }}</td>
                                             <td>{{ job[1] }}</td>
                                             <td>{{ job[2] }}</td>
@@ -220,27 +213,17 @@
                                             <td>{{ job[8] }}</td>
                                             <td>{{ job[9] }}</td>
                                             <td>{{ job[12] }}</td>
-
-                                            <!-- <td><input type="checkbox" class="form-check-input" style="width: 2.5em; height: 2.5em;" disabled></td> -->
                                             <td><div id="custom-checkbox" class="custom-checkbox"></div></td>
-                                            
-                                            <!-- <form action="{{ url_for('download') }}" method="post"> -->
+                                        
                                             <td>
                                                 <form method="post">
                                                     <button class="btn btn-success" type="submit" name="hdownloadbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Scarica&nbsp;&nbsp;<i class="fas fa-file-download"></i>&nbsp;</button>
-                                                    <!-- <input type="hidden" name="idJOB" value="{{ job[9] }}"> -->
                                                     <input type="hidden" name="datesim" value="{{ job[1] }}">
                                                     <input type="hidden" name="user" value="{{ user }}">
                                                     <input type="hidden" name="name_com" value="{{ job[4] }}">
                                                     <input type="hidden" name="codiceGisa" value="{{ job[8] }}">
                                                 </form>
                                             </td>
-                                            <!-- <td>
-                                                <form method="post">
-                                                    <input type="hidden" name="idJOB" value="{{ job[9] }}">
-                                                    <button class="btn btn-warning" type="submit" name="hshowbutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Mostra&nbsp;<i class="fas fa-chalkboard-teacher"></i>&nbsp;</button>
-                                                </form> 
-                                            </td> -->
                                             <td>
                                                 <form method="post">
                                                     <button class="btn btn-danger" type="submit" name="hdeletebutton" style="margin-left: 2px;font-weight: bold;color: var(--bs-card-bg);">&nbsp;Elimina&nbsp;<i class="fas fa-eraser"></i>&nbsp;</button>
@@ -254,12 +237,6 @@
                                         </tr>
                                         {% endfor %}
                                     </tbody>
-                                    
-                                    <!--
-                                    <tfoot>
-                                        <tr></tr>
-                                    </tfoot>
-                                    -->
                                 </table>
                                 <div class="pagination">
                                     {{ pagination.links }}
@@ -334,7 +311,9 @@
         <a class="border rounded d-inline scroll-to-top" href="#page-top">
             <i class="fas fa-angle-up"></i>
         </a>
-                
+
+        <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/ol@v9.2.4/dist/ol.js"></script>        
         <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
@@ -438,17 +417,13 @@
                             .then(response =>{
                                 if(!response.ok) {
 
-                                    if(table_body.rows[i].cells[15].textContent == '0') {
-        
+                                    if(table_body.rows[i].cells[15].textContent == '0')
                                         table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "gray";
-                                        console.log("simulazione ancora in corso.")
-                                    } else {
+                                    else 
                                         table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "red";
-                                        console.log("simulazione non andata a buon fine.")
-                                    }
+                                       
                                 } else {
                                     table_body.rows[i].cells[11].querySelector('#custom-checkbox').style.backgroundColor = "green";
-                                    console.log("simulazione trovata.");
                                 }
                                 
                             })
@@ -752,14 +727,12 @@
                 if (attivoBuffer3km) {
                     bottone.classList.remove("evidenziato");
                     bottone.style.color = "white";
-                    console.log("BUFFER [3km] : disattivato");
                     flag_buffer3km = false;
                     map.removeLayer(vectorLayer_buffer3000);
 
                 } else {
                     bottone.classList.add("evidenziato");
                     bottone.style.color = "black";
-                    console.log("BUFFER [3km] : attivato");
                     flag_buffer3km = true;
 
                     let lon = var_lon;
@@ -788,7 +761,6 @@
                         });
 
                     map.addLayer(vectorLayer_buffer3000);
-                    console.log("BUFFER [3km] : Added to map")
 
                 }
             }
@@ -803,7 +775,7 @@
 
                     bottone.classList.remove("evidenziato");
                     bottone.style.color = "white";
-                    console.log("BUFFER [500mt] : disattivato");
+
                     flag_buffer500mt = false;
                     map.removeLayer(vectorLayer_buffer500);
 
@@ -879,7 +851,7 @@
             }
             
             
-            function evidenziaRiga(riga) {
+            function highlightLine(riga) {
 
                 if( riga.classList.contains('evidenziato') )
                     return;
@@ -888,7 +860,6 @@
 
                 // Cleans the array of layers (places polygons) from the previous simulation.
                 vectorLayersCommons = [];
-                console.log("vectorLayersCommons pulito !");
 
                 // Initialize flags for button logic.
                 flag_buffer3km = false;
@@ -990,7 +961,6 @@
                             .then(response => response.json())
                             .then(data => {
 
-                                console.log("data : ",data);
                                 for (let elem of data) {
                                     // console.log("Common : ", elem[1]);
                                     let newCommon = document.createElement('li');
