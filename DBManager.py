@@ -388,16 +388,16 @@ class DBProxy():
             jobinfo[2], # date
             jobinfo[3], # ora
             jobinfo[4], # durata
-            jobinfo[5], # comuni
+            jobinfo[5].replace("'", "''"), # comuni
             jobinfo[6], # lon
             jobinfo[7], # lat
             jobinfo[8], # temp
             jobinfo[9], # codice_GISA
             completed,
-            string_search
+            string_search.replace("'", "''")
         )
 
-        # print("[*] DBManager.py -- query_jobinfo = " + query_jobinfo, flush=True)
+        print("[*] DBManager.py -- query_jobinfo = " + query_jobinfo, flush=True)
         query_jobs = "INSERT INTO JOBS VALUES(\'{}\', \'{}\')".format(jobinfo[0], jobinfo[10])
         # print("[*] DBManager -- query_job = " clear+ query_jobs, flush=True)
         self.__db.update(query_jobs)

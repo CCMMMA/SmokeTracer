@@ -17,6 +17,7 @@
 
 <body id="page-top">
     <div id="wrapper">
+
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
             <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#"><img style="width: 32px;height: 33px;" src="static/img/Regione_Campania-logo-0A3FAC65C4-seeklogo.com.png">
                     <div class="sidebar-brand-icon rotate-n-15"></div>
@@ -34,123 +35,147 @@
                 <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
         </nav>
+
+
         <div class="d-flex flex-column" id="content-wrapper" style="width: 100%;">
-            <div id="content">
-                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
-                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><small class="form-text fs-4 fw-semibold" style="width: auto;height: auto;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
-                        <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
-                            <div class="input-group"></div>
-                        </form>
-                        <ul class="navbar-nav flex-nowrap ms-auto">
-                            <div class="d-none d-sm-block topbar-divider"></div>
-                        </ul><small class="form-text" style="margin-left: 0px;width: 250.1641px;font-weight: bold;"><h4><b>{{ user }}</b></h4></small><a href="{{ url_for('logout') }}" class="btn btn-primary">Log Out</a>
+       
+
+               
+
+                
+            <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 ml-3">
+                <div class="d-flex justify-content-center">
+                    <h4 class="m-0 fw-bold">&nbsp;Ultimo accesso : {{ last_access }}&nbsp;</h4>
+                </div>
+                
+                <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group"></div>
+                </form>
+                
+                <div class="d-flex flex-row justify-content-center align-items-center">
+                    <div class="d-none d-sm-block topbar-divider"></div>
+
+                    <div class="mb-2 mb-md-0 me-md-2">
+                        <h4 class="m-0 fw-bold">&nbsp;&nbsp;{{ user }}&nbsp;&nbsp;</h4>
                     </div>
-                </nav>
-                <div class="container-fluid">
 
-                    <h3 class="text-dark mb-4">Profilo</h3>
-                    
-                    <div class="row mb-3">
-                        <!-- <div class="col-lg-8"> -->
-                        <div class="col">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="card shadow mb-3">
-                                        <div class="card-header py-3">
-                                            <p class="text-primary m-0 fw-bold">Impostazioni utente</p>
-                                        </div>
-                                        <div class="card-body">
-                                            <form method="POST">
+                    <div class="d-none d-sm-block topbar-divider"></div>
 
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="mb-3">
-                                                            <label class="form-label" for="username"><strong>Username</strong></label>
-                                                            <small style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small>
-                                                        </div>
-                                                    </div>
-
-                                                    
-                                                    <div class="col">
-                                                        <div class="mb-3">
-                                                            <label class="form-label" for="firstname"><strong>Nome</strong></label>
-                                                            <input class="form-control" type="text" id="firstname_profile" placeholder="{{ profile[0] }}" name="firstname">
-                                                        </div>
-                                                    </div>
-
-                                                </div>
+                    <a href="{{ url_for('logout') }}" class="btn btn-primary mr-3">&nbsp;Log Out</a>
+                </div>
+            </nav>
 
 
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="mb-3">
-                                                            <label class="form-label" for="password"><strong>Password</strong></label>
-                                                            <i class="far fa-eye" id="togglePassword" onclick="show()" style="margin-left: 10px; cursor: pointer;"></i>
-                                                            <input class="form-control" type="password" id="password_profile" placeholder="Inserisci una nuova password" name="password">
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="col">
-                                                        <div class="mb3">
-                                                            <label class="form-label" for="lastname"><strong>Cognome</strong></label>
-                                                            <input class="form-control" type="text" id="lastname_profile" placeholder="{{ profile[1] }}" name="lastname">
-                                                        </div>
+            <div class="container-fluid">
+                <h3 class="text-dark mb-4">Profilo</h3>
+                <div class="row mb-3">
+                    <!-- <div class="col-lg-8"> -->
+                    <div class="col">
+                        <div class="row">
+                            <div class="col">
+                                <div class="card shadow mb-3">
+                                    <div class="card-header py-3">
+                                        <p class="text-primary m-0 fw-bold">Impostazioni utente</p>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="POST">
+
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="username"><strong>Username</strong></label>
+                                                        <small style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small>
                                                     </div>
                                                 </div>
 
-
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <div class="mb-3">
-                                                            <label class="form-label" for="telephone"><strong>Telefono</strong></label>
-                                                            <input id="password_profile-1" class="form-control" type="text" name="telephone" placeholder="{{ profile[2] }}" name="password" />
-                                                        </div>
+                                                
+                                                <div class="col">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="firstname"><strong>Nome</strong></label>
+                                                        <input class="form-control" type="text" id="firstname_profile" placeholder="{{ profile[0] }}" name="firstname">
                                                     </div>
                                                 </div>
 
-                                                <div class="row">
-                                                    <div class="col" style="margin-bottom: 40px;">
-                                                        <div class="mb-3">
-                                                            <label class="form-label" for=""><strong>Gruppi</strong></label>
-                                                            {% for group in user_groups %}
-                                                            <small class="form-text"><h5><b>{{ group[0] }}</b></h5></small>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
+                                            </div>
 
-                                                    <div class="col">
-                                                        <div class="mb-3">
-                                                            <label class="form-label" for=""><strong>Struttura</strong></label>
-                                                            <small class="form-text"><h5><b>{{ user_structure }}</b></h5></small>
-                                                        </div>
-                                                    </div>
 
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="password"><strong>Password</strong></label>
+                                                        <i class="far fa-eye" id="togglePassword" onclick="show()" style="margin-left: 10px; cursor: pointer;"></i>
+                                                        <input class="form-control" type="password" id="password_profile" placeholder="Inserisci una nuova password" name="password">
+                                                    </div>
                                                 </div>
                                                 
-                                                <div class="mb-3">
-                                                    <button class="btn btn-primary btn-sm" id="savebutton_profile" type="submit" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;">Salva Impostazioni</button>
-                                                    <p>{% for mesg in get_flashed_messages() %}
-                                                    <div class="alert {{ category }} text-center">{{ mesg }}</div>
-                                                    {% endfor %}</p>
+                                                <div class="col">
+                                                    <div class="mb3">
+                                                        <label class="form-label" for="lastname"><strong>Cognome</strong></label>
+                                                        <input class="form-control" type="text" id="lastname_profile" placeholder="{{ profile[1] }}" name="lastname">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="telephone"><strong>Telefono</strong></label>
+                                                        <input id="password_profile-1" class="form-control" type="text" name="telephone" placeholder="{{ profile[2] }}" name="password" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col" style="margin-bottom: 40px;">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for=""><strong>Gruppi</strong></label>
+                                                        {% for group in user_groups %}
+                                                        <small class="form-text"><h5><b>{{ group[0] }}</b></h5></small>
+                                                        {% endfor %}
+                                                    </div>
                                                 </div>
 
-                                            </form>
-                                        </div>
+                                                <div class="col">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for=""><strong>Struttura</strong></label>
+                                                        <small class="form-text"><h5><b>{{ user_structure }}</b></h5></small>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <button class="btn btn-primary btn-sm" id="savebutton_profile" type="submit" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;">Salva Impostazioni</button>
+                                                <p>{% for mesg in get_flashed_messages() %}
+                                                <div class="alert {{ category }} text-center">{{ mesg }}</div>
+                                                {% endfor %}</p>
+                                            </div>
+
+                                        </form>
                                     </div>
-                                    <div class="card shadow"></div>
                                 </div>
+                                <!-- <div class="card shadow"></div> -->
                             </div>
                         </div>
                     </div>
-                    <div class="card shadow mb-5"></div>
                 </div>
+
+                <div class="card shadow mb-5"></div>
+
             </div>
-            <footer class="bg-white sticky-footer">
+
+            
+            <footer class="bg-white sticky-footer mt-auto">
                 <div class="container my-auto">
-                    <div class="text-center my-auto copyright"><span>Copyright © Uniparthenope 2023</span></div>
+                    <div class="text-center my-auto copyright"><span>Copyright © Uniparthenope 2025</span></div>
                 </div>
             </footer>
-        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+
+        </div>
+        
+        <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+
     </div>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>

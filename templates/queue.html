@@ -180,11 +180,11 @@
                                                         <div class="col me-2">
                                                             <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>latitudine</span></div>
             
-                                                            <div class="input-group">
+                                                            <div class="input-group flex-nowrap">
                                                         
                                                                 <div class="input-item">
-                                                                <label for="lat_int">Gradi</label>
-                                                                <input type="number" step="any" name="lat_int" id="lat_int" min="-90" max="90" style="width: 80px;" required>
+                                                                    <label for="lat_int">Gradi</label>
+                                                                    <input type="number" step="any" name="lat_int" id="lat_int" min="-90" max="90" style="width: 80px;" required>
                                                                 </div>
                                                             
                                                             
@@ -194,18 +194,72 @@
                                                             
                                                                 
                                                                 <div class="input-item">
-                                                                <label for="lat_decimal">Decimali</label>
-                                                                <input type="number" step="any" name="lat_decimal" id="lat_decimal" min="0" style="width: 120px;" required>
+                                                                    <label for="lat_decimal">Decimali</label>
+                                                                    <input type="number" step="any" name="lat_decimal" id="lat_decimal" min="0" style="width: 120px;" required>
                                                                 </div>
                                                             
                                                             
                                                                 <div class="input-item">
-                                                                <label for="c_directions_lat">Direzione</label>
-                                                                <input list="list_c_directions_lat" name="c_directions_lat" id="c_directions_lat" style="width: 80px;" required>
-                                                                <datalist id="list_c_directions_lat">
-                                                                    <option>N</option>
-                                                                    <option>S</option>
-                                                                </datalist>
+
+                                                                    <label for="c_directions_lat">Direzione</label>
+
+                                                                    <div class="row flex-nowrap " style="margin-left: 10px;">
+                                                                        <div class="col-6 form-check">
+                                                                            <input class="form-check-input" type="radio" name="c_directions_lat" id="c_directions_lat_N" value="N">
+                                                                            <label class="form-check-label" for="c_directions_lat_N">N</label>
+                                                                        </div>
+                                                                    
+                                                                        <div class="col-6 form-check">
+                                                                            <input class="form-check-input" type="radio" name="c_directions_lat" id="c_directions_lat_S" value="S">
+                                                                            <label class="form-check-label" for="c_directions_lat_S">S</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                    
+
+
+                                                                    <!--
+                                                                    <div class="row>
+                                                                        <div class="col-6 form-check">
+                                                                            <input class="form-check-input" type="radio" name="c_directions_lat" id="c_directions_lat_N" value="N">
+                                                                            <label class="form-check-label" for="c_directions_lat_N">N</label>
+                                                                        </div>
+                                                                    
+                                                                        <div class="col-6 form-check">
+                                                                            <input class="form-check-input" type="radio" name="c_directions_lat" id="c_directions_lat_S" value="S">
+                                                                            <label class="form-check-label" for="c_directions_lat_S">S</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    -->
+                                                                    
+
+                                                                    <!--
+                                                                    <div class="row">
+
+                                                                        <div class="col-6">
+                                                                            <input type="radio" name="c_directions_lat_N" id="c_directions_lat_N" value="N">
+                                                                            <label for="c_directions_lat_N">N</label>
+                                                                        </div>
+
+                                                                        <div class="col-6">
+                                                                            <input type="radio" name="c_directions_lat_S" id="c_directions_lat_S" value="S">
+                                                                            <label for="c_directions_lat_S">S</label>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    -->
+
+                                                                    
+
+                                                                    
+                
+                                                                    <!--
+                                                                    <input list="list_c_directions_lat" name="c_directions_lat" id="c_directions_lat" style="width: 80px;" required>
+                                                                    <datalist id="list_c_directions_lat">
+                                                                        <option>N</option>
+                                                                        <option>S</option>
+                                                                    </datalist>
+                                                                    -->
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -235,8 +289,28 @@
                                                                     <label for="lon_decimal">Decimali</label>
                                                                     <input type="number" step="any" name="lon_decimal" id="lon_decimal" min="0" style="width: 120px;" required>
                                                                 </div>
+
+                                                                <div class="input-item">
+
+                                                                    <label for="c_directions_lat">Direzione</label>
+
+                                                                    <div class="row" style="margin-left: 10px;">
+                                                                        <div class="col-6 form-check">
+                                                                            <input class="form-check-input" type="radio" name="c_directions_lon" id="c_directions_lon_E" value="N">
+                                                                            <label class="form-check-label" for="c_directions_lon_E">E</label>
+                                                                        </div>
+                                                                    
+                                                                        <div class="col-6 form-check">
+                                                                            <input class="form-check-input" type="radio" name="c_directions_lon" id="c_directions_lon_O" value="S">
+                                                                            <label class="form-check-label" for="c_directions_lon_O">O</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             
-                                                                
+                                                               
+
+
+                                                                <!--
                                                                 <div class="input-item">
                                                                     <label for="c_directions_lon">Direzione</label>
                                                                     <input list="list_c_directions_lon" name="c_directions_lon" id="c_directions_lon" style="width: 80px;" required>
@@ -245,6 +319,8 @@
                                                                     <option>O</option>
                                                                     </datalist>
                                                                 </div>
+                                                                -->
+                                                            
                                                             </div>
                                                         </div>
                                                     </div>
@@ -681,14 +757,18 @@
                 document.getElementById("lat_decimal").value = lat_decimal.slice(0, 5);
 
                 if(lat_int>0)
-                    document.getElementById("c_directions_lat").value = "N";
+                    document.getElementById('c_directions_lat_N').checked = true;
+                    // document.getElementById("c_directions_lat").value = "N";
                 else
-                    documen.getElementById("c_directions_lat").value = "S";
+                    document.getElementById('c_directions_lat_S').checked = true;
+                    //documen.getElementById("c_directions_lat").value = "S";
 
                 if(lon_int>0)
-                    document.getElementById("c_directions_lon").value = "E";
+                    document.getElementById('c_directions_lon_E').checked = true;
+                    // document.getElementById("c_directions_lon").value = "E";
                 else
-                    document.getElementById("c_directions_lon").value = "O";
+                    docuemnt.getElementById('c_directions_lon_O').checked = true;
+                    //document.getElementById("c_directions_lon").value = "O";
         
                 let point = turf.point([parseFloat(lonLat[0]), parseFloat(lonLat[1])]);
 
@@ -769,6 +849,7 @@
                                 var isInside = turf.booleanPointInPolygon(point, feature.geometry);
 
                                 if (isInside) {
+                                    //console.log("comune trovto : ", feature.properties.name);
                                     document.getElementById("comune_label").value = feature.properties.name; 
                                     break;
                                   

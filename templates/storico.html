@@ -150,14 +150,29 @@
         </nav>
 
         <div class="d-flex flex-column" id="content-wrapper">
-            <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
-                <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><small class="form-text fs-4 fw-semibold" style="width: 2348.234px;">Benvenuto! La tua&nbsp;ultima visita risale al: {{ last_access }}&nbsp;</small>
-                    <ul class="navbar-nav flex-nowrap ms-auto">
-                        <div class="d-none d-sm-block topbar-divider"></div>
-                    </ul><small class="form-text" style="margin-left: 0px;width: 450.1641px; font-weight:bold"><h4><b id="name_user_label">{{ user }}</b></h4></small><a href="{{ url_for('logout') }}" class="btn btn-primary" style="white-space: nowrap; text-align: center;">Log Out</a>
+
+            <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 ml-3">
+                <div class="d-flex justify-content-center">
+                    <h4 class="m-0 fw-bold">&nbsp;Ultimo accesso : {{ last_access }}&nbsp;</h4>
+                </div>
+                
+                <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group"></div>
+                </form>
+                
+                <div class="d-flex flex-row justify-content-center align-items-center">
+                    <div class="d-none d-sm-block topbar-divider"></div>
+
+                    <div class="mb-2 mb-md-0 me-md-2">
+                        <h4 class="m-0 fw-bold">&nbsp;&nbsp;{{ user }}&nbsp;&nbsp;</h4>
+                    </div>
+
+                    <div class="d-none d-sm-block topbar-divider"></div>
+
+                    <a href="{{ url_for('logout') }}" class="btn btn-primary mr-3">&nbsp;Log Out</a>
                 </div>
             </nav>
-
+            
             <div class="container-fluid">
                 <h3 class="text-dark mb-4">Storico Simulazioni</h3>
                 <div class="card shadow" style="margin-right: auto;margin-left: 0px;">
@@ -834,7 +849,14 @@
                         map.removeLayer(layer);
 
                     // Cleans the map from previous .kml.
-                    var layers = map.getLayers().getArray();
+                    // var layers = map.getLayers().getArray();
+                    
+                    var layers = map.getLayers(); 
+                    layers.forEach(function(layer) {
+                    if (layer instanceof ol.layer.Vector) {
+                            layer.getSource().clear();
+                        }
+                    });
 
                 } else {
                 
