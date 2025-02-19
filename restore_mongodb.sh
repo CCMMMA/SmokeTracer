@@ -1,1 +1,0 @@
-mongorestore -d test-db /ccmmma-database
