@@ -5,7 +5,6 @@
 /env
 activate
 
-
 /static/img/regione.png
 /static/js/adminuntils.js
 /static/js/interattivo.js
@@ -13,6 +12,11 @@ activate
 /static/js/storico.js
 /static/js/theme.js
 
+/templates/blank.html
+/templates/redirect_to.html
+
+
+.gitignore
 backup_script.sh
 docker-compose.yml
 Dockerfile-fumi2
