@@ -12,6 +12,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/css/Login-Form-Basic-icons.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/VentasPro-Login.css') }}">
+    <style>
+        .custom-checkbox {
+            width: 2.5em;
+            height: 2.5em;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s, border 0.3s;
+        }
+    </style>
     
 </head>
 
@@ -129,10 +140,48 @@
                                             <div class="row">
                                                 <div class="col" style="margin-bottom: 40px;">
                                                     <div class="mb-3">
-                                                        <label class="form-label" for=""><strong>Gruppi</strong></label>
+
+                                                        <div class="row">
+                                                            <div class="col-6 align-items-start">
+                                                                <label class="form-label" for=""><strong>Gruppi</strong></label>
+                                                            </div>
+                                                            <div class="col-3 align-items-start">
+                                                                <label class="form-label" for=""><strong>Lettura</strong></label>
+                                                            </div>
+                                                            <div class="col-3 align-items-start">
+                                                                <label class="form-label" for=""><strong>Scrittura</strong></label>
+                                                            </div> 
+                                                        </div>
+                                                        
                                                         {% for group in user_groups %}
-                                                        <small class="form-text"><h5><b>{{ group[0] }}</b></h5></small>
+                                                        <div class="row">
+
+                                                            <div class="col-6">
+                                                                <small class="col-6 form-text"><h5><b>{{ group[0] }}</b></h5></small>
+                                                            </div>
+
+                                                            <div class="col-6">
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        {% if group[1] %}
+                                                                            <div id="custom-checkbox" class="custom-checkbox" style="background-color: green;"></div>
+                                                                        {% else %}
+                                                                            <div id="custom-checkbox" class="custom-checkbox" style="background-color: red;"></div>
+                                                                        {% endif %}
+                                                                    </div>
+
+                                                                    <div class="col-6">
+                                                                        {% if group[2] %}
+                                                                            <div id="custom-checkbox" class="custom-checkbox" style="background-color: green;"></div>
+                                                                        {% else %}
+                                                                            <div id="custom-checkbox" class="custom-checkbox" style="background-color: red;"></div>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         {% endfor %}
+                                                        
                                                     </div>
                                                 </div>
 

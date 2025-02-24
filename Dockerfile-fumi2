@@ -11,10 +11,10 @@ COPY . /home/fumi2/FUMI2
 WORKDIR /home/fumi2/FUMI2
 
 RUN mkdir /home/fumi2/.ssh/
-RUN mv id_ecdsa /home/fumi2/.ssh/
-RUN chmod 400 /home/fumi2/.ssh/id_ecdsa
-RUN mv id_ecdsa.pub /home/fumi2/.ssh/
-RUN chmod 644 /home/fumi2/.ssh/id_ecdsa.pub
+RUN mv id_rsa /home/fumi2/.ssh/
+RUN chmod 400 /home/fumi2/.ssh/id_rsa
+RUN mv id_rsa.pub /home/fumi2/.ssh/
+RUN chmod 644 /home/fumi2/.ssh/id_rsa.pub
 
 # RUN mv known_hosts /home/fumi2/.ssh/
 # RUN chmod 644 /home/fumi2/.ssh/known_hosts
@@ -27,7 +27,6 @@ RUN apt-get update && apt-get install -y expect && apt-get install -y vim
 RUN pip3 install -r requirements.txt
 RUN chmod o+x RequestManager.py
 RUN chown -R fumi2:fumi2 /home/fumi2
-
 
 ENTRYPOINT [ "python3", "/home/fumi2/FUMI2/RequestManager.py"]
 

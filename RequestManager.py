@@ -432,7 +432,30 @@ def profilo(alert_category=""):
     # session["searchval"] = ""
     last_access=db.get_last_access(user)
     profile=db.get_profile(user)
+
     user_groups = db.get_groups_user(user)
+    print(f"user_groups : {user_groups}", flush=True)
+
+    permissions_of_groups = []
+
+
+
+    for group in user_groups:
+        permissions_of_groups.append(db.get_permission_of_group(user, group[0]))
+
+    print(f"permissions_of_groups : {permissions_of_groups}", flush=True)
+
+    new_user_groups = []
+    
+    for group, permission in zip(user_groups, permissions_of_groups):
+        group = group + (permission[0])
+        new_user_groups.append(group)
+    
+    user_groups = new_user_groups
+
+    print(f"user_groups : {user_groups}", flush=True)
+        
+
     category = alert_category
     all_users = db.fetch_users();
     user_structure = ""

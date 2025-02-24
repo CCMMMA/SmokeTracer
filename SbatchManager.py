@@ -83,6 +83,8 @@ class SbatchManager():
         subprocess.run(['mkdir', '{}/tmp/{}'.format(script_path, user)])
 
         var_millis = millis
+
+        # time.sleep(5)
         
         with open('tmp/{}/out_from_job_{}_runcmd_{}.txt'.format(user, user, var_millis), 'w') as f:
             subprocess.Popen(

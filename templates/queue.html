@@ -594,10 +594,13 @@
                     console.log("response status queue : ", data)
 
                     for(let i=0; i<tot_jobs; i++) {
+
                         let selected_row = tbody.rows[i];
                         let workflow = ['calmet', 'calpost', 'calpufff', 'calwrff', 'ctgproc', 'dst', 'lnd2', 'makegeo', 'terrel', 'wrf2calwrf', 'www']
 
                         for(let j=10; j<21; j++) {
+                            
+                           
                             if(!selected_row.cells[j]){
                                 selected_row.insertCell(j).textContent = data[i][0][workflow[j-10]]
                             } else {
@@ -614,6 +617,7 @@
                                 selected_row.cells[j].style.color = 'green';
                             }
                         }
+
                         
                         if(!selected_row.cells[21]) {
                             selected_row.insertCell(21).innerHTML = "<button class='btn btn-secondary btn-small' style='margin-left: 8px; font-weight: bold;width: auto;height: auto;' onclick='link_to_storico()'>Vai</button>";

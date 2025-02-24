@@ -488,9 +488,18 @@
                 map.removeLayer(vectorLayer_buffer3000);
                 map.removeLayer(vectorLayer_buffer500);
                 
-                // Removes all layers (relating to the municipality polygons) from the map.
+                /*
+                console.log("-----------------------------------------------");
+                console.log("Vector layers size : ", vectorLayersCommons.length);
                 for( let layer of vectorLayersCommons )
+                    console.log(" layer : ", layer);
+                console.log("-----------------------------------------------");
+                */
+
+                // Removes all layers (relating to the municipality polygons) from the map.
+                for( let layer of vectorLayersCommons ) 
                     map.removeLayer(layer);
+                
                 
                 // Vector cleaning that tracks the layers related to the polygons of the municipalities.
                 vectorLayersCommons = [];
@@ -608,10 +617,14 @@
                             })
                         });                        
                     
-                        if( flagEvidenziaComuni ) 
+                        if( flagEvidenziaComuni )
                             // Adds vectorLayers to the map.
                             map.addLayer(vectorLayer);
                         else 
+
+                            for(let layer in vectorLayersCommons)
+                                map.removeLayer(layer);
+                            
                             // Adds the extracted polygons' vectorLayers to the array that keeps track of those layers for the user.
                             vectorLayersCommons.push(vectorLayer);
                     }
@@ -619,9 +632,17 @@
                 .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
                 
                 
-                                 
+         
+              
                 if(flag_sovrapposizione==false){
 
+                    
+                    for(let layer in vectorLayersCommons)
+                        map.removeLayer(layer);
+
+                    vectorLayersCommons = [];
+
+                    
                     // Cleans the map from previous .kml.
                     var layers = map.getLayers().getArray();
                     layers.forEach(function(layer) {
@@ -629,6 +650,7 @@
                             layer.getSource().clear();
                         }
                     });
+                    
 
                     // Clears the legend from the map in case the overlap was previously 'True'.
                     map.removeControl(legendControl);
@@ -688,11 +710,16 @@
                 // Update the previous time based on the selected time.
                 previous_hour = parseInt(hourToLegend)-1;
 
+
                 // Control section of layers added to the map
                 if(flag_buffer3km)
                     map.addLayer(vectorLayer_buffer3000);
                 if(flag_buffer500mt)
                     map.addLayer(vectorLayer_buffer500);
+                
+
+                
+                
             }
 
 
@@ -845,18 +872,12 @@
                     //console.log("Highlights Commons : disattivato");
                     flagEvidenziaComuni = false;
 
+                    
                     for( let layer of vectorLayersCommons ) 
                         map.removeLayer(layer);
-
-                    // Cleans the map from previous .kml.
-                    // var layers = map.getLayers().getArray();
                     
-                    var layers = map.getLayers(); 
-                    layers.forEach(function(layer) {
-                    if (layer instanceof ol.layer.Vector) {
-                            layer.getSource().clear();
-                        }
-                    });
+                    
+                    
 
                 } else {
                 
@@ -880,6 +901,8 @@
 
                 // ---------------- START MAP CLEANING SECTION ---------------------------
 
+                document.getElementById('myRange').style.backgroundColor = "#d3d3d3";
+
                 // Cleans the array of layers (places polygons) from the previous simulation.
                 vectorLayersCommons = [];
 
@@ -887,18 +910,22 @@
                 flag_buffer3km = false;
                 attivoBuffer3km = true;
                 document.getElementById("buffer3km").classList.remove('evidenziato');
+                document.getElementById("buffer3km").style.color = "white";
 
                 flag_buffer500mt = false;
                 attivoBuffer500mt = true;
                 document.getElementById("buffer500mt").classList.remove('evidenziato');
+                document.getElementById("buffer500mt").style.color = "white";
 
                 flag_sovrapposizione = false;
                 attivo = true;
                 document.getElementById("bottoneSovrapposizione").classList.remove('evidenziato');
+                document.getElementById("bottoneSovrapposizione").style.color = "white";
 
                 flagEvidenziaComuni = false;
                 attivoEvidenziaComuni = true;
                 document.getElementById('buttonHighlightCommons').classList.remove('evidenziato');
+                document.getElementById('buttonHighlightCommons').style.color = "white";
 
                 // Cleans the legend. 
                 map.removeControl(legendControl);
