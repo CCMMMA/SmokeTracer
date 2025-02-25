@@ -432,9 +432,10 @@ def profilo(alert_category=""):
     # session["searchval"] = ""
     last_access=db.get_last_access(user)
     profile=db.get_profile(user)
-
+    role_user = db.get_role_user(user)[0][0]
     user_groups = db.get_groups_user(user)
-    print(f"user_groups : {user_groups}", flush=True)
+    print(f"role_user : {role_user}", flush=True)
+    # print(f"user_groups : {user_groups}", flush=True)
 
     permissions_of_groups = []
 
@@ -443,7 +444,7 @@ def profilo(alert_category=""):
     for group in user_groups:
         permissions_of_groups.append(db.get_permission_of_group(user, group[0]))
 
-    print(f"permissions_of_groups : {permissions_of_groups}", flush=True)
+    # print(f"permissions_of_groups : {permissions_of_groups}", flush=True)
 
     new_user_groups = []
     
@@ -453,7 +454,7 @@ def profilo(alert_category=""):
     
     user_groups = new_user_groups
 
-    print(f"user_groups : {user_groups}", flush=True)
+    # print(f"user_groups : {user_groups}", flush=True)
         
 
     category = alert_category
@@ -489,7 +490,7 @@ def profilo(alert_category=""):
                 lastname if lastname!="" else profile[1], 
                 telephone if telephone!="" else profile[2]]
 
-    return render_template('profilo.html', user=user, last_access=last_access, profile=profile, category=category, user_groups=user_groups, user_structure=user_structure)
+    return render_template('profilo.html', user=user, last_access=last_access, profile=profile, category=category, user_groups=user_groups, user_structure=user_structure, role_user=role_user)
 
 @app.route('/storico', methods=['POST', 'GET'])
 def storico():

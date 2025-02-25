@@ -84,42 +84,34 @@
                     <div class="col">
                         <div class="row">
                             <div class="col">
+
+                                
                                 <div class="card shadow mb-3">
+                                    
                                     <div class="card-header py-3">
-                                        <p class="text-primary m-0 fw-bold">Impostazioni utente</p>
+                                        <p class="text-primary m-0 fw-bold"> Scheda Utente</p>
                                     </div>
+
                                     <div class="card-body">
-                                        <form method="POST">
+
+                                        <from method="POST">
+
+                                            <div class="row d-flex justify-content-center align-items-center">
+                                                <div class="mb-3">
+                                                    <label class="form-label" for="username"><strong>Username</strong></label>
+                                                    <small style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small>
+                                                </div>
+                                            </div>
 
                                             <div class="row">
-                                                <div class="col">
-                                                    <div class="mb-3">
-                                                        <label class="form-label" for="username"><strong>Username</strong></label>
-                                                        <small style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small>
-                                                    </div>
-                                                </div>
-
-                                                
-                                                <div class="col">
+                                                <div class="col-6">
                                                     <div class="mb-3">
                                                         <label class="form-label" for="firstname"><strong>Nome</strong></label>
                                                         <input class="form-control" type="text" id="firstname_profile" placeholder="{{ profile[0] }}" name="firstname">
                                                     </div>
                                                 </div>
 
-                                            </div>
-
-
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div class="mb-3">
-                                                        <label class="form-label" for="password"><strong>Password</strong></label>
-                                                        <i class="far fa-eye" id="togglePassword" onclick="show()" style="margin-left: 10px; cursor: pointer;"></i>
-                                                        <input class="form-control" type="password" id="password_profile" placeholder="Inserisci una nuova password" name="password">
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="col">
+                                                <div class="col-6">
                                                     <div class="mb3">
                                                         <label class="form-label" for="lastname"><strong>Cognome</strong></label>
                                                         <input class="form-control" type="text" id="lastname_profile" placeholder="{{ profile[1] }}" name="lastname">
@@ -131,69 +123,20 @@
                                             <div class="row">
                                                 <div class="col-6">
                                                     <div class="mb-3">
+                                                        <label class="form-label" for="password"><strong>Password</strong></label>
+                                                        <i class="far fa-eye" id="togglePassword" onclick="show()" style="margin-left: 10px; cursor: pointer;"></i>
+                                                        <input class="form-control" type="password" id="password_profile" placeholder="Inserisci una nuova password" name="password">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-6">
+                                                    <div class="mb-3">
                                                         <label class="form-label" for="telephone"><strong>Telefono</strong></label>
                                                         <input id="password_profile-1" class="form-control" type="text" name="telephone" placeholder="{{ profile[2] }}" name="password" />
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col" style="margin-bottom: 40px;">
-                                                    <div class="mb-3">
-
-                                                        <div class="row">
-                                                            <div class="col-6 align-items-start">
-                                                                <label class="form-label" for=""><strong>Gruppi</strong></label>
-                                                            </div>
-                                                            <div class="col-3 align-items-start">
-                                                                <label class="form-label" for=""><strong>Lettura</strong></label>
-                                                            </div>
-                                                            <div class="col-3 align-items-start">
-                                                                <label class="form-label" for=""><strong>Scrittura</strong></label>
-                                                            </div> 
-                                                        </div>
-                                                        
-                                                        {% for group in user_groups %}
-                                                        <div class="row">
-
-                                                            <div class="col-6">
-                                                                <small class="col-6 form-text"><h5><b>{{ group[0] }}</b></h5></small>
-                                                            </div>
-
-                                                            <div class="col-6">
-                                                                <div class="row">
-                                                                    <div class="col-6">
-                                                                        {% if group[1] %}
-                                                                            <div id="custom-checkbox" class="custom-checkbox" style="background-color: green;"></div>
-                                                                        {% else %}
-                                                                            <div id="custom-checkbox" class="custom-checkbox" style="background-color: red;"></div>
-                                                                        {% endif %}
-                                                                    </div>
-
-                                                                    <div class="col-6">
-                                                                        {% if group[2] %}
-                                                                            <div id="custom-checkbox" class="custom-checkbox" style="background-color: green;"></div>
-                                                                        {% else %}
-                                                                            <div id="custom-checkbox" class="custom-checkbox" style="background-color: red;"></div>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        {% endfor %}
-                                                        
-                                                    </div>
-                                                </div>
-
-                                                <div class="col">
-                                                    <div class="mb-3">
-                                                        <label class="form-label" for=""><strong>Struttura</strong></label>
-                                                        <small class="form-text"><h5><b>{{ user_structure }}</b></h5></small>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                            
                                             <div class="mb-3">
                                                 <button class="btn btn-primary btn-sm" id="savebutton_profile" type="submit" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;">Salva Impostazioni</button>
                                                 <p>{% for mesg in get_flashed_messages() %}
@@ -201,17 +144,95 @@
                                                 {% endfor %}</p>
                                             </div>
 
-                                        </form>
+                                        </from>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="card shadow mb-3">
+
+                                    <div class="card-header py-3">
+                                        <p class="text-primary m-0 fw-bold">Info Utente</p>
+                                    </div>
+
+                                    <div class="card-body">
+
+                                        <div class="row">
+
+                                            <div class="col-6">
+
+                                                <div class="mb-3">
+
+                                                    <div class="row">
+                                                        <div class="col-6 align-items-start">
+                                                            <label class="form-label" for=""><strong>Gruppi</strong></label>
+                                                        </div>
+                                                        <div class="col-3 align-items-start">
+                                                            <label class="form-label" for=""><strong>Lettura</strong></label>
+                                                        </div>
+                                                        <div class="col-3 align-items-start">
+                                                            <label class="form-label" for=""><strong>Scrittura</strong></label>
+                                                        </div> 
+                                                    </div>
+                                                    
+                                                    {% for group in user_groups %}
+                                                    <div class="row">
+
+                                                        <div class="col-6">
+                                                            <small class="col-6 form-text"><h5><b>{{ group[0] }}</b></h5></small>
+                                                        </div>
+
+                                                        <div class="col-6">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    {% if group[1] %}
+                                                                        <div id="custom-checkbox" class="custom-checkbox" style="background-color: green;"></div>
+                                                                    {% else %}
+                                                                        <div id="custom-checkbox" class="custom-checkbox" style="background-color: red;"></div>
+                                                                    {% endif %}
+                                                                </div>
+
+                                                                <div class="col-6">
+                                                                    {% if group[2] %}
+                                                                        <div id="custom-checkbox" class="custom-checkbox" style="background-color: green;"></div>
+                                                                    {% else %}
+                                                                        <div id="custom-checkbox" class="custom-checkbox" style="background-color: red;"></div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                    
+                                                </div>
+                                            </div>
+
+                                            <div class="col-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label" for=""><strong>Struttura</strong></label>
+                                                    <small class="form-text"><h5><b>{{ user_structure }}</b></h5></small>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-3">
+                                                <div class="mb-3">
+                                                    <label class="form-label" for=""><strong>Ruolo</strong></label>
+                                                    {% if role_user == "" %}
+                                                        <small class="form-text"><h5><b>Nessun ruolo associato</b></h5></small>
+                                                    {% else %}
+                                                        <small class="form-text"><h5><b> {{ role_user }} </b></h5></small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+
+                                        </div>
                                     </div>
                                 </div>
-                                <!-- <div class="card shadow"></div> -->
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="card shadow mb-5"></div>
-
             </div>
 
             
@@ -231,8 +252,10 @@
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/profilo.js') }}"></script>
     <script>
+        /*
         let user_groups = '{{user_groups}}'
         console.log("user_groups : ", user_groups[0]);
+        */
     </script>
 </body>
 

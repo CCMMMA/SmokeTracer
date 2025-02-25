@@ -286,6 +286,10 @@ class DBProxy():
         query = "SELECT * FROM USER_GROUP;"
         return self.__db.execute(query)
 
+    def get_role_user(self, user):
+        query = "SELECT RUOLOTEC FROM \"USER\" WHERE USERNAME=\'{}\' ;".format(user)
+        return self.__db.execute(query)
+
     # Simple function that delete an user given his name
     def delete_user(self, user):
 
