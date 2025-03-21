@@ -3,9 +3,13 @@ FROM python:3.9.11
 # FROM ubuntu:latest
 
 # only for test .
-RUN groupadd -g 3001 ccmmma
-RUN groupadd -g 3050 fumi2
-RUN useradd -u 3050 -g 3050 -G 3001 -m -s /bin/bash fumi2 && echo 'root:ciao' | chpasswd
+#RUN groupadd -g 3001 ccmmma
+#RUN groupadd -g 3050 fumi2
+#RUN useradd -u 3050 -g 3050 -G 3001 -m -s /bin/bash fumi2 && echo 'root:ciao' | chpasswd
+
+RUN groupadd -g 60005 ccmmma
+RUN groupadd -g 60050 fumi2 
+RUN useradd -u 60050 -g 60050 -G 60005 -m -s /bin/bash fumi2 
 
 COPY . /home/fumi2/FUMI2
 WORKDIR /home/fumi2/FUMI2
