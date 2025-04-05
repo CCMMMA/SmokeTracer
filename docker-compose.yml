@@ -18,6 +18,8 @@ services:
     container_name: container_postgres_FUMI2
     build: 
       dockerfile: Dockerfile-postgres
+    volumes:
+      - ./postgresql_data4:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=S3cret
       - POSTGRES_USER=citizix_user

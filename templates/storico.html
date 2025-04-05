@@ -79,7 +79,7 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             font-family: Arial, sans-serif;
             z-index: 1000;
-            width: 150px;  
+            width: 250px;  
         }
 
         .ol-legend h4 {
@@ -258,9 +258,36 @@
                                 </div>
                             </div>
                             <div class="row"> 
-                                <div class="col-md-6 align-self-center">
+                                <!-- <div class="col-md-6 align-self-center"> -->
+                                <div class="col-6 align-items-start">                              
                                     <p id="dataTable_info" class="dataTables_info" role="status" aria-live="polite">{{ datainfo[0] }} - {{ datainfo[1] }} elementi di {{ datainfo[2] }} totali.</p>
                                 </div>
+                                <div class="col-6">
+                                    <div class="row d-flex justify-content-between">
+
+                                        <div class="col d-flex flex-column align-items-center">
+                                            <div class="custom-checkbox" id="checkbox1" style="background-color: green;"></div>
+                                            <label for="checkbox1">Simulazione disponibile</label>
+                                        </div>
+
+                                        <div class="col d-flex flex-column align-items-center">
+                                            <div class="custom-checkbox" id="checkbox2" style="background-color: gray;"></div>
+                                            <label for="checkbox2">Simulazione in corso</label>
+                                        </div>
+
+                                        <div class="col d-flex flex-column align-items-center">
+                                            <div class="custom-checkbox" id="checkbox3" style="background-color: red;"></div>
+                                            <label for="checkbox3">Simulazione fallita</label>
+                                        </div>
+
+
+
+
+                                       
+                                    </div>
+                                </div>
+                                
+                                
                             </div>
                         </div>
                     </div>
@@ -286,6 +313,15 @@
                         <div class="card-body" style="height: 50%; margin-bottom: 0px;">
                             <input type="range" min="0" max="120" value="0" step="5" class="slider" id="myRange" list="list_values">
                             <p>Ora : <span id="demo"></span></p>
+                            <div class="row d-flex justify-content-start mb-3 mt-3 ml-0 mr-0">
+                                
+                                <div class="col-1">
+                                    <button class="btn btn-primary btn-sm" id="back_button" onclick="back_logic_button()"> -1 h </button>
+                                </div>
+                                <div class="col-1">
+                                    <button class="btn btn-primary btn-sm" id="forward_button" onclick="forward_logic_button()"> +1 h </button>
+                                </div>
+                            </div>
                             <p>Data : 
                                 <select id="days_list">
                                 </select>
@@ -373,6 +409,10 @@
 
             // Vector to manage the VectorLayers of the common polygons.
             var vectorLayersCommons = [];
+
+            // Vector useful to memorized the colors of .kml
+            var vector_colors = [];
+            var index_colors = -1;
 
             var base_global_path = "";
 
@@ -482,33 +522,30 @@
 
             function changeInput() {
 
+                
+                // Update the time label
                 output.innerHTML = this.value / 5;
 
                 // Map cleaning section from previous layers.
                 map.removeLayer(vectorLayer_buffer3000);
                 map.removeLayer(vectorLayer_buffer500);
                 
-                /*
-                console.log("-----------------------------------------------");
-                console.log("Vector layers size : ", vectorLayersCommons.length);
-                for( let layer of vectorLayersCommons )
-                    console.log(" layer : ", layer);
-                console.log("-----------------------------------------------");
-                */
 
                 // Removes all layers (relating to the municipality polygons) from the map.
                 for( let layer of vectorLayersCommons ) 
                     map.removeLayer(layer);
                 
-                
                 // Vector cleaning that tracks the layers related to the polygons of the municipalities.
                 vectorLayersCommons = [];
                 
+
+                // Extract the day of simulation selected by the user
                 let selected_choice = document.getElementById('days_list');
                 let value_selected_choice = selected_choice.options[selected_choice.selectedIndex].value;
                 let value_without_char = value_selected_choice.replace(/-/g, "");
 
-
+                
+                // Extract the  hour of simulation selected by the user.
                 let selected_hour = slider.value / 5;
                 let selected_hour_str = selected_hour.toString();
                 if( selected_hour < 10 ) {
@@ -516,7 +553,12 @@
                 }
 
                 hourToLegend = parseInt(selected_hour_str);
-            
+                
+                // Dynamically create kml file path based on user-set parameters.
+                let url_var = base_global_path + value_without_char + "Z" + selected_hour_str + ".kml"; 
+
+        
+
                 // Create the style (color change) for the lines of the .kml
                 function changeKMLColor(feature, color) {
                     feature.setStyle(new ol.style.Style({
@@ -526,9 +568,6 @@
                         })
                     }));
                 }
-                
-                // Dynamically create kml file path based on user-set parameters.
-                let url_var = base_global_path + value_without_char + "Z" + selected_hour_str + ".kml"; 
 
 
                 // Loading kml file into a vector-layer.
@@ -539,17 +578,31 @@
                     })
                 });
 
+
+                // When the user advances or decreases by an hour, for example 4 in the morning,  check if there is a color in position vector_colors[4].
+                // If there is, assign it that one otherwise create a new color and add it to the vector
+
+                let new_color=" ";
+        
+                if(vector_colors[selected_hour] != null) {
+                    new_color = vector_colors[selected_hour];
+                    
+                } else {
+                    new_color = tinycolor.random().toHexString();
+                    vector_colors.push(new_color);
+                }
+
                 // Updated color variable for legend.
-                let new_color = tinycolor.random().toHexString();
                 colorToLegend = new_color;
+                
           
 
                 // Effective color change to vector features in kml.
                 targetVectorLayer.getSource().once('change', function(event) {
                     if (targetVectorLayer.getSource().getState() === 'ready') {
+
                             var features = targetVectorLayer.getSource().getFeatures();
                             color = new_color;
-                            // console.log("colorToLegend : ", colorToLegend);
 
                             features.forEach(function(feature) {
                                 changeKMLColor(feature, color);
@@ -566,159 +619,180 @@
                 fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url_var)
                 .then(response => {
 
-                    if( response.status == 500 || response.status == 404 ) {
-                        document.getElementById('myRange').style.backgroundColor = "red";
+                    if( response.status == 500 || response.status == 404 ) {                    
+                        document.getElementById('myRange').style.backgroundColor = "red";                           
+                        
                     } else { 
                         document.getElementById('myRange').style.backgroundColor = "#d3d3d3";
+                        
                     }
 
                     return response.json();
                 }) 
                 .then(data => {
 
-                    let wkt_strings_box_extracted_commons = [];
-                    vectorLayersCommons = [];
+                    if(document.getElementById('myRange').style.backgroundColor !=  "red") {
+                   
+                        let wkt_strings_box_extracted_commons = [];
+                        vectorLayersCommons = [];
 
-                    for( let elem of data ) {
+                        for( let elem of data ) {
 
-                        let newCommon = document.createElement('li')
-                        newCommon.textContent = elem[1].toString()
-                        var_commons_list.appendChild(newCommon)
+                            let newCommon = document.createElement('li')
+                            newCommon.textContent = elem[1].toString()
+                            var_commons_list.appendChild(newCommon)
 
-                        wkt_strings_box_extracted_commons.push(elem[2]);
+                            wkt_strings_box_extracted_commons.push(elem[2]);
 
-                    }
+                        }
  
-                    // Box coordinates wkt string manipulation section.
-                    for( let elem of wkt_strings_box_extracted_commons ) {
+                        // Box coordinates wkt string manipulation section.
+                        for( let elem of wkt_strings_box_extracted_commons ) {
 
-                        let wktFormat = new ol.format.WKT();
-                        let polygonGeometry = wktFormat.readGeometry(elem);
-                        let polygonFeature = new ol.Feature(polygonGeometry);
+                            let wktFormat = new ol.format.WKT();
+                            let polygonGeometry = wktFormat.readGeometry(elem);
+                            let polygonFeature = new ol.Feature(polygonGeometry);
 
-                        //  The coordinates are stored in EPSG:4326 (due to the nature of mongodb places), I convert to EPSG:3857
-                        polygonGeometry = polygonGeometry.transform('EPSG:4326', 'EPSG:3857');
+                            //  The coordinates are stored in EPSG:4326 (due to the nature of mongodb places), I convert to EPSG:3857
+                            polygonGeometry = polygonGeometry.transform('EPSG:4326', 'EPSG:3857');
 
-                        let vectorSource = new ol.source.Vector({
-                            features: [polygonFeature]
-                        });
+                            let vectorSource = new ol.source.Vector({
+                                features: [polygonFeature]
+                            });
 
-                        // Create the vector layer with a fill color
-                        let vectorLayer = new ol.layer.Vector({
-                            source: vectorSource,
-                            style: new ol.style.Style({
-                                fill: new ol.style.Fill({
-                                    color: 'rgba(255, 0, 0, 0.2)'
-                                }),
-                                stroke: new ol.style.Stroke({
-                                    color: 'red',
-                                    width: 0.5
+                            // Create the vector layer with a fill color
+                            let vectorLayer = new ol.layer.Vector({
+                                source: vectorSource,
+                                style: new ol.style.Style({
+                                    fill: new ol.style.Fill({
+                                        color: 'rgba(255, 0, 0, 0.2)'
+                                    }),
+                                    stroke: new ol.style.Stroke({
+                                        color: 'red',
+                                        width: 0.5
+                                    })
                                 })
-                            })
-                        });                        
-                    
-                        if( flagEvidenziaComuni )
-                            // Adds vectorLayers to the map.
-                            map.addLayer(vectorLayer);
-                        else 
+                            });                        
+                        
+                            if( flagEvidenziaComuni )
+                                // Adds vectorLayers to the map.
+                                map.addLayer(vectorLayer);
+                            else 
 
-                            for(let layer in vectorLayersCommons)
-                                map.removeLayer(layer);
-                            
-                            // Adds the extracted polygons' vectorLayers to the array that keeps track of those layers for the user.
-                            vectorLayersCommons.push(vectorLayer);
+                                for(let layer in vectorLayersCommons)
+                                    map.removeLayer(layer);
+                                
+                                // Adds the extracted polygons' vectorLayers to the array that keeps track of those layers for the user.
+                                vectorLayersCommons.push(vectorLayer);
+                        }
+
                     }
                 })
                 .catch(error => console.error('Errore estrazione comuni dal file .kml : ', error))
                 
                 
+                if(document.getElementById('myRange').style.backgroundColor!="red") {
          
               
-                if(flag_sovrapposizione==false){
+                    if(flag_sovrapposizione==false){ 
 
-                    
-                    for(let layer in vectorLayersCommons)
-                        map.removeLayer(layer);
-
-                    vectorLayersCommons = [];
-
-                    
-                    // Cleans the map from previous .kml.
-                    var layers = map.getLayers().getArray();
-                    layers.forEach(function(layer) {
-                    if (layer instanceof ol.layer.Vector) {
-                            layer.getSource().clear();
-                        }
-                    });
-                    
-
-                    // Clears the legend from the map in case the overlap was previously 'True'.
-                    map.removeControl(legendControl);
-
-                    // Adds the simulation .kml (layer) to the map.
-                    map.addLayer(targetVectorLayer); 
-
-                    
-
-                } else { 
-
-                    // In case the user goes back with the time, the last layer inserted on the map and in the legend must be deleted. 
-
-                    if ( (parseInt(selected_hour_str)) <= previous_hour ) {
-
-                        // remove the last inserted layer
-                        let layers_map = map.getLayers().getArray();
-                        map.removeLayer(layers_map[layers_map.length-1]);
-
-                        // remove the last entry in the legend 
-                        let array_lines_html_string = (legendElement.innerHTML).split('\n');
-                        let new_string_html = " ";
-
-                        for(let i=0; i<array_lines_html_string.length-2; i++) {
-                            console.log("line : ", array_lines_html_string[i]);
-                            new_string_html += array_lines_html_string[i] + '\n';
-                        }
-
-                        legendElement.innerHTML = new_string_html;
-                        legendControl = new ol.control.Control({
-                            element: legendElement
-                        });
-
-                        // Add updated legend to map 
-                        map.addControl(legendControl);
-            
+                        // Case where only a .kml is shown.
                         
-                    } else {
-                    
-                        // Add the current simulation time field to the legend.
-                        let hour_legend = (hourToLegend.toString()).padStart(2, '0') + ':00 UTC';
-                        legendElement.innerHTML = legendElement.innerHTML + ` <div><span style="background-color: ` + new_color.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend  + ` </div> \n`;
+                        for(let layer in vectorLayersCommons)
+                            map.removeLayer(layer);
 
-                        legendControl = new ol.control.Control({
-                            element: legendElement
-                        });
+                        vectorLayersCommons = [];
 
-                        // Add updated legend to map. 
-                        map.addControl(legendControl);
-
-                        // Add the .kml (layer) to the map.
-                        map.addLayer(targetVectorLayer);  
                         
+                        // Cleans the map from previous .kml.
+                        var layers = map.getLayers().getArray();
+                        layers.forEach(function(layer) {
+                        if (layer instanceof ol.layer.Vector) {
+                                layer.getSource().clear();
+                            }
+                        });
+                        
+
+                        // Clears the legend from the map in case the overlap was previously 'True'.
+                        map.removeControl(legendControl);
+
+
+                        
+
+                        // Adds the simulation .kml (layer) to the map.
+                        map.addLayer(targetVectorLayer); 
+
+                        
+
+                    } else { 
+
+                        // Case where multiple overlapping .kml files are shown.
+
+                        // In case the user goes back with the time, the last layer inserted on the map and in the legend must be deleted. 
+
+                        if ( (parseInt(selected_hour_str)) <= previous_hour ) {
+
+                            // remove the last inserted layer
+                            let layers_map = map.getLayers().getArray();
+                            map.removeLayer(layers_map[layers_map.length-1]);
+
+
+                            //index_colors-=1;
+
+                            // remove the last entry in the legend 
+                            let array_lines_html_string = (legendElement.innerHTML).split('\n');
+                            let new_string_html = " ";
+
+                            for(let i=0; i<array_lines_html_string.length-2; i++) {
+                                console.log("line : ", array_lines_html_string[i]);
+                                new_string_html += array_lines_html_string[i] + '\n';
+                            }
+
+                            legendElement.innerHTML = new_string_html;
+                            legendControl = new ol.control.Control({
+                                element: legendElement
+                            });
+
+                            // Add updated legend to map 
+                            map.addControl(legendControl);
+                
+                            
+                        } else {
+                    
+                            // Add the current simulation time field to the legend.
+                            let hour_legend = (hourToLegend.toString()).padStart(2, '0') + ':00 UTC';
+                            legendElement.innerHTML = legendElement.innerHTML + ` <div><span style="background-color: ` + new_color.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend  + ' - ' +  value_selected_choice + ` </div> \n`;
+
+                            legendControl = new ol.control.Control({
+                                element: legendElement
+                            });
+
+                            // Add updated legend to map. 
+                            map.addControl(legendControl);
+
+                            //index_colors+=1;
+                        
+
+                            // Add the .kml (layer) to the map.
+                            map.addLayer(targetVectorLayer);  
+                        
+                        }
                     }
+
+                    // Update the previous time based on the selected time.
+                    previous_hour = parseInt(hourToLegend)-1;
+
+
+                    // Control section of layers added to the map
+                    if(flag_buffer3km)
+                        map.addLayer(vectorLayer_buffer3000);
+                    if(flag_buffer500mt)
+                        map.addLayer(vectorLayer_buffer500);
+                
+
                 }
-
-                // Update the previous time based on the selected time.
-                previous_hour = parseInt(hourToLegend)-1;
-
-
-                // Control section of layers added to the map
-                if(flag_buffer3km)
-                    map.addLayer(vectorLayer_buffer3000);
-                if(flag_buffer500mt)
-                    map.addLayer(vectorLayer_buffer500);
                 
 
-                
                 
             }
 
@@ -727,6 +801,9 @@
 
                 attivo = !attivo;
                 var bottone = document.getElementById("bottoneSovrapposizione");
+
+                let selected_choice = document.getElementById('days_list');
+                let value_selected_choice = selected_choice.options[selected_choice.selectedIndex].value;
 
                 if (attivo) {
 
@@ -748,7 +825,7 @@
                     legendElement.className = 'ol-legend';
                     legendElement.innerHTML = `
                         <h4>Legenda</h4>
-                        <div><span style="background-color: ` + colorToLegend.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend.toString() + ` </div> \n`;
+                        <div><span style="background-color: ` + colorToLegend.toString() + `; width: 20px; height: 20px; display: inline-block;"></span> ` + hour_legend.toString() +  ' - ' + value_selected_choice +  ` </div> \n`;
 
                     // Create a custom control for the legend.
                     legendControl = new ol.control.Control({
@@ -859,6 +936,9 @@
             }
             
             
+
+
+
             function highlightsCommon() {
 
                 attivoEvidenziaComuni = !attivoEvidenziaComuni;
@@ -872,12 +952,8 @@
                     //console.log("Highlights Commons : disattivato");
                     flagEvidenziaComuni = false;
 
-                    
                     for( let layer of vectorLayersCommons ) 
                         map.removeLayer(layer);
-                    
-                    
-                    
 
                 } else {
                 
@@ -893,7 +969,10 @@
 
             }
             
+         
             
+
+
             function highlightLine(riga) {
 
                 if( riga.classList.contains('evidenziato') )
@@ -905,6 +984,9 @@
 
                 // Cleans the array of layers (places polygons) from the previous simulation.
                 vectorLayersCommons = [];
+
+                // Cleans the vector of colors.
+                vector_colors = [];
 
                 // Initialize flags for button logic.
                 flag_buffer3km = false;
@@ -1002,6 +1084,8 @@
 
                             // The first plot of isolines will always be red.
                             colorToLegend = "red"
+                            vector_colors.push("red");
+                            
 
                             let var_commons_list = document.getElementById('commons_list')
                             let wkt_strings_box_extracted_commons = [];                         
@@ -1093,6 +1177,109 @@
                 }  
             }
         
+
+
+
+
+            //TODO: Redundant code back_logic_button and forward_logic_button. Must do a code refactoring.
+            function back_logic_button() {
+
+                let selected_choice = document.getElementById('days_list');
+                let value_selected_choice = selected_choice.options[selected_choice.selectedIndex].value;
+                let value_without_char = value_selected_choice.replace(/-/g, "");
+
+                let selected_hour = slider.value / 5 - 1;
+                let selected_hour_str = selected_hour.toString();
+                if( selected_hour < 10 ) {
+                    selected_hour_str = selected_hour_str.padStart(2, '0')
+                }
+
+                let url_var = base_global_path + value_without_char + "Z" + selected_hour_str + ".kml"; 
+
+
+                console.log("back -- url_var : ", url_var);
+
+                fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url_var)
+                .then(response => {
+
+                    if(!response.ok) {
+
+                        if(response.status == 404 || response.status == 500) {
+                            console.log("errore request : ", response.status);
+                            return;
+                        }
+                    } else {
+
+                        let actual_hour = parseInt(document.getElementById('myRange').value);
+                        let text_actual_hour = parseInt(document.getElementById('demo').textContent);
+
+                        if( text_actual_hour - 1  >= 0 ) {
+                            document.getElementById('myRange').value = actual_hour - 5;
+                            document.getElementById('demo').textContent = (text_actual_hour - 1).toString();
+
+                            const event = new Event('input');
+                            document.getElementById('myRange').dispatchEvent(event);
+                        }
+                    }
+                })
+
+                
+
+                
+            }
+
+
+
+
+
+            function forward_logic_button() {
+
+                let selected_choice = document.getElementById('days_list');
+                let value_selected_choice = selected_choice.options[selected_choice.selectedIndex].value;
+                let value_without_char = value_selected_choice.replace(/-/g, "");
+
+                let selected_hour = slider.value / 5 + 1;
+                let selected_hour_str = selected_hour.toString();
+                if( selected_hour < 10 ) {
+                    selected_hour_str = selected_hour_str.padStart(2, '0')
+                }
+
+                let url_var = base_global_path + value_without_char + "Z" + selected_hour_str + ".kml"; 
+
+   
+                fetch('extractCommons?path_kml=' + '/home/fumi2/FUMI2/' + url_var)
+                .then(response => {
+
+                    if(!response.ok) {
+
+                        if(response.status == 404 || response.status == 500) {
+
+                            console.log("errore request : ", response.status);
+                            return;
+
+                        } 
+                    } else {
+
+                        console.log("dati disponibili : ", response.status);
+
+                        let actual_hour = parseInt(document.getElementById('myRange').value);
+                        let text_actual_hour = parseInt(document.getElementById('demo').textContent);
+                        
+                        
+                        if( text_actual_hour + 1 <= 23 ) {
+                            document.getElementById('myRange').value = parseInt(actual_hour + 5);
+                            document.getElementById('demo').textContent = (text_actual_hour + 1).toString();
+
+                            
+                            const event = new Event('input');
+                            document.getElementById('myRange').dispatchEvent(event);
+                        }
+
+                    }
+
+                })
+                
+            }
         </script>
 </body>
 </html>

@@ -96,11 +96,30 @@
 
                                         <from method="POST">
 
+                                            <!--
                                             <div class="row d-flex justify-content-center align-items-center">
                                                 <div class="mb-3">
                                                     <label class="form-label" for="username"><strong>Username</strong></label>
                                                     <small style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small>
                                                 </div>
+                                            </div>
+                                            -->
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="username"><strong>Username</strong></label>
+                                                        <small style="margin-left: 0px;width: 250.1641px;"><h4><b>{{ user }}</b></h4></small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label" for="email"><strong>Email</strong></label>
+                                                        <input class="form-control" type="text" id="email_profile" placeholder="{{ profile[3] }}" name="email">
+
+                                                    </div>
+                                                </div>
+                                        
                                             </div>
 
                                             <div class="row">
@@ -138,11 +157,13 @@
                                             </div>
 
                                             <div class="mb-3">
-                                                <button class="btn btn-primary btn-sm" id="savebutton_profile" type="submit" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;">Salva Impostazioni</button>
+                                                <button class="btn btn-primary btn-sm" id="savebutton_profile" name="savebutton_profile" type="submit" style="width: 158.023px;height: 38px;font-weight: bold;background: var(--bs-teal);border-style: none;">Salva Impostazioni</button>
                                                 <p>{% for mesg in get_flashed_messages() %}
                                                 <div class="alert {{ category }} text-center">{{ mesg }}</div>
                                                 {% endfor %}</p>
                                             </div>
+
+
 
                                         </from>
 
@@ -227,8 +248,34 @@
                                             </div>
 
                                         </div>
+
                                     </div>
                                 </div>
+
+                                
+                                <div class="card shadow mb-3">
+
+                                    <div class="card-header py-3">
+                                        <p class="text-primary m-0 fw-bold">Supporto Utente</p>
+                                    </div>
+
+                                    <form method="POST">
+
+                                        <div class="card-body">
+
+                                            <div class="row align-items-center m-3">
+                                                <textarea name="text_mail_msg" placeholder="Inserisci messaggio ..." style="height: 150px;"></textarea>
+                                            </div>
+
+                                            <div class="row align-items-center m-3">
+                                                <button class="btn btn-secondary" name="contact_support" type="submit"> Invia Messaggio </button>
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+                                
+                                
                             </div>
                         </div>
                     </div>

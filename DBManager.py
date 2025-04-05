@@ -205,7 +205,7 @@ class DBProxy():
     def get_profile(self, user):
 
         # Returning 
-        profile_values = self.__db.select("FIRSTNAME, LASTNAME, TELEPHONE", "\"USER\"", "USERNAME", user)
+        profile_values = self.__db.select("FIRSTNAME, LASTNAME, TELEPHONE, EMAIL", "\"USER\"", "USERNAME", user)
         return profile_values[0]
 
     # Simple function that will return all the users in the system to be shown in the admin panel
@@ -410,6 +410,11 @@ class DBProxy():
         for group in user_groups:
             query = "INSERT INTO SIMULATION_GROUP VALUES(\'{}\', \'{}\')".format(job_id, group[0])
             self.__db.update(query)
+
+
+    def get_user_mail(self, username):
+        query = f"SELECT EMAIL FROM \"USER\" WHERE USERNAME=\'{username}\';"
+        return self.__db.execute(query)
 
     # Simple function that will insert values into the JOBIDENTIFER table 
     def new_jobidentifier(self, jobidentifier_info):

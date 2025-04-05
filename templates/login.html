@@ -100,13 +100,14 @@
                             <h5 class="card-title"> <i class="bi bi-fire"></i> &nbsp;&nbsp;LOGIN SMOKETRACER &nbsp;&nbsp;<i class="bi bi-fire"></i></h5>
                             <p>
                                 {% for mesg in get_flashed_messages() %}
-                                <div class="alert alert-danger text-center">Errore: {{ mesg }}</div>
+                                <div class="alert alert-danger text-center"> {{ mesg }}</div>
                                 {% endfor %}
                             </p>
                             <form class="text-center" method="post">
                                 <div class="mb-3"><input class="form-control form-control" type="username" id="user_login" name="username" placeholder="Username"></div>
                                 <div class="mb-3"><input class="form-control form-control" type="password" id="password_login" name="password" placeholder="Password"></div>
                                 <div class="mb-3"><button class="btn btn-primary d-block w-100" id="loginbutton_login" type="submit">Login</button></div>
+                                <div class="mb-3"><button class="btn btn-primary d-block w-100" name="resetpasswd_login" type="submit">Password Dimenticata</button></div>
                             </form>
                         </div>
                     </div>

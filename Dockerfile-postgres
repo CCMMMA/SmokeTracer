@@ -1,9 +1,18 @@
 FROM postgres:14.1
 
-RUN apt-get update
+# RUN groupadd -g 60005 ccmmma
+# RUN useradd -u 60005 -g 60005 ccmmma
 
-RUN apt-get install -y postgresql-14-postgis-3
+RUN usermod -u 60005 postgres
+RUN groupmod -g 60005 postgres
+
+RUN apt-get update && apt-get install -y postgresql-14-postgis-3
 
 COPY FUMI2.sql /docker-entrypoint-initdb.d/FUMI2.sql
- 
-CMD ["/usr/local/bin/docker-entrypoint.sh","postgres"]
+
+# RUN chown -R ccmmma:ccmmma /var/lib/postgresql/data/
+# CMD ["/usr/local/bin/docker-entrypoint.sh","postgres"]
+
+CMD ["postgres"]
+
+

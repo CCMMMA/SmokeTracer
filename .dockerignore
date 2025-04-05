@@ -28,3 +28,8 @@ script_docker_compose_rm.sh
 tmpgen_runjob.sh
 
 
+
+/postgresql_data
+/postgresql_data2
+/postgresql_data3
+

@@ -4,3 +4,9 @@
 /.gitignore
 static/KML/storage/
 secrets/
+
+
+/postgresql_data
+/postgresql_data2
+/postgresql_data3
+/postgresql_data4

@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, url_for, session, make_respon
 #from werkzeug.security import safe_join, safe_str_cmp, generate_password_hash
 from werkzeug.security import safe_join, generate_password_hash
 from flask_paginate import Pagination
-from flask_mail import Mail, Message
+# from flask_mail import Mail, Message
 from shutil import copyfile, rmtree
 from dotenv import load_dotenv
 from datetime import datetime
@@ -23,6 +23,7 @@ import threading
 import geopandas as gpd
 import io
 import subprocess
+import smtplib
 # Custom Import
 from DBManager import DBProxy, DBManager
 from SbatchManager import SbatchManager
@@ -53,14 +54,18 @@ parser = Parser()
 ncdump = NCODump()
 
 ### Configuring SMTP data and info to send mails
-app.config['MAIL_SERVER']= os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
+# app.config['MAIL_SERVER']= os.getenv('MAIL_SERVER')
+# app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
+# app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+# app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+# app.config['MAIL_USE_TLS'] = False
+# app.config['MAIL_USE_SSL'] = True
 #app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True) da decommentare quando si usa https 
-mail = Mail(app)
+# mail = Mail(app)
+
+host_mail = "mail.uniparthenope.it"
+server = smtplib.SMTP(host_mail)
+from_mail = "smoketracer@uniparthenope.it"
 
 ##############
 ## HELPERS ##
@@ -148,6 +153,8 @@ def workflowStatus(id):
 '''
 @app.route('/', methods=['POST', 'GET'])
 def login():
+
+    db = DBProxy()
     
     #if "user" in session:   
         # return redirect(url_for('dashboard'))
@@ -161,7 +168,36 @@ def login():
         if 'button_user_panel' in request.form:
            return redirect(url_for('dashboard'))
 
-        db = DBProxy()
+        if 'resetpasswd_login' in request.form:
+
+
+            username = request.form.get("username")
+
+            print(f" --- :  {username}", flush=True)
+            print(f" --- : type {type(username)}", flush=True)
+
+            
+            if(username != ""):
+                to_mail = db.get_user_mail(username)
+                link = generate_unique_link(username, "ripristino")
+                msg = f"Subject: Reset password SmokeTracer\n\nUsername : {username}\nEmail : {to_mail[0][0]}\n\nLink per reimpostare la propria password : {link}\n"
+                msg = msg.encode('utf-8')
+                response = server.sendmail(from_mail, to_mail[0][0], msg)
+
+                if not response:
+                    flash("Email di reset password inviata correttamente")
+                    print("mail inviata!", flush=True)
+                else:
+                    flash("Errore invio mail di reset password")
+                    print("errore invio mail !", flush=True)
+            else: 
+                flash("Inserire prima username e cliccare il bottone di reset password !!")
+        
+
+            return redirect(url_for('adminpane'))
+            
+
+
 
         username = request.form.get("username")
         password = request.form.get("password")
@@ -434,12 +470,12 @@ def profilo(alert_category=""):
     profile=db.get_profile(user)
     role_user = db.get_role_user(user)[0][0]
     user_groups = db.get_groups_user(user)
-    print(f"role_user : {role_user}", flush=True)
+    email = db.get_user_mail(user)
+    
+    # print(f"role_user : {role_user}", flush=True)
     # print(f"user_groups : {user_groups}", flush=True)
 
     permissions_of_groups = []
-
-
 
     for group in user_groups:
         permissions_of_groups.append(db.get_permission_of_group(user, group[0]))
@@ -455,10 +491,9 @@ def profilo(alert_category=""):
     user_groups = new_user_groups
 
     # print(f"user_groups : {user_groups}", flush=True)
-        
 
     category = alert_category
-    all_users = db.fetch_users();
+    all_users = db.fetch_users()
     user_structure = ""
 
     for user_var in all_users:
@@ -468,27 +503,59 @@ def profilo(alert_category=""):
   
     if request.method == "POST":
 
-        firstname = request.form.get("firstname")
-        lastname = request.form.get("lastname")
-        password = request.form.get("password")
-        telephone = request.form.get("telephone")
+       
 
-        hashed_password = generate_password_hash(password)
+        if "contact_support" in request.form : 
+            
+            from_mail = email[0][0]
+            to_mail = "smoketracer@uniparthenope.it"
+       
+            msg = request.form.get("text_mail_msg")
+            msg = f"Subject : Richiesta supporto utente\n\nUser : {user} \nMail : {from_mail[0][0]} \n\n" + msg + '\n'
 
-        try:
-            db.update_profile(user, firstname, lastname, hashed_password, telephone)
-        except Exception as E:
-            category = "alert-danger"
+            # print(f"from_mail : {from_mail[0][0]}", flush=True)
+            # print(f"msg user : {msg}", flush=True)
+            # print(f"to_mail : {to_mail}", flush=True)
+
+            response = server.sendmail(from_mail[0][0], to_mail, msg)
+            
+            if not response:
+                # print(f"send mail!", flush=True)
+                flash("Messaggio inviato correttamente come mail a smoketracer@uniparthenope.it")
+            else: 
+                # print(f"error send mail!", flush=True)
+                flash("Errore invio messaggio")
+
+           
+ 
+        elif "savebutton_profile" in request.form : 
+
+            firstname = request.form.get("firstname")
+            lastname = request.form.get("lastname")
+            password = request.form.get("password")
+            telephone = request.form.get("telephone")
+            email = request.form.get("email")
+
+            hashed_password = generate_password_hash(password)
+
+            try:
+                db.update_profile(user, firstname, lastname, hashed_password, telephone)
+            except Exception as E:
+                category = "alert-danger"
+                flash("Impostazioni salvate correttamente!")
+                return redirect(url_for('profilo', alert_category=category))
+
+
+            category = "alert-success"
             flash("Impostazioni salvate correttamente!")
-            return redirect(url_for('profilo', alert_category=category))
 
-
-        category = "alert-success"
-        flash("Impostazioni salvate correttamente!")
-
-        profile=[firstname if firstname!="" else profile[0], 
-                lastname if lastname!="" else profile[1], 
-                telephone if telephone!="" else profile[2]]
+            profile=[firstname if firstname!="" else profile[0], 
+                    lastname if lastname!="" else profile[1], 
+                    telephone if telephone!="" else profile[2]]
+            
+    
+    print(f"profile : {profile}", flush=True)
+    
 
     return render_template('profilo.html', user=user, last_access=last_access, profile=profile, category=category, user_groups=user_groups, user_structure=user_structure, role_user=role_user)
 
@@ -600,9 +667,14 @@ def storico():
             print("[*]  Button - coda", flush=True)
 
         elif "hdownloadbutton" in request.form:
+            codice_gisa = request.form['codiceGisa']
+            date = request.form['datesim']
+            user = request.form['user']
+            name_com = request.form['name_com']
+    
             redirect(url_for('storico'))
-            return download()
-            # return redirect(url_for('storico'))
+            return download(codice_gisa, date, user, name_com)
+
 
     page = int(request.args.get('page', 1))
     per_page = 5
@@ -765,17 +837,35 @@ def adminpane():
                 print("Error insert : {}".format(str(e)), flush=True)       
                 return redirect(url_for('adminpane'))
 
-            link = generate_unique_link(username, "registrazione")
-            msg = Message('Registrazione al sistema FUMI2', sender = 'regionefumi2@gmail.com', recipients = [email])
-            msg.body = f"Benvenuto al sistema FUMI2, {username}!. Visitare il link per completare la registrazione: {link}"
 
-            try:
-                mail.send(msg)
-            except:
+            
+            to_mail = email
+            link = generate_unique_link(username, "registrazione")
+            msg = f"Subject: Registrazione SmokeTracer\n\nBenvenuto al sistema SmokeTracer.\nIl tuo username : {username} .\nVisitare il link per completare la registrazione: {link}"
+            msg = msg.encode('utf-8')
+            response = server.sendmail(from_mail, to_mail, msg)
+
+
+            
+            
+
+            # msg = Message('Registrazione al sistema FUMI2', sender = 'regionefumi2@gmail.com', recipients = [email])
+            # msg.body = f"Benvenuto al sistema FUMI2, {username}!. Visitare il link per completare la registrazione: {link}"
+            # msg.body = f"Benvenuto al sistema SmokeTracer.\n Questo è il tuo username: {username}.\n Visitare il link per completare la registrazione: {link}."
+
+            # try:
+            #     mail.send(msg)
+            # except:
+            #     flash("Errore nell'invio della mail. Rimandarla con l'apposito pulsante per generazione password!")
+            #     return redirect(url_for('adminpane'))
+
+            if not response: 
+                flash("Utente {} registrato con successo! Link di registrazione generato.".format(username))
+            else: 
                 flash("Errore nell'invio della mail. Rimandarla con l'apposito pulsante per generazione password!")
-                return redirect(url_for('adminpane'))
+
                 
-            flash("Utente {} registrato con successo! Link di registrazione generato.".format(username))
+            # flash("Utente {} registrato con successo! Link di registrazione generato.".format(username))
             return redirect(url_for('adminpane'))
 
         elif "button_change_group" in request.form:
@@ -863,6 +953,9 @@ def adminpane():
             
             username = request.form.get("username_hidden").lower()
             is_active = db.user_active(username)
+            to_mail = db.get_user_mail(username)
+
+            
 
             link = ""
             title = ""
@@ -870,22 +963,43 @@ def adminpane():
 
             if is_active:
                 link = generate_unique_link(username, "ripristino")
-                title = "Ripristino Password FUMI2"
-                body = "Ciao {}! Hai richiesto un ripristino della password. Visitare il link per completare la procedura".format(username)
+                msg = f"Subject: Reset password SmokeTracer\n\nUsername : {username}\nEmail : {to_mail[0][0]}\n\nLink per reimpostare la propria password : {link}\n"
+                msg = msg.encode('utf-8')
+                response1 = server.sendmail(from_mail, to_mail[0][0], msg)
+
+                # title = "Ripristino Password FUMI2"
+                # body = "Ciao {}! Hai richiesto un ripristino della password. Visitare il link per completare la procedura".format(username)
             
             else:
                 link = generate_unique_link(username, "registrazione")
-                title = "Registrazione al sistema FUMI2"
-                body = "Benvenuto al sistema FUMI2, {}!. Visitare il link per completare la registrazione".format(username)
+                msg = f"Subject: Registrazione SmokeTracer\n\nBenvenuto al sistema SmokeTracer.\nIl tuo username : {username} .\nVisitare il link per completare la registrazione: {link}"
+                msg = msg.encode('utf-8')
+                response2 = server.sendmail(from_mail, to_mail, msg)
 
-            email = db.specific_select("\"USER\"", "EMAIL", "USERNAME", username)
-            msg = Message(title, sender = 'regionefumi2@gmail.com', recipients = [email])
-            msg.body = f"{body}: {link}"
+                # title = "Registrazione al sistema FUMI2"
+                # body = "Benvenuto al sistema FUMI2, {}!. Visitare il link per completare la registrazione".format(username)
 
-            try:
-                mail.send(msg)
-            except:
-                flash("Errore nell'invio della mail. Rimandarla con l'apposito pulsante per generazione password!")
+            if not response1:
+                flash("Errore invio della mail di reset password")
+            else:
+                flash("Invio mail reset password corretto")
+
+
+            if not response2:
+                flash("Errore invio della mail di registrazione")
+            else:
+                flash("Invio mail di registrazione corretto")
+
+            
+
+            #email = db.specific_select("\"USER\"", "EMAIL", "USERNAME", username)
+            #msg = Message(title, sender = 'regionefumi2@gmail.com', recipients = [email])
+            # msg.body = f"{body}: {link}"
+
+            #try:
+            #    mail.send(msg)
+            #except:
+            #    flash("Errore nell'invio della mail. Rimandarla con l'apposito pulsante per generazione password!")
                 
             flash("Ripristino password effettuato per {}".format(username))
             return redirect(url_for('adminpane'))
@@ -959,8 +1073,14 @@ def adminpane():
             pass
         
         elif "hdownloadbutton" in request.form:
-            redirect(url_for('storico'))
-            return download()
+
+            codice_gisa = request.form['codiceGisa']
+            date = request.form['datesim']
+            user = request.form['user']
+            name_com = request.form['name_com']
+        
+            redirect(url_for('adminpane'))
+            return download(codice_gisa, date, user, name_com)
 
     
         
@@ -1107,56 +1227,40 @@ def logout():
     # session["tot_jobs_queue"] = 0
     return redirect(url_for('login'))
 
-@app.route('/download', methods=['POST', 'GET'])
-def download(): 
-    if request.method == "POST":
-        db = DBProxy()
+# @app.route('/download', methods=['POST', 'GET'])
+def download(codice_gisa, date, user, name_com):
+    # if request.method == "POST":
+    db = DBProxy()
 
-        codice_gisa = request.form['codiceGisa']
-        date = request.form['datesim']
-        user = request.form['user']
-        name_com = request.form['name_com']
-        gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
-        cod_com = gdf.loc[gdf['COMUNE'] == name_com, 'COD_COM'].values
+    # codice_gisa = request.form['codiceGisa']
+    # date = request.form['datesim']
+    # user = request.form['user']
+    # name_com = request.form['name_com']
 
-        path = '/home/fumi2/FUMI2/static/smoketracer/' + user + '/' + date + '_' + cod_com[0] + '/'
-        
-        #print("path : " + str(path))
-        #print(f"date : {date}")
-        #print(f"user : {user}")
-        #print(f"name_com : {name_com}")
+    gdf = gpd.read_file('static/centroidi_comuni/centroidi_comuni.geojson')
+    cod_com = gdf.loc[gdf['COMUNE'] == name_com, 'COD_COM'].values
 
-        fileobj = io.BytesIO()
-        with zipfile.ZipFile(fileobj, 'w') as zip_file:
-            for file in os.listdir(path):
+    path = '/home/fumi2/FUMI2/static/smoketracer/' + user + '/' + date + '_' + cod_com[0] + '/'
+    
+    fileobj = io.BytesIO()
+    with zipfile.ZipFile(fileobj, 'w') as zip_file:
+        for file in os.listdir(path):            
+            if str(file) != "out":
+                file_path = safe_join(path, file)
+                new_name_file = name_com + '_' + codice_gisa + '_' + str(file).replace("['", "").replace("']", "")
+                zip_file.write(file_path, str(new_name_file).replace("['", "").replace("']", ""))
+    
+    fileobj.seek(0)
 
-                print(f"file : {file}", flush=True)
-                
-                if str(file) != "out":
-                    file_path = safe_join(path, file)
-                    
-                    new_name_file = name_com + '_' + codice_gisa + '_' + str(file).replace("['", "").replace("']", "")
+    response = make_response(fileobj.read())
+    response.headers.set('Content-Type', 'zip')
+    filename_out = name_com + '_' + codice_gisa + '_' + date
 
-                    #zip_file.write(file_path, os.path.basename(file_path))
+    filename_out = str(filename_out).replace("['", "")
+    filename_out = str(filename_out).replace("']", "")
 
-                    zip_file.write(file_path, str(new_name_file).replace("['", "").replace("']", ""))
-
-                
-        fileobj.seek(0)
-
-        response = make_response(fileobj.read())
-        response.headers.set('Content-Type', 'zip')
-        # filename_out = user + '_' + date + '_' + cod_com
-        # filename_out = user + '_' + date + '_' + name_com
-        filename_out = name_com + '_' + codice_gisa + '_' + date
-
-        filename_out = str(filename_out).replace("['", "")
-        filename_out = str(filename_out).replace("']", "")
-
-        print(f"filename_out : {filename_out}", flush=True)
-
-        response.headers.set('Content-Disposition', 'attachment', filename="{}.zip".format(filename_out))
-        return response
+    response.headers.set('Content-Disposition', 'attachment', filename="{}.zip".format(filename_out))
+    return response
         
 
 #TODO: Is safe ? 
