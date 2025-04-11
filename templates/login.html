@@ -14,54 +14,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/VentasPro-Login.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <style>
-        .left-half {
-            background-color: #3498db;
-            height: 100vh;
-        }
-        .right-half {
-            background-color: #ffffff; 
-            height: 100vh;
-        }
-
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .overlay-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .dimmed {
-            opacity: 0.3;
-        }  
-        
-        .logo-izsdm {
-            max-height: 150px;
-            min-height: 50px;
-        }
-
-        .logo-regione {
-            max-width: 150px;
-            min-width: 50px;
-            max-height: 150px;
-            min-height: 50px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/css/login.css') }}">
 
 </head>
 
@@ -143,22 +96,7 @@
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
 
-    <script>
-        var flag_admin = "{{ session['admin'] }}";
-  
-        if (flag_admin == "True") {
-            document.getElementById('left_contents').classList.add("dimmed")
-            document.getElementById('right_contents').classList.add("dimmed")
-            document.getElementById('overlay_contents').style.display = 'flex';
-        } else {
-            console.log("False");
-        }
-
-        function closeOverlay() {
-            document.querySelector('.overlay').style.display = 'none';
-            document.querySelectorAll('.dimmed').forEach(el => el.classList.remove('dimmed'));
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 </body>
 
 </html>
