@@ -579,6 +579,7 @@ def storico():
         for permission in permissions:
             if permission[0] == False:
                 count_false+=1
+
     if count_false == len(user_groups):
         # print("- simulazioni - User non ha i permessi di scrittura in nessun gruppo", flush=True)
         flash("Tale Utente non ha i permessi di lettura in nessun gruppo")
@@ -608,8 +609,6 @@ def storico():
                 if job_var[9] not in str(jobs):
                     jobs.append(job_var)
         
-        print(f"\n\n -- Jobs -- {jobs}\n\n", flush=True)
-
         '''
         if str(group[0]) != str(user):
             print("\n\n- requestmanager - group : " + str(group[0]) + " - user : \n\n" + str(user), flush=True)
@@ -629,6 +628,16 @@ def storico():
                 for jobs_var in jobs_of_user_group:
                     jobs.append(jobs_var)
         '''
+
+    print(f"\n\n --- jobs --- \n{jobs}", flush=True)
+
+    reversed_jobs = []
+    for job in reversed(jobs):
+        reversed_jobs.append(job)
+
+    print(f"\n\n --- reversed_job --- \n{reversed_jobs}", flush=True)
+
+    jobs = reversed_jobs
 
     if request.method=="POST":  
         if "hsearchbutton" in request.form:
@@ -671,9 +680,16 @@ def storico():
             date = request.form['datesim']
             user = request.form['user']
             name_com = request.form['name_com']
+            start_hour = request.form['start_hour']
+
+            if len(start_hour) < 2:
+                start_hour = start_hour.zfill(2)
+            
+            start_hour = "Z" + start_hour
+
     
             redirect(url_for('storico'))
-            return download(codice_gisa, date, user, name_com)
+            return download(codice_gisa, date, user, name_com, start_hour)
 
 
     page = int(request.args.get('page', 1))
@@ -1228,7 +1244,7 @@ def logout():
     return redirect(url_for('login'))
 
 # @app.route('/download', methods=['POST', 'GET'])
-def download(codice_gisa, date, user, name_com):
+def download(codice_gisa, date, user, name_com, start_hour):
     # if request.method == "POST":
     db = DBProxy()
 
@@ -1254,7 +1270,7 @@ def download(codice_gisa, date, user, name_com):
 
     response = make_response(fileobj.read())
     response.headers.set('Content-Type', 'zip')
-    filename_out = name_com + '_' + codice_gisa + '_' + date
+    filename_out = name_com + '_' + codice_gisa + '_' + date + start_hour
 
     filename_out = str(filename_out).replace("['", "")
     filename_out = str(filename_out).replace("']", "")
